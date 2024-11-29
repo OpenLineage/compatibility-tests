@@ -1,0 +1,13 @@
+[
+  {
+    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
+      "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t1"
+    },
+    "target": {
+      "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+    },
+    "start_time": "2024-10-17T09:18:26.825Z",
+    "end_time": "2024-10-17T09:18:26.825Z"
+  }
+]

@@ -15,7 +15,7 @@
       "path": "validation/runs/runs.json",
       "entity": "run",
       "tags": {
-        "facets": ["run_event", "processing_engine"],
+        "facets": ["run_event"],
         "min_version": "1.22.0",
         "producer": "spark"
       }

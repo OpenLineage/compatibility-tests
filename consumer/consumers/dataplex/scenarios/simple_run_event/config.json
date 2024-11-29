@@ -6,7 +6,6 @@
       "entity": "process",
       "tags": {
         "facets": ["run_event"],
-        "max_version": "1.23.0",
         "min_version": "1.22.0",
         "producer": "spark"
       }
@@ -17,7 +16,6 @@
       "entity": "run",
       "tags": {
         "facets": ["run_event"],
-        "max_version": "1.23.0",
         "min_version": "1.22.0",
         "producer": "spark"
       }
@@ -28,7 +26,16 @@
       "entity": "lineage_event",
       "tags": {
         "facets": ["run_event"],
-        "max_version": "1.23.0",
+        "min_version": "1.22.0",
+        "producer": "spark"
+      }
+    },
+    {
+      "name":"links",
+      "path": "validation/links/links.json",
+      "entity": "link",
+      "tags": {
+        "facets": ["run_event"],
         "min_version": "1.22.0",
         "producer": "spark"
       }
