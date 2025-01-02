@@ -166,7 +166,7 @@ def validate_scenario_syntax(result_events, validator, config):
     syntax_tests = {}
     for name, event in result_events.items():
         identification = get_event_identifier(event, name, config.get('patterns'))
-        logging.info(f"syntax validation for {identification}")
+        print(f"syntax validation for {identification}")
         details = validator.validate(event)
         syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
                                             'syntax', 'openlineage', details, {})
