@@ -1,21 +1,6 @@
 [
   {
     "name": "{{ match(result, 'projects/484892851355/locations/us/processes/1275f3986dc31d314011311e70aacf4a/runs/36a0836e5795f3f12b5a879be6972711/lineageEvents/.*') }}",
-    "start_time": "2024-11-26T13:05:34.626595Z",
-    "end_time": "2024-11-26T13:05:34.626595Z",
-    "links": [
-      {
-        "source": {
-          "fully_qualified_name": "bigquery:mock-project.test.upload"
-        },
-        "target": {
-          "fully_qualified_name": "bigquery:mock-project.test.upload_cp"
-        }
-      }
-    ]
-  },
-  {
-    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/1275f3986dc31d314011311e70aacf4a/runs/36a0836e5795f3f12b5a879be6972711/lineageEvents/.*') }}",
     "start_time": "2024-11-26T13:05:39.460005Z",
     "end_time": "2024-11-26T13:05:39.460005Z",
     "links": [
@@ -25,6 +10,21 @@
         },
         "target": {
           "fully_qualified_name": "gcs:mock-bucket.`result.csv`"
+        }
+      }
+    ]
+  },
+  {
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/1275f3986dc31d314011311e70aacf4a/runs/36a0836e5795f3f12b5a879be6972711/lineageEvents/.*') }}",
+    "start_time": "2024-11-26T13:05:34.626595Z",
+    "end_time": "2024-11-26T13:05:34.626595Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "bigquery:mock-project.test.upload"
+        },
+        "target": {
+          "fully_qualified_name": "bigquery:mock-project.test.upload_cp"
         }
       }
     ]
@@ -69,21 +69,6 @@
   },
   {
     "name": "{{ match(result, 'projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199/lineageEvents/.*') }}",
-    "start_time": "2024-11-26T13:10:45.874270Z",
-    "end_time": "2024-11-26T13:10:45.874270Z",
-    "links": [
-      {
-        "source": {
-          "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
-        },
-        "target": {
-          "fully_qualified_name": "filesystem:localhost.`files/temp/downloaded_file.txt`"
-        }
-      }
-    ]
-  },
-  {
-    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199/lineageEvents/.*') }}",
     "start_time": "2024-11-26T13:10:44.755944Z",
     "end_time": "2024-11-26T13:10:44.755944Z",
     "links": [
@@ -99,24 +84,9 @@
   },
   {
     "name": "{{ match(result, 'projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199/lineageEvents/.*') }}",
-    "start_time": "2024-11-26T13:10:41.007315Z",
-    "end_time": "2024-11-26T13:10:41.007315Z",
-    "links": [
-      {
-        "source": {
-          "fully_qualified_name": "filesystem:localhost.`files/temp/data.txt`"
-        },
-        "target": {
-          "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
-        }
-      }
-    ]
-  },
-  {
-    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199/lineageEvents/.*') }}",
     "start_time": "2024-11-26T13:10:46.074886Z",
     "end_time": "2024-11-26T13:10:46.074886Z",
-    "{{ unordered_list(result, 'links') }}": [
+    "links": [
       {
         "source": {
           "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
@@ -147,6 +117,36 @@
         },
         "target": {
           "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
+        }
+      }
+    ]
+  },
+  {
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199/lineageEvents/.*') }}",
+    "start_time": "2024-11-26T13:10:41.007315Z",
+    "end_time": "2024-11-26T13:10:41.007315Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "filesystem:localhost.`files/temp/data.txt`"
+        },
+        "target": {
+          "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
+        }
+      }
+    ]
+  },
+  {
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199/lineageEvents/.*') }}",
+    "start_time": "2024-11-26T13:10:45.874270Z",
+    "end_time": "2024-11-26T13:10:45.874270Z",
+    "links": [
+      {
+        "source": {
+          "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
+        },
+        "target": {
+          "fully_qualified_name": "filesystem:localhost.`files/temp/downloaded_file.txt`"
         }
       }
     ]

@@ -1,7 +1,7 @@
 [
   {
     "name": "projects/484892851355/locations/us/processes/1275f3986dc31d314011311e70aacf4a",
-    "display_name": "airflow:BQ.download",
+    "display_name": "airflow:BQ",
     "attributes": {}
   },
   {
@@ -11,7 +11,7 @@
   },
   {
     "name": "projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457",
-    "display_name": "airflow:gcs_hook.download_to_file",
+    "display_name": "airflow:gcs_hook.delete",
     "attributes": {}
   }
 ]

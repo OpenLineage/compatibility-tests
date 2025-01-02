@@ -1,9 +1,9 @@
 [
   {
     "name": "projects/484892851355/locations/us/processes/1275f3986dc31d314011311e70aacf4a/runs/36a0836e5795f3f12b5a879be6972711",
-    "display_name": "01936893-9751-7b10-a4a7-cd7454722d0f",
-    "start_time": "2024-11-26T13:05:31.724484Z",
-    "end_time": "2024-11-26T13:05:34.626595Z",
+    "display_name": "01936893-9751-7b3c-8f76-8ac6d0e5f8a3",
+    "start_time": "2024-11-26T13:05:25.547948Z",
+    "end_time": "2024-11-26T13:05:29.606867Z",
     "state": 2,
     "attributes": {}
   },
@@ -23,7 +23,7 @@
   },
   {
     "name": "projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/0eecd60ed77cc63e10fc8967bbca8199",
-    "display_name": "01936898-5bd1-70bf-9ca2-4953116e45e1",
+    "display_name": "01936898-5bd1-7e2c-a5f9-48dbad475045",
     "attributes": {
       "processing_engine": {
         "version": "3.0.0.dev0",
@@ -31,22 +31,8 @@
         "name": "Airflow"
       }
     },
-    "start_time": "2024-11-26T13:10:36.695796Z",
+    "start_time": "2024-11-26T13:10:42.323097Z",
     "end_time": "2024-11-26T13:10:46.074886Z",
     "state": 2
-  },
-  {
-    "name": "projects/484892851355/locations/us/processes/597c3efb0c87da89121db76aa9a28457/runs/ebd07ead8fa3c6d4e665c493523788b3",
-    "display_name": "01936895-90d6-7510-bf99-c2652cdd4fb5",
-    "attributes": {
-      "processing_engine": {
-        "version": "3.0.0.dev0",
-        "openlineageAdapterVersion": "1.14.0",
-        "name": "Airflow"
-      }
-    },
-    "start_time": "2024-11-26T13:07:33.476396Z",
-    "end_time": "2024-11-26T13:07:35.889172Z",
-    "state": 3
   }
 ]
