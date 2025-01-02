@@ -70,9 +70,9 @@ class OLSyntaxValidator:
 
     def validate_entity_array(self, data, entity, generic_facet_type):
         return [e.replace('$', f'$.{entity}[{ind}]')
-                    for ind, i in enumerate(data[entity])
-                        for k, v in i[generic_facet_type].items()
-                            for e in self.validate_entity({k: v}, k)]
+                for ind, i in enumerate(data[entity])
+                for k, v in (i.get(generic_facet_type).items() if generic_facet_type in i else {}.items())
+                for e in self.validate_entity({k: v}, k)]
 
     def validate_entity_map(self, data, entity):
         return [e.replace('$', f'$.{entity}') for k, v in data[entity]['facets'].items() for e in
