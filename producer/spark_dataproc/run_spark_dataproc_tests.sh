@@ -66,6 +66,58 @@ if [[ -z "$GCP_CREDENTIALS_JSON_PATH" || -z "$GCS_TRANSPORT_JAR_PATH" || -z "$OP
     usage
 fi
 
+#./run_spark_dataproc_tests.sh --gcp-credentials-json-path /path/to/credentials.json \
+#--gcs-transport-jar-path  \
+#--openlineage-directory ~/projects/OpenLineage \
+#--gcp-project my-project \
+#--gcp-region us-central1 \
+#--gcs-bucket my-bucket \
+#--dataproc-cluster-name manual-test-cluster-1
+#
+##=============================================== START CLUSTER =========================================================
+#
+#python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
+#  --project-id gcp-open-lineage-testing \
+#  --region us-west1 \
+#  --cluster-name manual-test-cluster-6 \
+#  --credentials-file /Users/tomasznazarewicz/projects/open-lineage-tests/ignored/gcp-open-lineage-testing-6d2aa0caca8e.json \
+#  --metadata "SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar,OPENLINEAGE_SPARK_URL=gs://open-lineage-e2e/jars/openlineage-spark_2.12-1.25.0-SNAPSHOT.jar" \
+#  --initialization-actions="gs://open-lineage-e2e/scripts/get_openlineage_jar.sh"
+#
+##============================================= TERMINATE CLUSTER =======================================================
+#
+#python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
+#  --project-id gcp-open-lineage-testing \
+#  --region us-west1 \
+#  --cluster-name manual-test-cluster-6 \
+#  --credentials-file  /Users/tomasznazarewicz/projects/open-lineage-tests/ignored/gcp-open-lineage-testing-6d2aa0caca8e.json
+#
+##================================================== RUN JOB ============================================================
+#
+#scenario="bigquery_input"
+#scenario_path="producer/spark_dataproc/scenarios/$scenario"
+#run_script=$(find "$scenario_path/test" -maxdepth 1 -type f -name "*.py" | head -n 1)
+#
+#echo "Running spark job for scenario: $scenario"
+#
+#python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
+#--project-id gcp-open-lineage-testing \
+#--region us-west1 \
+#--cluster-name manual-test-cluster-6 \
+#--gcs-bucket open-lineage-e2e \
+#--python-job "$run_script" \
+#--jars "gs://open-lineage-e2e/jars/transports-gcs-1.25.0-SNAPSHOT.jar" \
+#--spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
+#--output-directory "/tmp/manual-test-output/$scenario" \
+#--credentials-file "/Users/tomasznazarewicz/projects/open-lineage-tests/ignored/gcp-open-lineage-testing-6d2aa0caca8e.json" \
+#--dataproc-image-version 2.2-ubuntu22
+#
+##=======================================================================================================================
+#
+#gcloud dataproc jobs describe acee19d9-6f97-4b6f-b947-3a4366e7894e --region us-west1
+#
+#gsutil cp gs://dataproc-staging-us-west1-484892851355-unzodmbv/google-cloud-dataproc-metainfo/972858e5-565c-404e-af16-38eb4a3ec465/jobs/acee19d9-6f97-4b6f-b947-3a4366e7894e/driveroutput .
+#gsutil ls gs://dataproc-staging-us-west1-484892851355-unzodmbv/google-cloud-dataproc-metainfo/972858e5-565c-404e-af16-38eb4a3ec465/jobs/acee19d9-6f97-4b6f-b947-3a4366e7894e/driveroutput
 
 
 OL_SPEC_DIRECTORIES=$OPENLINEAGE_DIRECTORY/spec/,$OPENLINEAGE_DIRECTORY/spec/facets/,$OPENLINEAGE_DIRECTORY/spec/registry/gcp/dataproc/facets,$OPENLINEAGE_DIRECTORY/spec/registry/gcp/lineage/facets

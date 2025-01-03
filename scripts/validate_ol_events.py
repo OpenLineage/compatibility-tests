@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import os
 import re
 
@@ -68,8 +69,10 @@ class OLSyntaxValidator:
         return validation_result
 
     def validate_entity_array(self, data, entity, generic_facet_type):
-        return [e.replace('$', f'$.{entity}[{ind}]') for ind, i in enumerate(data[entity]) for k, v in
-                i[generic_facet_type].items() for e in self.validate_entity({k: v}, k)]
+        return [e.replace('$', f'$.{entity}[{ind}]')
+                for ind, i in enumerate(data[entity])
+                for k, v in (i.get(generic_facet_type).items() if generic_facet_type in i else {}.items())
+                for e in self.validate_entity({k: v}, k)]
 
     def validate_entity_map(self, data, entity):
         return [e.replace('$', f'$.{entity}') for k, v in data[entity]['facets'].items() for e in
@@ -162,8 +165,9 @@ def get_expected_events(producer_dir, component, scenario_name, config, release)
 def validate_scenario_syntax(result_events, validator, config):
     syntax_tests = {}
     for name, event in result_events.items():
-        details = validator.validate(event)
         identification = get_event_identifier(event, name, config.get('patterns'))
+        print(f"syntax validation for {identification}")
+        details = validator.validate(event)
         syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
                                             'syntax', 'openlineage', details, {})
     return syntax_tests

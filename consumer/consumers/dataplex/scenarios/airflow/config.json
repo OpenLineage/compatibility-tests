@@ -6,8 +6,7 @@
       "entity": "process",
       "tags": {
         "facets": ["run_event"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "producer": "airflow"
       }
     },
     {
@@ -16,8 +15,7 @@
       "entity": "run",
       "tags": {
         "facets": ["run_event", "processing_engine"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "producer": "airflow"
       }
     },
     {
@@ -26,8 +24,7 @@
       "entity": "lineage_event",
       "tags": {
         "facets": ["run_event"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "producer": "airflow"
       }
     },
     {
@@ -36,7 +33,6 @@
       "entity": "link",
       "tags": {
         "facets": ["run_event"],
-        "min_version": "1.22.0",
         "producer": "airflow"
       }
     }

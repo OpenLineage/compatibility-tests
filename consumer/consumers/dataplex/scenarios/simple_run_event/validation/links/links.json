@@ -1,0 +1,13 @@
+[
+  {
+    "name":  "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
+      "fully_qualified_name": "bigquery:test.table.input"
+    },
+    "target": {
+      "fully_qualified_name": "bigquery:test.table.output"
+    },
+    "start_time": "2023-04-04T13:21:16.098Z",
+    "end_time": "2023-04-04T13:21:16.098Z"
+  }
+]
