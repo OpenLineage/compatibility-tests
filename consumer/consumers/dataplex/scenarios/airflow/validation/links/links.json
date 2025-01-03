@@ -2,17 +2,6 @@
   {
     "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
     "source": {
-      "fully_qualified_name": "bigquery:mock-project.test.upload"
-    },
-    "target": {
-      "fully_qualified_name": "bigquery:mock-project.test.upload_cp"
-    },
-    "start_time": "2024-11-26T13:05:34.626595Z",
-    "end_time": "2024-11-26T13:05:34.626595Z"
-  },
-  {
-    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
-    "source": {
       "fully_qualified_name": "bigquery:mock-project.test.upload_cp"
     },
     "target": {
@@ -46,13 +35,57 @@
   {
     "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
     "source": {
+      "fully_qualified_name": "bigquery:mock-project.test.upload"
+    },
+    "target": {
+      "fully_qualified_name": "bigquery:mock-project.test.upload_cp"
+    },
+    "start_time": "2024-11-26T13:05:34.626595Z",
+    "end_time": "2024-11-26T13:05:34.626595Z"
+  },
+  {
+    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
+      "fully_qualified_name": "gcs:mock-bucket.`uploaded_data.txt`"
+    },
+    "target": {
+      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
+    },
+    "start_time": "2024-11-26T13:10:46.074886Z",
+    "end_time": "2024-11-26T13:10:46.074886Z"
+  },
+  {
+    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
+      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_data.txt`"
+    },
+    "target": {
+      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
+    },
+    "start_time": "2024-11-26T13:10:46.074886Z",
+    "end_time": "2024-11-26T13:10:46.074886Z"
+  },
+  {
+    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
+      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_file.txt`"
+    },
+    "target": {
+      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
+    },
+    "start_time": "2024-11-26T13:10:46.074886Z",
+    "end_time": "2024-11-26T13:10:46.074886Z"
+  },
+  {
+    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
       "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
     },
     "target": {
-      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_file.txt`"
+      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
     },
-    "start_time": "2024-11-26T13:10:44.750985Z",
-    "end_time": "2024-11-26T13:10:44.750985Z"
+    "start_time": "2024-11-26T13:10:46.074886Z",
+    "end_time": "2024-11-26T13:10:46.074886Z"
   },
   {
     "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
@@ -68,17 +101,6 @@
   {
     "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
     "source": {
-      "fully_qualified_name": "gcs:mock-bucket.`uploaded_data.txt`"
-    },
-    "target": {
-      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_data.txt`"
-    },
-    "start_time": "2024-11-26T13:10:44.755944Z",
-    "end_time": "2024-11-26T13:10:44.755944Z"
-  },
-  {
-    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
-    "source": {
       "fully_qualified_name": "filesystem:localhost.`files/temp/data.txt`"
     },
     "target": {
@@ -90,45 +112,23 @@
   {
     "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
     "source": {
-      "fully_qualified_name": "gcs:mock-bucket.`uploaded_data.txt`"
-    },
-    "target": {
-      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
-    },
-    "start_time": "2024-11-26T13:10:46.074886Z",
-    "end_time": "2024-11-26T13:10:46.074886Z"
-  },
-  {
-    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
-    "source": {
-      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_data.txt`"
-    },
-    "target": {
-      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
-    },
-    "start_time": "2024-11-26T13:10:46.074886Z",
-    "end_time": "2024-11-26T13:10:46.074886Z"
-  },
-  {
-    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
-    "source": {
-      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_file.txt`"
-    },
-    "target": {
-      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
-    },
-    "start_time": "2024-11-26T13:10:46.074886Z",
-    "end_time": "2024-11-26T13:10:46.074886Z"
-  },
-  {
-    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
-    "source": {
       "fully_qualified_name": "gcs:mock-bucket.`uploaded_file.txt`"
     },
     "target": {
-      "fully_qualified_name": "gcs:mock-bucket.`compose_result.txt`"
+      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_file.txt`"
     },
-    "start_time": "2024-11-26T13:10:46.074886Z",
-    "end_time": "2024-11-26T13:10:46.074886Z"
+    "start_time": "2024-11-26T13:10:44.750985Z",
+    "end_time": "2024-11-26T13:10:44.750985Z"
+  },
+  {
+    "name": "{{ match(result, 'projects/.*/locations/us/links/p:.*') }}",
+    "source": {
+      "fully_qualified_name": "gcs:mock-bucket.`uploaded_data.txt`"
+    },
+    "target": {
+      "fully_qualified_name": "gcs:mock-bucket.`copy_of_uploaded_data.txt`"
+    },
+    "start_time": "2024-11-26T13:10:44.755944Z",
+    "end_time": "2024-11-26T13:10:44.755944Z"
   }
 ]
