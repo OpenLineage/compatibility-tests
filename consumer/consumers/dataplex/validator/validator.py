@@ -72,7 +72,7 @@ class Validator:
                 report.append(
                     {"status": "SUCCESS", 'validation_type': 'syntax', 'name': e['name'], 'entity_type': 'openlineage',
                      'tags': {}})
-                time.sleep(0.1)
+                time.sleep(1)
             except InvalidArgument as exc:
                 report.append(
                     {"status": "FAILURE", 'validation_type': 'syntax', "details": exc.args[0], 'name': e['name'],

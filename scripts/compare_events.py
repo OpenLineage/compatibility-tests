@@ -16,25 +16,25 @@ log = logging.getLogger(__name__)
 
 
 def any(result: Any):
-    return "true" if result is not None else "false"
+    return "" if result is not None else "value not defined"
 
 
 def is_datetime(result: Any):
     try:
         parse(result)
-        return "true"
+        return ""
     except Exception:
         pass
-    return "false"
+    return f"'{result}' is not datetime"
 
 
 def is_uuid(result: Any):
     try:
         uuid.UUID(result)
-        return "true"
+        return ""
     except Exception:
         pass
-    return "false"
+    return f"'{result}' is not UUID"
 
 
 def env_var(var: str, default: Optional[str] = None) -> str:
@@ -52,24 +52,19 @@ def env_var(var: str, default: Optional[str] = None) -> str:
 
 
 def contains(result, pattern) -> str:
-    return "true" if pattern in result else "false"
+    return "" if pattern in result else f"'{result}' doesn't contain '{pattern}'"
 
 
 def not_match(result, pattern) -> str:
-    return "true" if re.fullmatch(pattern, result) is None else "false"
+    return "" if re.fullmatch(pattern, result) is None else f"'{result}' matches '{pattern}' but shouldn't"
 
 
 def match(result, pattern) -> str:
-    return "true" if re.fullmatch(pattern, result) is not None else "false"
+    return "" if re.fullmatch(pattern, result) is not None else f"'{result}' doesn't match '{pattern}'"
 
 
-def url_scheme_authority(url) -> str:
-    parsed = urlparse(url)
-    return f"{parsed.scheme}://{parsed.netloc}"
-
-
-def url_path(url) -> str:
-    return urlparse(url).path
+def one_of(result, *args) -> str:
+    return "" if result in args else f"'{result}' is not one of {args}"
 
 
 def key_not_defined(result, key):
@@ -89,10 +84,9 @@ def setup_jinja() -> Environment:
     env.globals["contains"] = contains
     env.globals["not_match"] = not_match
     env.globals["match"] = match
+    env.globals["one_of"] = one_of
     env.globals["key_not_defined"] = key_not_defined
     env.globals["unordered_list"] = unordered_list
-    env.filters["url_scheme_authority"] = url_scheme_authority
-    env.filters["url_path"] = url_path
     return env
 
 
@@ -131,8 +125,8 @@ def diff(expected, result, prefix="", function=None) -> list:
             # Evaluate jinja: in some cases, we want to check only if key exists, or if
             # value has the right type
             rendered = env.from_string(expected).render(result=result)
-            if not (rendered == "true" or rendered == result):
-                errors.append(f"In {prefix}: Rendered value {rendered} does not equal 'true' or {result}")
+            if len(rendered) > 0:
+                errors.append(f"In {prefix}: {rendered}")
         elif expected != result:
             errors.append(f"In {prefix}: Expected value {expected} does not equal result {result}")
     elif expected != result:

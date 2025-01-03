@@ -1,7 +1,7 @@
 [
   {
     "name": "projects/484892851355/locations/us/processes/1275f3986dc31d314011311e70aacf4a",
-    "display_name": "airflow:BQ{{ match(result, 'airflow:BQ.*') }}",
+    "display_name": "{{ match(result, 'airflow:BQ.*') }}",
     "attributes": {}
   },
   {
