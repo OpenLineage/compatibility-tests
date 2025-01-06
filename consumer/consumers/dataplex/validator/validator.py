@@ -64,7 +64,7 @@ class Validator:
             json.dump(links_state, f, indent=2)
 
     def send_ol_events(self, scenario):
-        events = self.load_ol_events(scenario)
+        events = sorted(self.load_ol_events(scenario), key=lambda d: d['name'])
         report = []
         for e in events:
             try:
