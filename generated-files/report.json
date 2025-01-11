@@ -105,7 +105,7 @@
     "scenarios": [
       {
         "name": "simple_run_event",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "simple_run_event.json",
@@ -125,7 +125,6 @@
               "facets": [
                 "run_event"
               ],
-              "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
             }
@@ -140,7 +139,6 @@
               "facets": [
                 "run_event"
               ],
-              "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
             }
@@ -155,7 +153,22 @@
               "facets": [
                 "run_event"
               ],
-              "max_version": "1.23.0",
+              "min_version": "1.22.0",
+              "producer": "spark"
+            }
+          },
+          {
+            "name": "links",
+            "status": "FAILURE",
+            "validation_type": "semantics",
+            "entity_type": "link",
+            "details": [
+              "event 2023-04-04T13:21:16.098Z, no matching entity"
+            ],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
               "min_version": "1.22.0",
               "producer": "spark"
             }
@@ -208,7 +221,6 @@
               "facets": [
                 "run_event"
               ],
-              "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
             }
@@ -224,7 +236,6 @@
                 "run_event",
                 "processing_engine"
               ],
-              "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
             }
@@ -239,9 +250,337 @@
               "facets": [
                 "run_event"
               ],
-              "max_version": "1.23.0",
               "min_version": "1.22.0",
               "producer": "spark"
+            }
+          },
+          {
+            "name": "links",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "link",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "min_version": "1.22.0",
+              "producer": "airflow"
+            }
+          }
+        ]
+      },
+      {
+        "name": "airflow",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "line_01.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_02.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_03.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_04.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_05.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_06.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_07.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_08.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_09.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_10.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_11.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_12.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_13.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_14.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_15.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_16.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_17.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_18.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_19.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_20.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_21.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_22.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_23.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_24.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_25.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_26.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_27.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_28.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_29.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_30.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_31.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "line_32.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "producer": "airflow"
+            }
+          },
+          {
+            "name": "runs",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "processing_engine"
+              ],
+              "producer": "airflow"
+            }
+          },
+          {
+            "name": "lineage_events",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "lineage_event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "producer": "airflow"
+            }
+          },
+          {
+            "name": "links",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "link",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "producer": "airflow"
             }
           }
         ]
