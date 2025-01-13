@@ -25,16 +25,17 @@
 
 # Consumers
 ## Facets Compatibility
-|    Name    |         run_event        |     processing_engine    |
-|------------|--------------------------|--------------------------|
-|marquez-mock|             -            |             -            |
-|  dataplex  |above 1.22.0, below 1.23.0|above 1.22.0, below 1.23.0|
+|    Name    |run_event|processing_engine|
+|------------|---------|-----------------|
+|marquez-mock|    -    |        -        |
+|  dataplex  |    +    |        +        |
 
 ## Producers support for marquez-mock
 |Producer|          Version         |
 |--------|--------------------------|
 |  spark |above 1.22.0, below 1.23.0|
 ## Producers support for dataplex
-|Producer|          Version         |
-|--------|--------------------------|
-|  spark |above 1.22.0, below 1.23.0|
+|Producer|   Version  |
+|--------|------------|
+|  spark |above 1.22.0|
+| airflow|      +     |
