@@ -1,0 +1,13 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "{{ any(result) }}",
+    "name": "{{ any(result) }}",
+    "facets": {}
+  }
+}

@@ -46,7 +46,7 @@ jobs:
 #          repository: 'maven2'
 #          groupId: 'com.google.cloud.spark'
 #          artifactId: 'spark-3.5-bigquery'
-#          version: '0.41.0'
+#          version: '0.42.0'
 #          extension: 'jar'
 
       - name: Upload openlineage spark integration to GCS
