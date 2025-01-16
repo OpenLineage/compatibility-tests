@@ -42,6 +42,6 @@ if __name__ == "__main__":
 
     df = set_options(spark.read, table_name).load()
     df.createOrReplaceTempView('testTable')
-    aggregated_df = df.groupBy("Name").sum("Value").withColumnRenamed("sum(Value)", "TotalValue")
+    aggregated_df = df.groupBy("Name").sum("Value").withColumnRenamed("max(Timestamp)", "maxTS")
     aggregated_df.show()
 
