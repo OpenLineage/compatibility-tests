@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "run_event_test",
+      "path": "events/run_event_test.json",
+      "tags": {
+        "facets": [
+          "run_event"
+        ]
+      }
+    }
+  ]
+}
