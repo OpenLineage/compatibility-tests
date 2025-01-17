@@ -20,5 +20,5 @@ if __name__ == "__main__":
         .option("databaseId", database_id) \
         .option("table", table_name).load()
     aggregated_df = df.groupBy("Name").max("Value").withColumnRenamed("sum(Value)", "totalValue")
-    aggregated_df.show()
+    aggregated_df.write.csv("output")
 
