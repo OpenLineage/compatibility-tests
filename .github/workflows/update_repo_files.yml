@@ -50,22 +50,9 @@ jobs:
             mv ./generated-files/updated-spec-versions.json ./generated-files/spec_versions.json || echo "updated-spec-versions.json not found"
           fi
 
-      - name: Create Pull Request
-        id: create-pr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          add-paths: |
-            generated-files/historical_reports/*
-            generated-files/report.json
-            generated-files/releases.json
-            generated-files/spec_versions.json
-            generated-files/compatibility-table.md
-          branch: "test-${{ github.run_id }}-${{ inputs.execution-time }}"
-          title: "[bot] update report with data from run ${{ github.run_id }} execution time: ${{ inputs.execution-time }}"
-          signoff: true
-
-      - name: Automerge Pull Request
-        id: automerge-pr
-        if: ${{ steps.create-pr.outputs.pull-request-number }}
-        run: gh pr merge --auto --delete-branch --squash ${{ steps.create-pr.outputs.pull-request-number }}
-
+      - name: Push changes
+        id: push-changes
+        run: |
+          git add -u
+          git commit -sm "[bot] update report with data from run ${{ github.run_id }} execution time: ${{ inputs.execution-time }}"
+          git push origin main
