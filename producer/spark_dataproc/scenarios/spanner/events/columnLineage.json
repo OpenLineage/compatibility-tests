@@ -1,0 +1,72 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output"
+  },
+  "outputs": [
+    {
+      "namespace": "{{ match(result, 'hdfs://dataproc-producer-test-.*') }}",
+      "name": "/user/root/output",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "Name": {
+              "inputFields": [
+                {
+                  "namespace": "spanner://gcp-open-lineage-testing/spaner-openlineage-testing-instance",
+                  "name": "test-database/test_table",
+                  "field": "Name",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    },
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "GROUP_BY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "totalValue": {
+              "inputFields": [
+                {
+                  "namespace": "spanner://gcp-open-lineage-testing/spaner-openlineage-testing-instance",
+                  "name": "test-database/test_table",
+                  "field": "Value",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "AGGREGATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                },
+                {
+                  "namespace": "spanner://gcp-open-lineage-testing/spaner-openlineage-testing-instance",
+                  "name": "test-database/test_table",
+                  "field": "Name",
+                  "transformations": [
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "GROUP_BY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

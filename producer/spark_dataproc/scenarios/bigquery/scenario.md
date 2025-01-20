@@ -8,7 +8,7 @@ input entity is bigquery table
 
 `bigquery-public-data.samples.shakespeare`
 
-output entity local csv file
+output entity bigquery table
 
 `e2e_dataset.wordcount_output`
 

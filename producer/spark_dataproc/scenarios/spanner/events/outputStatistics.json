@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output"
+  },
+  "outputs": [
+    {
+      "namespace": "{{ match(result, 'hdfs://dataproc-producer-test-.*') }}",
+      "name": "/user/root/output",
+      "outputFacets": {
+        "outputStatistics": {
+          "rowCount": 3,
+          "size": 24,
+          "fileCount": 1
+        }
+      }
+    }
+  ]
+}

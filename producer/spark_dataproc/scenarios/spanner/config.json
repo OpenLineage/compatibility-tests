@@ -1,13 +1,122 @@
 {
   "tests": [
     {
+      "name": "columnLineage_test",
+      "path": "events/columnLineage.json",
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+       "lineage_level": {
+          "spanner": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "environment-properties_test",
+      "path": "events/environment-properties.json",
+      "tags": {
+        "facets": [
+          "environment-properties"
+        ]
+      }
+    },
+    {
+      "name": "gcp_lineage_test",
+      "path": "events/gcp_lineage.json",
+      "tags": {
+        "facets": [
+          "gcp_lineage"
+        ]
+      }
+    },
+    {
+      "name": "outputStatistics_test",
+      "path": "events/outputStatistics.json",
+      "tags": {
+        "facets": [
+          "outputStatistics"
+        ]
+      }
+    },
+    {
+      "name": "processing_engine_test",
+      "path": "events/processing_engine.json",
+      "tags": {
+        "facets": [
+          "processing_engine"
+        ]
+      }
+    },
+    {
+      "name": "schema_test",
+      "path": "events/schema.json",
+      "tags": {
+        "facets": [
+          "schema"
+        ]
+      }
+    },
+    {
+      "name": "dataSource_test",
+      "path": "events/dataSource.json",
+      "tags": {
+        "facets": [
+          "dataSource"
+        ]
+      }
+    },
+    {
+      "name": "gcp_dataproc_test",
+      "path": "events/gcp_dataproc.json",
+      "tags": {
+        "facets": [
+          "gcp_dataproc"
+        ]
+      }
+    },
+    {
+      "name": "jobType_test",
+      "path": "events/jobType.json",
+      "tags": {
+        "facets": [
+          "jobType"
+        ]
+      }
+    },
+    {
+      "name": "parent_test",
+      "path": "events/parent.json",
+      "tags": {
+        "facets": [
+          "parent"
+        ]
+      }
+    },
+    {
       "name": "run_event_test",
-      "path": "events/run_event_test.json",
+      "path": "events/run_event.json",
       "tags": {
         "facets": [
           "run_event"
         ]
       }
+    },
+    {
+      "name": "spark_properties_test",
+      "path": "events/spark_properties.json",
+      "tags": {
+        "facets": [
+          "spark_properties"
+        ]
+      }
     }
   ]
 }
+
+
+

@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output"
+  },
+  "run": {
+    "facets": {
+      "processing_engine": {
+        "version": "{{ any(result) }}",
+        "name": "spark",
+        "openlineageAdapterVersion": "{{ any(result) }}"
+      }
+    }
+  }
+}

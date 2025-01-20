@@ -1,0 +1,14 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output"
+  },
+  "run": {
+    "facets": {
+      "environment-properties": {
+        "environment-properties": {}
+      }
+    }
+  }
+}

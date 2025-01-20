@@ -1,16 +1,16 @@
 # Description
 
-Scenario contains a spark job that reads from a bigquery table, filters the data, aggregates it and writes to a bigquery table
-`e2e_dataset.wordcount_output`
+Scenario contains a spark job that reads from a spanner table, aggregates the data and writes to a csv file (writes not supported for spark spanner connector)
+
 # Entities
 
 input entity is bigquery table
 
-`bigquery-public-data.samples.shakespeare`
+`test-database/test_table`
 
 output entity local csv file
 
-`e2e_dataset.wordcount_output`
+`/user/root/output`
 
 # Facets
 
