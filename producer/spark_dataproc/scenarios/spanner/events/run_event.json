@@ -1,0 +1,29 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "spanner://gcp-open-lineage-testing/spaner-openlineage-testing-instance",
+      "name": "test-database/test_table",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "{{ match(result, 'hdfs://dataproc-producer-test-.*') }}",
+      "name": "/user/root/output",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}

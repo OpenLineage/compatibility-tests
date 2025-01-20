@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output"
+  },
+  "run": {
+    "facets": {
+      "parent": {
+        "run": {
+          "runId": "{{ is_uuid(result) }}"
+        },
+        "job": {
+          "namespace": "default",
+          "name": "spark_spanner_example"
+        }
+      }
+    }
+  }
+}

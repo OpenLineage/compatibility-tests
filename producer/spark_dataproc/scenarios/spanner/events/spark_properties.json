@@ -1,0 +1,17 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_spanner_example.adaptive_spark_plan.root_output"
+  },
+  "run": {
+    "facets": {
+      "spark_properties": {
+        "properties": {
+          "spark.master": "yarn",
+          "spark.app.name": "Spark Spanner Example"
+        }
+      }
+    }
+  }
+}
