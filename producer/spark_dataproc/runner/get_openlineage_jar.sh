@@ -9,6 +9,7 @@ readonly SPARK_BQ_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attribute
 readonly OPENLINEAGE_SPARK_URL=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_SPARK_URL || echo "")
 readonly SPARK_SPANNER_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attributes/SPARK_SPANNER_CONNECTOR_URL || echo "")
 
+
 if [[ -n "${OPENLINEAGE_SPARK_URL}" ]]; then
     bq_url="${SPARK_BQ_CONNECTOR_URL}"
     ol_url="${OPENLINEAGE_SPARK_URL}"
@@ -19,6 +20,9 @@ else
     spanner_url="gs://open-lineage-e2e/jars/spark-3.1-spanner-1.1.0.jar"
 fi
 
+postgresql_url="gs://open-lineage-e2e/jars/postgresql-42.5.6.jar"
+
 gsutil cp -P "${bq_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${ol_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${spanner_url}" "${VM_SPARK_JARS_DIR}/"
+gsutil cp -P "${postgresql_url}" "${VM_SPARK_JARS_DIR}/"

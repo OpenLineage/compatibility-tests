@@ -82,6 +82,8 @@ jobs:
     uses: ./.github/workflows/producer_spark_dataproc.yml
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+      postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
+      postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
       get-latest-snapshots: 'false'
