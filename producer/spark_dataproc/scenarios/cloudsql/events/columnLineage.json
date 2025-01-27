@@ -1,0 +1,49 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_cloud_sql_example.execute_save_into_data_source_command.test"
+  },
+  "outputs": [
+    {
+      "namespace": "postgres://localhost:3307",
+      "name": "e2etest.test",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "value": {
+              "inputFields": [
+                {
+                  "namespace": "postgres://localhost:3307",
+                  "name": "e2etest.jdbc_source2",
+                  "field": "j2",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                },
+                {
+                  "namespace": "postgres://localhost:3307",
+                  "name": "e2etest.jdbc_source1",
+                  "field": "j1",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
