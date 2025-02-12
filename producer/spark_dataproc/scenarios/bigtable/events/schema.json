@@ -1,0 +1,69 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example.execute_save_into_data_source_command.gcp-open-lineage-testing"
+  },
+  "inputs": [
+    {
+        "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+        "name": "input_table",
+        "facets": {
+            "schema": {
+                "fields": [
+                    {
+                        "name": "booleanCol",
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "floatCol",
+                        "type": "float"
+                    },
+                    {
+                        "name": "longCol",
+                        "type": "long"
+                    },
+                    {
+                        "name": "stringCol2",
+                        "type": "string"
+                    },
+                    {
+                        "name": "doubleCol",
+                        "type": "double"
+                    },
+                    {
+                        "name": "stringCol",
+                        "type": "string"
+                    },
+                    {
+                        "name": "shortCol",
+                        "type": "short"
+                    },
+                    {
+                        "name": "intCol",
+                        "type": "integer"
+                    }
+                ]
+            }
+        }    }
+],
+"outputs": [
+    {
+        "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+        "name": "output_table",
+        "facets": {
+            "schema": {
+                "fields": [
+                    {
+                        "name": "someCol",
+                        "type": "string"
+                    },
+                    {
+                        "name": "someCol2",
+                        "type": "string"
+                    }
+                ]
+            }
+        }    }
+]
+}

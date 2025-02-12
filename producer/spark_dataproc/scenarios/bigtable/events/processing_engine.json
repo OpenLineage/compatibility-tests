@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example"
+  },
+  "run": {
+    "facets": {
+      "processing_engine": {
+        "version": "{{ any(result) }}",
+        "name": "spark",
+        "openlineageAdapterVersion": "{{ any(result) }}"
+      }
+    }
+  }
+}
