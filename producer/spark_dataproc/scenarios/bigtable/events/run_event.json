@@ -1,0 +1,29 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example.execute_save_into_data_source_command.gcp-open-lineage-testingd",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+      "name": "input_table",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+      "name": "output_table",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}

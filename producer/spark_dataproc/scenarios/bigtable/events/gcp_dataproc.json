@@ -1,0 +1,22 @@
+{
+    "eventType": "COMPLETE",
+    "job": {
+        "namespace": "default",
+        "name": "bigtable_example",
+    
+    "run": {
+        "facets": {
+            "gcp_dataproc": {
+                "clusterUuid": "{{ is_uuid(result) }}",
+                "jobUuid": "{{ is_uuid(result) }}",
+                "queryNodeName": "execute_save_into_data_source_command",
+                "appName": "BigtableExample",
+                "clusterName": "{{ match(result, 'dataproc-producer-test-.*') }}",
+                "appId": "{{ match(result, 'application_.*') }}",
+                "jobType": "dataproc_job",
+                "projectId": "gcp-open-lineage-testing"
+            }
+        }
+    }
+}
+}

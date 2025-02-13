@@ -1,0 +1,14 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example"
+  },
+  "run": {
+    "facets": {
+      "environment-properties": {
+        "environment-properties": {}
+      }
+    }
+  }
+}

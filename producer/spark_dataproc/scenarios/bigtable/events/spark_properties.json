@@ -1,0 +1,17 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example.execute_save_into_data_source_command.gcp-open-lineage-testing"
+  },
+  "run": {
+    "facets": {
+      "spark_properties": {
+        "properties": {
+          "spark.master": "yarn",
+          "spark.app.name": "BigtableExample"
+        }
+      }
+    }
+  }
+}

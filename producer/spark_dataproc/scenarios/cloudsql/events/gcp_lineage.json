@@ -1,0 +1,15 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_cloud_sql_example",
+    "facets": {
+      "gcp_lineage": {
+        "origin": {
+          "sourceType": "DATAPROC",
+          "name": "{{ match(result, 'projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-.*') }}"
+        }
+      }
+    }
+  }
+}

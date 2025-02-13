@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_cloud_sql_example.execute_save_into_data_source_command.test"
+  },
+  "outputs": [
+    {
+      "namespace": "postgres://localhost:3307",
+      "name": "e2etest.test",
+      "outputFacets": {
+        "outputStatistics": {
+          "rowCount": 3,
+          "size": 0,
+          "fileCount": 0
+        }
+      }
+    }
+  ]
+}

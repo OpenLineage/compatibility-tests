@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example"
+  },
+  "run": {
+    "facets": {
+      "parent": {
+        "run": {
+          "runId": "{{ is_uuid(result) }}"
+        },
+        "job": {
+          "namespace": "default",
+          "name": "bigtable_example.execute_save_into_data_source_command.gcp-open-lineage-testing"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "spark_cloud_sql_example.execute_save_into_data_source_command.test",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "postgres://localhost:3307",
+      "name": "e2etest.jdbc_source1",
+      "facets": {},
+      "inputFacets": {}
+    },
+    {
+      "namespace": "postgres://localhost:3307",
+      "name": "e2etest.jdbc_source2",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "postgres://localhost:3307",
+      "name": "e2etest.test",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}
