@@ -63,7 +63,7 @@ jobs:
               local file="./producer/${producer}/ol_rep_ver.json"
           
               if [[ -f "$file" ]]; then
-                  cat "$file" | jq -cnR '{content: input}'
+                  cat "$file" | jq -c | jq -R
               else
                   echo "Error: File '$file' does not exist." >&2
                   return 1
