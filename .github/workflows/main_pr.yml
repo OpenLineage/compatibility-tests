@@ -70,6 +70,7 @@ jobs:
               fi
           }
           echo "spark_dataproc_matrix=$(check_producer spark_dataproc)" >> $GITHUB_OUTPUT
+          echo "spark_dataproc_matrix=$(check_producer spark_dataproc)"
           # echo "myoutput=$(jq -cn --argjson environments "$TARGETS" '{target: $environments}')" >> $GITHUB_OUTPUT
 
   ######## COMPONENT VALIDATION ########
