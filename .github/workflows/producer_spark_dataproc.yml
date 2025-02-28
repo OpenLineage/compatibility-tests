@@ -50,14 +50,14 @@ jobs:
 
       - name: GCP authorization
         id: gcp-auth
-        if: ${{ !steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.scenarios }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
       - name: Get OL artifacts
         id: get-ol-artifacts
-        if: ${{ !steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/get_openlineage_artifacts
         with:
           version: ${{ inputs.ol_release }}
