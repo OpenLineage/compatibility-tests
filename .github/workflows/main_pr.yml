@@ -75,14 +75,6 @@ jobs:
 
   ######## COMPONENT VALIDATION ########
 
-  test:
-    needs: initialize_workflow
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo ${{matrix.versions}}
-    strategy:
-        matrix: ${{ fromJson(needs.initialize_workflow.outputs.test_matrix) }}
-
 #  scenarios:
 #    needs: initialize_workflow
 #    if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
@@ -102,15 +94,18 @@ jobs:
 #    with:
 #      release: ${{ needs.initialize_workflow.outputs.ol_release }}
 #
-#  spark_dataproc:
-#    needs: initialize_workflow
-#    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
-#    uses: ./.github/workflows/producer_spark_dataproc.yml
-#    secrets:
-#      gcpKey: ${{ secrets.GCP_SA_KEY }}
-#    with:
-#      release: ${{ needs.initialize_workflow.outputs.ol_release }}
-#      get-latest-snapshots: 'false'
+  spark_dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.test_matrix) }}
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      ol_release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      spark_release: ${{needs.initialize_workflow.outputs.}}
+      get-latest-snapshots: 'false'
 #
 #  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 #
