@@ -103,8 +103,8 @@ jobs:
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
-      ol_release: ${{ needs.initialize_workflow.outputs.ol_release }}
-      spark_release: ${{needs.initialize_workflow.outputs.}}
+      ol_release: ${{ matrix.openlineage_versions }}
+      spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
 #
 #  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
