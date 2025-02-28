@@ -188,7 +188,8 @@ def get_arguments():
     parser.add_argument('--spec_dirs', type=str, help="comma separated list of directories containing spec and facets")
     parser.add_argument('--producer_dir', type=str, help="directory storing producers")
     parser.add_argument('--component', type=str, help="component producing the validated events")
-    parser.add_argument('--release', type=str, help="OpenLineage release used in generating events")
+    parser.add_argument('--component_version', type=str, help="component release used in generating events")
+    parser.add_argument('--openlineage_version', type=str, help="OpenLineage release used in generating events")
     parser.add_argument('--target', type=str, help="target file")
 
     args = parser.parse_args()
@@ -197,14 +198,15 @@ def get_arguments():
     producer_dir = args.producer_dir
     target = args.target
     component = args.component
-    release = args.release
+    component_version = args.component_version
+    openlineage_version = args.openlineage_version
     spec_dirs = args.spec_dirs.split(',')
 
-    return event_base_dir, producer_dir, target, spec_dirs, component, release
+    return event_base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version
 
 
 def main():
-    base_dir, producer_dir, target, spec_dirs, component, release = get_arguments()
+    base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version = get_arguments()
     validator = OLSyntaxValidator.load_schemas(paths=spec_dirs)
     scenarios = {}
     for scenario_name in listdir(base_dir):
@@ -212,13 +214,13 @@ def main():
         if isdir(scenario_path):
             config = get_config(producer_dir, component, scenario_name)
             if component == 'scenarios':
-                if release_between(release, config['tags'].get('min_version'), config['tags'].get('max_version')):
+                if release_between(openlineage_version, config['tags'].get('min_version'), config['tags'].get('max_version')):
                     result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                      isfile(path := join(scenario_path, file))}
                     tests = validate_scenario_syntax(result_events, validator, config)
                     scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
             else:
-                expected = get_expected_events(producer_dir, component, scenario_name, config, release)
+                expected = get_expected_events(producer_dir, component, scenario_name, config, openlineage_version)
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
                 tests = validate_scenario_syntax(result_events, validator, config)
@@ -227,7 +229,7 @@ def main():
                     for name, res in OLSemanticValidator(expected).validate(result_events).items():
                         tests[name] = res
                 scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-    report = Report({component: Component(component, 'producer', scenarios)})
+    report = Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
 

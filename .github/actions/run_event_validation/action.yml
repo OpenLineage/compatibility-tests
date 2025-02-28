@@ -5,8 +5,11 @@ inputs:
   tag:
     description: "Version of the spec to check against"
     required: true
-  release:
+  ol_release:
     description: "release to run the validation with"
+    required: true
+  component_release:
+    description: "release of the component producing events"
     required: true
   target-path:
     description: "Path to save the report to"
@@ -62,4 +65,5 @@ runs:
         --target=${{ inputs.target-path }} \
         --component="${{ inputs.component }}" \
         --producer_dir=${{ inputs.producer-dir }} \
-        --release=${{ inputs.release }}
+        --openlineage_version=${{ inputs.ol_release }} \
+        --component_version=${{ inputs.component_release }}

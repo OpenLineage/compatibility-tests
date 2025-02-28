@@ -33,14 +33,17 @@ class Report:
 
 class Component:
 
-    def __init__(self, name, component_type, scenarios):
+    def __init__(self, name, component_type, scenarios, component_version, openlineage_version):
         self.name = name
         self.component_type = component_type
         self.scenarios = scenarios
+        self.component_version = component_version
+        self.openlineage_version = openlineage_version
 
     @classmethod
     def from_dict(cls, d):
-        return cls(d['name'], d['component_type'], {s['name']: Scenario.from_dict(s) for s in d['scenarios']})
+        return cls(f"{d['name']}-{d['component_version']}-{d['openlineage_version']}", d['component_type'],
+            {s['name']: Scenario.from_dict(s) for s in d['scenarios']}, d['component_version'], d['openlineage_version'])
 
     def get_tag_summary(self):
         facets = {}
@@ -79,8 +82,8 @@ class Component:
                 self.scenarios[k] = v
 
     def to_dict(self):
-        return {'name': self.name, 'component_type': self.component_type,
-                'scenarios': [c.to_dict() for c in self.scenarios.values()]}
+        return {'name': self.name, 'component_type': self.component_type, 'component_version': self.component_version,
+                'openlineage_version': self.openlineage_version, 'scenarios': [c.to_dict() for c in self.scenarios.values()]}
 
 
 class Scenario:
