@@ -5,9 +5,13 @@ class Report:
     def __init__(self, components):
         self.components = components
 
+    def __str__(self):
+        return str(self.to_dict())
+
     @classmethod
     def from_dict(cls, d):
-        return cls({s['name']: Component.from_dict(s) for s in d})
+        return cls({f"{c['name']}-{c['component_version']}-{c['openlineage_version']}": Component.from_dict(c) for c in d})
+
 
     def get_tag_summary(self):
         return {k: v.get_tag_summary() for k, v in self.components.items()}
@@ -40,10 +44,14 @@ class Component:
         self.component_version = component_version
         self.openlineage_version = openlineage_version
 
+    def __str__(self):
+        return str(self.to_dict())
+
     @classmethod
     def from_dict(cls, d):
-        return cls(f"{d['name']}-{d['component_version']}-{d['openlineage_version']}", d['component_type'],
-            {s['name']: Scenario.from_dict(s) for s in d['scenarios']}, d['component_version'], d['openlineage_version'])
+        return cls(d['name'], d['component_type'],
+                   {s['name']: Scenario.from_dict(s) for s in d['scenarios']}, d['component_version'],
+                   d['openlineage_version'])
 
     def get_tag_summary(self):
         facets = {}
@@ -72,7 +80,7 @@ class Component:
         os = old.scenarios if old is not None and old.scenarios is not None else {}
         nfs = {k: nfs for k, v in self.scenarios.items() if
                (nfs := v.get_new_failures(os.get(k))) is not None}
-        return Component(self.name, self.component_type, nfs) if any(nfs) else None
+        return Component(self.name, self.component_type, nfs, self.component_version, self.openlineage_version) if any(nfs) else None
 
     def update(self, new):
         for k, v in new.scenarios.items():
@@ -83,10 +91,15 @@ class Component:
 
     def to_dict(self):
         return {'name': self.name, 'component_type': self.component_type, 'component_version': self.component_version,
-                'openlineage_version': self.openlineage_version, 'scenarios': [c.to_dict() for c in self.scenarios.values()]}
+                'openlineage_version': self.openlineage_version,
+                'scenarios': [c.to_dict() for c in self.scenarios.values()]}
 
 
 class Scenario:
+
+    def __str__(self):
+        return str(self.to_dict())
+
     def __init__(self, name, status, tests):
         self.name = name
         self.status = status
@@ -164,6 +177,9 @@ class Test:
         self.entity_type = entity_type
         self.details = details
         self.tags = tags
+
+    def __str__(self):
+        return str(self.to_dict())
 
     @classmethod
     def simplified(cls, name, validation_type, entity_type, details, tags):

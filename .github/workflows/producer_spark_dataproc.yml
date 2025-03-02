@@ -195,6 +195,7 @@ jobs:
           component: 'spark_dataproc'
           tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
           ol_release: ${{ inputs.ol_release }}
+          component_release: ${{ inputs.spark_release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
           target-path: 'spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report.json'
 
