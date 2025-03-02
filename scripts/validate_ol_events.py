@@ -151,8 +151,6 @@ def all_tests_succeeded(syntax_tests):
 
 
 def get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version):
-    if component == 'scenarios':
-        return None
     test_events = []
     for test in config['tests']:
         if check_versions(component_version, openlineage_version, config):
@@ -223,7 +221,6 @@ def main():
         scenario_path = get_path(base_dir, component, scenario_name)
         if isdir(scenario_path):
             config = get_config(producer_dir, component, scenario_name)
-            component_versions = config.get("component_versions")
             if component == 'scenarios':
                 if check_versions(component_version, openlineage_version, config):
                     result_events = {file: load_json(path) for file in listdir(scenario_path) if
@@ -231,7 +228,7 @@ def main():
                     tests = validate_scenario_syntax(result_events, validator, config)
                     scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
             else:
-                expected = get_expected_events(producer_dir, component, scenario_name, config, openlineage_version)
+                expected = get_expected_events(producer_dir, component, scenario_name, config, openlineage_version, component_version)
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
                 tests = validate_scenario_syntax(result_events, validator, config)
