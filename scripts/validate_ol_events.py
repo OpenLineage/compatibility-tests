@@ -204,13 +204,13 @@ def get_arguments():
 
 
 def check_versions(component_version, openlineage_version, config):
-    component_versions = config.get("openlineage_versions", {})
+    component_versions = config.get("component_versions", {})
     openlineage_versions = config.get("openlineage_versions", {})
 
     return release_between(component_version, component_versions.get("min"),
-                           component_versions.get("min")) and release_between(openlineage_version,
+                           component_versions.get("max")) and release_between(openlineage_version,
                                                                              openlineage_versions.get("min"),
-                                                                             openlineage_versions.get("min"))
+                                                                             openlineage_versions.get("max"))
 
 
 def main():

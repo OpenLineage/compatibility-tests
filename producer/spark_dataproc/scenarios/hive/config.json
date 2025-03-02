@@ -11,7 +11,7 @@
     {
       "name": "run_event_test",
       "path": "events/run_event_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -23,7 +23,7 @@
     {
       "name": "parent_test",
       "path": "events/parent_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -35,7 +35,7 @@
     {
       "name": "spark_properties_test",
       "path": "events/spark_properties_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -47,7 +47,7 @@
     {
       "name": "processing_engine_test",
       "path": "events/processing_engine_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -59,7 +59,7 @@
     {
       "name": "gcp_dataproc_spark_test",
       "path": "events/gcp_dataproc_spark_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -72,7 +72,7 @@
     {
       "name": "gcp_dataproc_test",
       "path": "events/gcp_dataproc_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -85,7 +85,7 @@
     {
       "name": "jobType_test",
       "path": "events/jobType_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -97,7 +97,7 @@
     {
       "name": "gcp_lineage_test",
       "path": "events/gcp_lineage_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -109,7 +109,7 @@
     {
       "name": "dataSource_test",
       "path": "events/dataSource_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -121,7 +121,7 @@
     {
       "name": "schema_test",
       "path": "events/schema_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -138,7 +138,7 @@
     {
       "name": "columnLineage_test",
       "path": "events/columnLineage_test.json",
-      "component_version": {
+      "component_versions": {
         "max": "3.3.2"
       },
       "tags": {
@@ -157,7 +157,7 @@
     {
       "name": "run_event_test_3.5.1",
       "path": "events_3.5.1/run_event_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -169,7 +169,7 @@
     {
       "name": "parent_test_3.5.1",
       "path": "events_3.5.1/parent_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -181,7 +181,7 @@
     {
       "name": "spark_properties_test_3.5.1",
       "path": "events_3.5.1/spark_properties_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -193,7 +193,7 @@
     {
       "name": "processing_engine_test_3.5.1",
       "path": "events_3.5.1/processing_engine_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -205,7 +205,7 @@
     {
       "name": "gcp_dataproc_spark_test_3.5.1",
       "path": "events_3.5.1/gcp_dataproc_spark_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -218,7 +218,7 @@
     {
       "name": "gcp_dataproc_test_3.5.1",
       "path": "events_3.5.1/gcp_dataproc_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -231,7 +231,7 @@
     {
       "name": "jobType_test_3.5.1",
       "path": "events_3.5.1/jobType_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -243,7 +243,7 @@
     {
       "name": "gcp_lineage_test_3.5.1",
       "path": "events_3.5.1/gcp_lineage_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -255,7 +255,7 @@
     {
       "name": "dataSource_test_3.5.1",
       "path": "events_3.5.1/dataSource_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -267,7 +267,7 @@
     {
       "name": "schema_test_3.5.1",
       "path": "events_3.5.1/schema_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
@@ -284,7 +284,7 @@
     {
       "name": "columnLineage_test_3.5.1",
       "path": "events_3.5.1/columnLineage_test.json",
-      "component_version": {
+      "component_versions": {
         "min": "3.5.1"
       },
       "tags": {
