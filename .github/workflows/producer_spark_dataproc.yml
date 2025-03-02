@@ -28,6 +28,7 @@ jobs:
         run: |
           scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/spark_dataproc/scenarios/" ${{ inputs.spark_release }} ${{ inputs.ol_release }} )
           [[ "$scenarios" == "" ]] || echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
+          echo "openlineage_cluster_suffix=$(echo 'inputs.ol_release' | sed 's/\.//g')" >> $GITHUB_OUTPUT
           case "${{ inputs.spark_release }}" in
             "3.5.1")
               echo "spark_short=3.5" >> $GITHUB_OUTPUT
