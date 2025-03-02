@@ -201,6 +201,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ steps.init.outputs.scenarios }}
         with:
-          name: spark-dataproc-report
+          name: spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report
           path: spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report.json
           retention-days: 1
