@@ -185,7 +185,7 @@ jobs:
           python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
           --project-id gcp-open-lineage-testing \
           --region us-west1 \
-          --cluster-name dataproc-producer-test-${{ github.run_id }} \
+          --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Validation
