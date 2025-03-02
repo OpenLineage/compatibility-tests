@@ -150,12 +150,12 @@ def all_tests_succeeded(syntax_tests):
     return not any(t.status == "FAILURE" for t in syntax_tests.values())
 
 
-def get_expected_events(producer_dir, component, scenario_name, config, release):
+def get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version):
     if component == 'scenarios':
         return None
     test_events = []
     for test in config['tests']:
-        if release_between(release, test['tags'].get('min_version'), test['tags'].get('max_version')):
+        if check_versions(component_version, openlineage_version, config):
             filepath = join(producer_dir, component, 'scenarios', scenario_name, test['path'])
             body = load_json(filepath)
             test_events.append((test['name'], body, test['tags']))
@@ -205,6 +205,16 @@ def get_arguments():
     return event_base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version
 
 
+def check_versions(component_version, openlineage_version, config):
+    component_versions = config.get("openlineage_versions", {})
+    openlineage_versions = config.get("openlineage_versions", {})
+
+    return release_between(component_version, component_versions.get("min"),
+                           component_versions.get("min")) and release_between(openlineage_version,
+                                                                             openlineage_versions.get("min"),
+                                                                             openlineage_versions.get("min"))
+
+
 def main():
     base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version = get_arguments()
     validator = OLSyntaxValidator.load_schemas(paths=spec_dirs)
@@ -213,8 +223,9 @@ def main():
         scenario_path = get_path(base_dir, component, scenario_name)
         if isdir(scenario_path):
             config = get_config(producer_dir, component, scenario_name)
+            component_versions = config.get("component_versions")
             if component == 'scenarios':
-                if release_between(openlineage_version, config['tags'].get('min_version'), config['tags'].get('max_version')):
+                if check_versions(component_version, openlineage_version, config):
                     result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                      isfile(path := join(scenario_path, file))}
                     tests = validate_scenario_syntax(result_events, validator, config)
