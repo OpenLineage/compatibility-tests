@@ -153,7 +153,7 @@ def all_tests_succeeded(syntax_tests):
 def get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version):
     test_events = []
     for test in config['tests']:
-        if check_versions(component_version, openlineage_version, config):
+        if check_versions(component_version, openlineage_version, test):
             filepath = join(producer_dir, component, 'scenarios', scenario_name, test['path'])
             body = load_json(filepath)
             test_events.append((test['name'], body, test['tags']))
@@ -207,10 +207,8 @@ def check_versions(component_version, openlineage_version, config):
     component_versions = config.get("component_versions", {})
     openlineage_versions = config.get("openlineage_versions", {})
 
-    return release_between(component_version, component_versions.get("min"),
-                           component_versions.get("max")) and release_between(openlineage_version,
-                                                                             openlineage_versions.get("min"),
-                                                                             openlineage_versions.get("max"))
+    return (release_between(component_version, component_versions.get("min"), component_versions.get("max")) and
+            release_between(openlineage_version, openlineage_versions.get("min"), openlineage_versions.get("max")))
 
 
 def main():
@@ -228,7 +226,7 @@ def main():
                     tests = validate_scenario_syntax(result_events, validator, config)
                     scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
             else:
-                expected = get_expected_events(producer_dir, component, scenario_name, config, openlineage_version, component_version)
+                expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version)
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
                 tests = validate_scenario_syntax(result_events, validator, config)
