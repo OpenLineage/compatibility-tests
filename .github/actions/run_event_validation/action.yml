@@ -93,5 +93,5 @@ runs:
         --target=${{ inputs.target-path }} \
         --component="${{ inputs.component }}" \
         --producer_dir=${{ inputs.producer-dir }} \
-        --openlineage_versions=${{ inputs.release_tags }} \
+        --openlineage_version=${{ inputs.release_tags }} \
         --component_version=${{ inputs.component_release }}
