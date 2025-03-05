@@ -1,5 +1,5 @@
 import argparse
-import json
+import jsonc
 import logging
 import os
 import re
@@ -39,6 +39,7 @@ class OLSyntaxValidator:
             if path.__contains__('Facet.json'):
                 print(join(spec_path, tag, path))
                 facet_schemas.append(load_json(join(spec_path, tag, path)))
+
         # facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('Facet.json')]
         spec_schema = next(load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
         schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema) for schema in
@@ -139,7 +140,7 @@ class OLSemanticValidator:
 
 def load_json(path):
     with open(path) as f:
-        return json.load(f)
+        return jsonc.load(f)
 
 
 def extract_pattern(identifier, patterns):
