@@ -66,7 +66,7 @@ runs:
                 DEST_DIR="../specs/$TAG"
                 if [ -d "spec" ]; then
                     mkdir -p "../specs/$TAG"
-                    find "$SOURCE_DIR" -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \) -exec cp {} "../specs/$TAG/" \;
+                    find . -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \) -exec cp {} "../specs/$TAG/" \;
                     echo "success"
                 else
                     echo "Spec directory not found in $TAG"
