@@ -190,7 +190,7 @@ def get_config(producer_dir, component, scenario_name):
     else:
         path = join(producer_dir, component, 'scenarios', scenario_name, 'config.json')
     with open(path) as f:
-        return json.load(f)
+        return jsonc.load(f)
 
 
 def get_arguments():
