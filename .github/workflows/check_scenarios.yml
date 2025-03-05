@@ -23,6 +23,7 @@ jobs:
       - name: get scenarios' OL versions
         id: get_versions
         run: |
+          SCENARIO_DIR=./consumer/scenarios
           if [ ! -d "$SCENARIO_DIR" ]; then
               echo "Scenario directory '$SCENARIO_DIR' not found!"
               exit 1
@@ -40,7 +41,6 @@ jobs:
 
           UNIQUE_VERSIONS=($(printf "%s\n" "${VERSIONS[@]}" | sort -u))
           echo "versions=$(IFS=,; echo "${UNIQUE_VERSIONS[*]}")" >> $GITHUB_OUTPUT
-          
 
       - name: Create report.json directory
         run: mkdir -p reports/
