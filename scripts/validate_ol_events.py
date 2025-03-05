@@ -254,7 +254,7 @@ def main():
             scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
         report = Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
     with open(target, 'w') as f:
-        json.dump(report.to_dict(), f, indent=2)
+        jsonc.dump(report.to_dict(), f, indent=2)
 
 
 def get_path(base_dir, component, scenario_name):
