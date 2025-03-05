@@ -1,7 +1,6 @@
 {
+  "openlineage_version": "1.23.0",
   "tags": {
-    "min_version": "1.22.0",
-    "max_version": "1.23.0",
     "input": "spark_dataproc"
   }
 }

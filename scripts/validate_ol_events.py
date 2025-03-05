@@ -24,15 +24,22 @@ class OLSyntaxValidator:
                        ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
 
     @classmethod
-    def load_schemas(cls, paths):
-        file_paths = [p for path in paths for file in listdir(path) if isfile((p := join(path, file)))]
+    def get_validators(cls, spec_path, tags):
+        syntax_validators = {}
+        for tag in tags:
+            schema_validators = cls.get_validator(spec_path, tag)
+            syntax_validators[tag] = cls(schema_validators)
+        return syntax_validators
 
+    @classmethod
+    def get_validator(cls, spec_path, tag):
+        file_paths = listdir(join(spec_path, tag))
         facet_schemas = [load_json(path) for path in file_paths if path.__contains__('Facet.json')]
         spec_schema = next(load_json(path) for path in file_paths if path.__contains__('OpenLineage.json'))
-
-        schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema) for schema in facet_schemas}
+        schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema) for schema in
+                             facet_schemas}
         schema_validators['core'] = Draft202012Validator(spec_schema)
-        return cls(schema_validators)
+        return schema_validators
 
     def validate_entity(self, instance, schema_type):
         schema_validator = self.schema_validators.get(schema_type)
@@ -183,11 +190,11 @@ def get_config(producer_dir, component, scenario_name):
 def get_arguments():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--event_base_dir', type=str, help="directory containing the reports")
-    parser.add_argument('--spec_dirs', type=str, help="comma separated list of directories containing spec and facets")
+    parser.add_argument('--spec_base_dir', type=str, help="directory containing specs and facets")
     parser.add_argument('--producer_dir', type=str, help="directory storing producers")
     parser.add_argument('--component', type=str, help="component producing the validated events")
     parser.add_argument('--component_version', type=str, help="component release used in generating events")
-    parser.add_argument('--openlineage_version', type=str, help="OpenLineage release used in generating events")
+    parser.add_argument('--openlineage_version', type=str, help="Comma separated list of Openlineage versions")
     parser.add_argument('--target', type=str, help="target file")
 
     args = parser.parse_args()
@@ -198,9 +205,9 @@ def get_arguments():
     component = args.component
     component_version = args.component_version
     openlineage_version = args.openlineage_version
-    spec_dirs = args.spec_dirs.split(',')
+    spec_base_dir = args.spec_base_dir
 
-    return event_base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version
+    return event_base_dir, producer_dir, target, spec_base_dir, component, component_version, openlineage_version
 
 
 def check_versions(component_version, openlineage_version, config):
@@ -213,29 +220,33 @@ def check_versions(component_version, openlineage_version, config):
 
 def main():
     base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version = get_arguments()
-    validator = OLSyntaxValidator.load_schemas(paths=spec_dirs)
     scenarios = {}
-    for scenario_name in listdir(base_dir):
-        scenario_path = get_path(base_dir, component, scenario_name)
-        if isdir(scenario_path):
-            config = get_config(producer_dir, component, scenario_name)
-            if component == 'scenarios':
-                if check_versions(component_version, openlineage_version, config):
-                    result_events = {file: load_json(path) for file in listdir(scenario_path) if
-                                     isfile(path := join(scenario_path, file))}
-                    tests = validate_scenario_syntax(result_events, validator, config)
-                    scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-            else:
-                expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version)
+    if component == 'scenarios':
+        validators = OLSyntaxValidator.get_validators(spec_path=spec_dirs, tags=openlineage_version.split(','))
+        for scenario_name in listdir(base_dir):
+            scenario_path = get_path(base_dir, component, scenario_name)
+            if isdir(scenario_path):
+                config = get_config(producer_dir, component, scenario_name)
+                validator = validators.get(config.get('openlineage_version'))
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
                 tests = validate_scenario_syntax(result_events, validator, config)
-
-                if all_tests_succeeded(tests) and expected is not None:
-                    for name, res in OLSemanticValidator(expected).validate(result_events).items():
-                        tests[name] = res
                 scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-    report = Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
+        report = Report({component: Component(component, 'producer', scenarios, "", "")})
+    else:
+        validator = OLSyntaxValidator.get_validator(spec_path=spec_dirs, tag=openlineage_version)
+        for scenario_name in listdir(base_dir):
+            config = get_config(producer_dir, component, scenario_name)
+            scenario_path = get_path(base_dir, component, scenario_name)
+            expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version)
+            result_events = {file: load_json(path) for file in listdir(scenario_path) if
+                             isfile(path := join(scenario_path, file))}
+            tests = validate_scenario_syntax(result_events, validator, config)
+            if all_tests_succeeded(tests) and expected is not None:
+                for name, res in OLSemanticValidator(expected).validate(result_events).items():
+                    tests[name] = res
+            scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+        report = Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
     with open(target, 'w') as f:
         json.dump(report.to_dict(), f, indent=2)
 

@@ -1,4 +1,5 @@
 {
+  "openlineage_version": "1.14.0",
   "tags": {
     "input": "airflow"
   }

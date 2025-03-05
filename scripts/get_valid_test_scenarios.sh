@@ -13,7 +13,7 @@ openlineage_version="$3"
 version_check() {
   local min max version
   read -r min max < <(jq -r "$1.min // \"0.0.0\" , $1.max // \"999.999.999\"" "$2" | xargs)
-  IFS='.' read -r v1 v2 v3 <<< "$3"; version=$(( v1 * 1000000 + v2 * 1000 + v3 ))
+    IFS='.' read -r v1 v2 v3 <<< "$3"; version=$(( v1 * 1000000 + v2 * 1000 + v3 ))
   IFS='.' read -r m1 m2 m3 <<< "$min"; min=$(( m1 * 1000000 + m2 * 1000 + m3 ))
   IFS='.' read -r M1 M2 M3 <<< "$max"; max=$(( M1 * 1000000 + M2 * 1000 + M3 ))
   [[ $version -ge $min && $version -le $max ]]
