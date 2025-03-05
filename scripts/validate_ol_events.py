@@ -34,8 +34,8 @@ class OLSyntaxValidator:
     @classmethod
     def get_validator(cls, spec_path, tag):
         file_paths = listdir(join(spec_path, tag))
-        facet_schemas = [load_json(path) for path in file_paths if path.__contains__('Facet.json')]
-        spec_schema = next(load_json(path) for path in file_paths if path.__contains__('OpenLineage.json'))
+        facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('Facet.json')]
+        spec_schema = next(load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
         schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema) for schema in
                              facet_schemas}
         schema_validators['core'] = Draft202012Validator(spec_schema)
