@@ -18,10 +18,16 @@ class OLSyntaxValidator:
         self.schema_validators = schema_validators
 
     @staticmethod
-    def is_custom_facet(facet):
+    def is_custom_facet(facet, schema_type):
         if facet.get('_schemaURL') is not None:
-            return any(facet.get('_schemaURL').__contains__(f'defs/{facet_type}Facet') for facet_type in
-                       ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
+            is_custom = any(facet.get('_schemaURL').__contains__(f'defs/{facet_type}Facet') for facet_type in
+                    ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
+            if is_custom:
+                print(f"facet {schema_type} seems to be custom facet, validation skipped")
+            return is_custom
+        return False
+
+
 
     @classmethod
     def get_validators(cls, spec_path, tags):
@@ -55,7 +61,7 @@ class OLSyntaxValidator:
                 return []
             else:
                 return [f"{(e := best_match([error], by_relevance())).json_path}: {e.message}" for error in errors]
-        elif self.is_custom_facet(instance.get(schema_type)):
+        elif self.is_custom_facet(instance.get(schema_type), schema_type):
             # facet type may be custom facet without available schema json file (defined only as class)
             return []
         else:
@@ -232,7 +238,7 @@ def main():
         for scenario_name in listdir(base_dir):
             scenario_path = get_path(base_dir, component, scenario_name)
             if isdir(scenario_path):
-                config = get_config(base_dir, component, scenario_name)
+                config = get_config(producer_dir, component, scenario_name)
                 validator = validators.get(config.get('openlineage_version'))
                 print(f"for scenario {scenario_name} validation version is {config.get('openlineage_version')}")
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
