@@ -193,7 +193,7 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'spark_dataproc'
-          tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
+          release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
           ol_release: ${{ inputs.ol_release }}
           component_release: ${{ inputs.spark_release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
