@@ -77,13 +77,6 @@ runs:
         done
         cd ..
 
-    - name: TEMP UPLOAD SPECS
-      uses: actions/upload-artifact@v4
-      with:
-        name: specs
-        path: specs
-        retention-days: 1
-
     - name: Set up Python 3.11
       uses: actions/setup-python@v3
       with:
