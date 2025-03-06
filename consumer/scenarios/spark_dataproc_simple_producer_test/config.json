@@ -1,6 +1,4 @@
 {
   "openlineage_version": "1.23.0",
-  "tags": {
-    "input": "spark_dataproc"
-  }
+  "input": "spark_dataproc"
 }

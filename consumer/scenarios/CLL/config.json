@@ -1,6 +1,4 @@
 {
   "openlineage_version": "1.19.0",
-  "tags": {
-    "input": "spark"
-  }
+  "input": "spark"
 }

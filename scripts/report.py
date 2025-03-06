@@ -12,6 +12,9 @@ class Report:
     def from_dict(cls, d):
         return cls({f"{c['name']}-{c['component_version']}-{c['openlineage_version']}": Component.from_dict(c) for c in d})
 
+    @classmethod
+    def single_component_report(cls, component):
+        return cls({component.name: component})
 
     def get_tag_summary(self):
         return {k: v.get_tag_summary() for k, v in self.components.items()}
@@ -107,8 +110,9 @@ class Scenario:
 
     @classmethod
     def simplified(cls, name, tests):
-        return cls(name, 'SUCCESS' if not any(t for n, t in tests.items() if t.status == 'FAILURE') else 'FAILURE',
-                   tests)
+        tests_ = tests if isinstance(tests, dict) else {t.name: t for t in tests}
+        return cls(name, 'SUCCESS' if not any(t for n, t in tests_.items() if t.status == 'FAILURE') else 'FAILURE',
+                   tests_)
 
     @classmethod
     def from_dict(cls, d):
