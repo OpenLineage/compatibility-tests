@@ -232,8 +232,9 @@ def main():
         for scenario_name in listdir(base_dir):
             scenario_path = get_path(base_dir, component, scenario_name)
             if isdir(scenario_path):
-                config = get_config(producer_dir, component, scenario_name)
+                config = get_config(base_dir, component, scenario_name)
                 validator = validators.get(config.get('openlineage_version'))
+                print(f"for scenario {scenario_name} validation version is {config.get('openlineage_version')}")
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
                 tests = validate_scenario_syntax(result_events, validator, config)
