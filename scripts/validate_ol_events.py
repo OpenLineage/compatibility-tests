@@ -31,11 +31,7 @@ class OLSyntaxValidator:
 
     @classmethod
     def get_validators(cls, spec_path, tags):
-        syntax_validators = {}
-        for tag in tags:
-            schema_validators = cls.get_validator(spec_path, tag)
-            syntax_validators[tag] = cls(schema_validators)
-        return syntax_validators
+        return {tag: cls.get_validator(spec_path, tag) for tag in tags}
 
     @classmethod
     def get_validator(cls, spec_path, tag):
@@ -45,7 +41,7 @@ class OLSyntaxValidator:
         schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema) for schema in
                              facet_schemas}
         schema_validators['core'] = Draft202012Validator(spec_schema)
-        return schema_validators
+        return cls(schema_validators)
 
     def validate_entity(self, instance, schema_type):
         schema_validator = self.schema_validators.get(schema_type)
