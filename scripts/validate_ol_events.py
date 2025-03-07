@@ -11,7 +11,7 @@ from jsonschema import Draft202012Validator
 from report import Test, Scenario, Component, Report
 from compare_releases import release_between
 from compare_events import diff
-
+from jsonschema import RefResolver
 
 class OLSyntaxValidator:
     def __init__(self, schema_validators):
@@ -43,29 +43,32 @@ class OLSyntaxValidator:
         schema_validators['core'] = Draft202012Validator(spec_schema)
         return cls(schema_validators)
 
-    def validate_entity(self, instance, schema_type):
-        schema_validator = self.schema_validators.get(schema_type)
-        if schema_validator is not None:
-            errors = [error for error in schema_validator.iter_errors(instance)]
-            if len(errors) == 0:
+    def validate_entity(self, instance, schema_type, name):
+        try:
+            schema_validator = self.schema_validators.get(schema_type)
+            if schema_validator is not None:
+                errors = [error for error in schema_validator.iter_errors(instance)]
+                if len(errors) == 0:
+                    return []
+                else:
+                    return [f"{(e := best_match([error], by_relevance())).json_path}: {e.message}" for error in errors]
+            elif self.is_custom_facet(instance.get(schema_type), schema_type):
+                # facet type may be custom facet without available schema json file (defined only as class)
                 return []
             else:
-                return [f"{(e := best_match([error], by_relevance())).json_path}: {e.message}" for error in errors]
-        elif self.is_custom_facet(instance.get(schema_type), schema_type):
-            # facet type may be custom facet without available schema json file (defined only as class)
-            return []
-        else:
-            return [f"$.{schema_type} facet type {schema_type} not recognized"]
+                return [f"$.{schema_type} facet type {schema_type} not recognized"]
+        except Exception as e:
+            print(f"when validating {schema_type}, for instance of {name} following exception ocurred \n {e}")
 
-    def validate(self, event):
+    def validate(self, event, name):
         validation_result = []
-        run_validation = self.validate_entity(event, 'core')
-        run = self.validate_entity_map(event, 'run')
-        job = self.validate_entity_map(event, 'job')
-        inputs = self.validate_entity_array(event, 'inputs', 'facets')
-        input_ifs = self.validate_entity_array(event, 'inputs', 'inputFacets')
-        outputs = self.validate_entity_array(event, 'outputs', 'facets')
-        output_ofs = self.validate_entity_array(event, 'outputs', 'outputFacets')
+        run_validation = self.validate_entity(event, 'core', name)
+        run = self.validate_entity_map(event, 'run', name)
+        job = self.validate_entity_map(event, 'job', name)
+        inputs = self.validate_entity_array(event, 'inputs', 'facets', name)
+        input_ifs = self.validate_entity_array(event, 'inputs', 'inputFacets', name)
+        outputs = self.validate_entity_array(event, 'outputs', 'facets', name)
+        output_ofs = self.validate_entity_array(event, 'outputs', 'outputFacets', name)
 
         validation_result.extend(run_validation)
         validation_result.extend(run)
@@ -77,15 +80,15 @@ class OLSyntaxValidator:
 
         return validation_result
 
-    def validate_entity_array(self, data, entity, generic_facet_type):
+    def validate_entity_array(self, data, entity, generic_facet_type, name):
         return [e.replace('$', f'$.{entity}[{ind}]')
                 for ind, i in enumerate(data[entity])
                 for k, v in (i.get(generic_facet_type).items() if generic_facet_type in i else {}.items())
-                for e in self.validate_entity({k: v}, k)]
+                for e in self.validate_entity({k: v}, k, name)]
 
-    def validate_entity_map(self, data, entity):
+    def validate_entity_map(self, data, entity, name):
         return [e.replace('$', f'$.{entity}') for k, v in data[entity]['facets'].items() for e in
-                self.validate_entity({k: v}, k)]
+                self.validate_entity({k: v}, k, name)]
 
 
 class OLSemanticValidator:
@@ -174,7 +177,7 @@ def validate_scenario_syntax(result_events, validator, config):
     for name, event in result_events.items():
         identification = get_event_identifier(event, name, config.get('patterns'))
         print(f"syntax validation for {identification}")
-        details = validator.validate(event)
+        details = validator.validate(event, name)
         syntax_tests[identification] = Test(identification, "FAILURE" if len(details) > 0 else "SUCCESS",
                                             'syntax', 'openlineage', details, {})
     return syntax_tests
