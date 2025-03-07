@@ -40,7 +40,7 @@ class OLSyntaxValidator:
         file_paths = listdir(join(spec_path, tag))
         facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('Facet.json')]
         spec_schema = next(load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
-        resolver = RefResolver(base_uri='https://openlineage.io/spec/2-0-2/OpenLineage.json', referrer=spec_schema)
+        resolver = RefResolver(base_uri=spec_schema['$id'], referrer=spec_schema)
         schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema, resolver=resolver) for schema in
                              facet_schemas}
         schema_validators['core'] = Draft202012Validator(spec_schema)
