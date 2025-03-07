@@ -109,16 +109,16 @@ jobs:
 #
 #  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 #
-#  collect-and-compare-reports:
-#    needs:
-#      - initialize_workflow
-#      - scenarios
-#      - dataplex
+  collect-and-compare-reports:
+    needs:
+      - initialize_workflow
+      - scenarios
+      - dataplex
 #      - spark_dataproc
-#    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
-#    uses: ./.github/workflows/collect_and_compare_reports.yml
-#    with:
-#      fail-for-new-failures: true
+    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
+    uses: ./.github/workflows/collect_and_compare_reports.yml
+    with:
+      fail-for-new-failures: true
 #
 #  generate-compatibility-tables:
 #    needs:
