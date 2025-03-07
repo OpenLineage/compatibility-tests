@@ -44,14 +44,12 @@ class OLSyntaxValidator:
         for schema in facet_schemas:
             name = next(iter(schema['properties']))
             store = {
-                "https://openlineage.io/spec/2-0-2/OpenLineage.json": spec_schema,
+                spec_schema['$id']: spec_schema,
                 schema['$id']: schema,
             }
             resolver = RefResolver(base_uri="", referrer=spec_schema, store=store)
             schema_validators[name] = Draft202012Validator(schema, resolver=resolver)
 
-        # schema_validators = {next(iter(schema['properties'])): Draft202012Validator(schema, resolver=resolver) for schema in
-        #                      facet_schemas}
         schema_validators['core'] = Draft202012Validator(spec_schema)
         return cls(schema_validators)
 
