@@ -1,4 +1,6 @@
 import argparse
+import traceback
+
 import jsonc
 import logging
 import os
@@ -57,8 +59,8 @@ class OLSyntaxValidator:
                 return []
             else:
                 return [f"$.{schema_type} facet type {schema_type} not recognized"]
-        except Exception as e:
-            print(f"when validating {schema_type}, for instance of {name} following exception ocurred \n {e}")
+        except Exception:
+            print(f"when validating {schema_type}, for instance of {name} following exception ocurred \n {traceback.format_exc()}")
 
     def validate(self, event, name):
         validation_result = []
