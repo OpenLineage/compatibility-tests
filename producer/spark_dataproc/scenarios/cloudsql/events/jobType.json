@@ -1,0 +1,14 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "spark_cloud_sql_example.execute_save_into_data_source_command.test",
+    "facets": {
+      "jobType": {
+        "processingType": "BATCH",
+        "integration": "SPARK",
+        "jobType": "SQL_JOB"
+      }
+    }
+  }
+}

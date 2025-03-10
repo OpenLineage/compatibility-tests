@@ -420,7 +420,7 @@ def parse_spark_properties(spark_properties_str: str) -> typing.Dict[str, str]:
     properties = {}
     if spark_properties_str:
         for item in spark_properties_str.split(","):
-            key_value = item.split("=")
+            key_value = item.split("=", 1)
             if len(key_value) == 2:
                 key, value = key_value
                 properties[key.strip()] = value.strip()
@@ -436,7 +436,7 @@ async def create_cluster_command(args):
     credentials = get_gcp_credentials(credentials_file=args.credentials_file)
     spark_properties = parse_spark_properties(args.cluster_properties)
     spark_metadata = parse_spark_properties(args.metadata)
-    initialization_actions = args.initialization_actions.split(",")
+    initialization_actions = args.initialization_actions.split(",") if args.initialization_actions else []
     client = ClusterControllerAsyncClient(
         client_options={"api_endpoint": f"{args.region}-dataproc.googleapis.com:443"},
         credentials=credentials,

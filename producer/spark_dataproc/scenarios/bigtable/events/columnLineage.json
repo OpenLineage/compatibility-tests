@@ -1,0 +1,53 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "bigtable_example.execute_save_into_data_source_command.gcp-open-lineage-testing"
+  },
+  "outputs": [
+    {
+      "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+      "name": "output_table",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "someCol": {
+              "inputFields": [
+                {
+                  "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+                  "name": "input_table",
+                  "field": "stringCol",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "someCol2": {
+              "inputFields": [
+                {
+                  "namespace": "bigtable://gcp-open-lineage-testing/openlineage-test",
+                  "name": "input_table",
+                  "field": "stringCol2",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

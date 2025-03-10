@@ -1,0 +1,17 @@
+{
+    "eventType": "COMPLETE",
+    "job": {
+      "namespace": "default",
+      "name": "spark_cloud_sql_example"
+    },
+    "run": {
+      "facets": {
+        "spark_properties": {
+            "properties": {
+                "spark.master": "yarn",
+                "spark.app.name": "Spark CloudSQL example"
+            }
+        }
+      }
+    }
+}

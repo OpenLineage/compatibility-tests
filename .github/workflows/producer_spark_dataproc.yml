@@ -5,6 +5,10 @@ on:
     secrets:
       gcpKey:
         required: true
+      postgresqlUser:
+        required: true
+      postgresqlPassword:
+        required: true
     inputs:
       release:
         description: "release tag of OpenLineage to use"
@@ -80,6 +84,14 @@ jobs:
           local-file-path: producer/spark_dataproc/runner/get_openlineage_jar.sh
           gcs-path: "gs://open-lineage-e2e/scripts"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+    
+      - name: Upload CloudSQL init actions to GCS
+        id: upload-cloud-sql-initialization-actions
+        uses: ./.github/actions/upload_artifacts
+        with:
+          local-file-path: producer/spark_dataproc/runner/cloud_sql_proxy.sh
+          gcs-path: "gs://open-lineage-e2e/scripts"
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v3
@@ -100,8 +112,8 @@ jobs:
           --region us-west1 \
           --cluster-name dataproc-producer-test-${{ github.run_id }} \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
-          --metadata "SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar,OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }},SPARK_SPANNER_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.1-spanner-1.1.0.jar" \
-          --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }}"
+          --metadata 'SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar,OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }},SPARK_SPANNER_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.1-spanner-1.1.0.jar,SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.3.0.jar,enable-cloud-sql-hive-metastore=false,additional-cloud-sql-instances=gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307' \
+          --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }},${{ steps.upload-cloud-sql-initialization-actions.outputs.uploaded-file }}"
 #          --metadata "SPARK_BQ_CONNECTOR_URL=${{ steps.upload-spark-bq-connector.outputs.uploaded-file }},OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }}" \
 
       - name: Set producer output event dir
@@ -126,7 +138,7 @@ jobs:
               --gcs-bucket open-lineage-e2e \
               --python-job "$run_script" \
               --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
-              --spark-properties "spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs" \
+              --spark-properties 'spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs,spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }},spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}' \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
               --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
               --dataproc-image-version 2.2-ubuntu22 \
