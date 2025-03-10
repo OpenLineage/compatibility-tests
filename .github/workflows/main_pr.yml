@@ -20,6 +20,7 @@ jobs:
       run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
       any_run: ${{ steps.changed_files.outputs.any_any_changed }}
+      test_matrix: ${{ steps.set-matrix-values.outputs.spark_dataproc_matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,7 +54,24 @@ jobs:
         run: |
           echo " any changed value is ${{ steps.changed_files.outputs.any_changed }}"
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
-          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT
+      - name: set-matrix-values
+        id: set-matrix-values
+        run: |
+          check_producer() {
+              local producer="$1"
+              local file="./producer/${producer}/versions.json"
+          
+              if [[ -f "$file" ]]; then
+                  cat "$file" | jq -c
+              else
+                  echo "Error: File '$file' does not exist." >&2
+                  return 1
+              fi
+          }
+          echo "spark_dataproc_matrix=$(check_producer spark_dataproc)" >> $GITHUB_OUTPUT
+          
+          # echo "myoutput=$(jq -cn --argjson environments "$TARGETS" '{target: $environments}')" >> $GITHUB_OUTPUT
 
   ######## COMPONENT VALIDATION ########
 
@@ -80,14 +98,17 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.test_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
-      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      ol_release: ${{ matrix.openlineage_versions }}
+      spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
 
-  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
-
+#  ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
+#
   collect-and-compare-reports:
     needs:
       - initialize_workflow
@@ -95,12 +116,13 @@ jobs:
       - dataplex
       - spark_dataproc
     if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
+
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
       fail-for-new-failures: true
-
-  generate-compatibility-tables:
-    needs:
-      - collect-and-compare-reports
-    uses: ./.github/workflows/generate_compatibility_tables.yml
+#
+#  generate-compatibility-tables:
+#    needs:
+#      - collect-and-compare-reports
+#    uses: ./.github/workflows/generate_compatibility_tables.yml
 
