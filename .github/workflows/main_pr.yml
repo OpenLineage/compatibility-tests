@@ -15,11 +15,11 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: ${{ steps.changed_files.outputs.dataplex_any_changed }}
-      run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
-      run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
+      run_dataplex: ${{ steps.get-changed.outputs.dataplex_changed }}
+      run_scenarios: ${{ steps.get-changed.outputs.scenarios_changed }}
+      run_spark_dataproc: ${{ steps.get-changed.outputs.spark_dataproc_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
-      any_run: ${{ steps.changed_files.outputs.any_any_changed }}
+      any_run: ${{ steps.get-changed.outputs.any_changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,26 +32,37 @@ jobs:
         id: check-configs
         run: ./scripts/check_configs.sh
 
-      - name: Get changed files
-        id: changed_files
-        uses: tj-actions/changed-files@v45
-        with:
-          files_yaml: |
-            scenarios:
-              - consumer/scenarios/**
-            dataplex:
-              - consumer/consumers/dataplex/**
-            spark_dataproc:
-              - producer/spark_dataproc/**
-            any:
-              - consumer/scenarios/**
-              - consumer/consumers/**
-              - producer/**
+      - name: get changed files
+        id: get-changed
+        run: |
+          check_path() {
+            local path=$1
+            local output=$2
+            if echo "$CHANGED_FILES" | grep -q "$path"; then
+              echo "$output=true" >> $GITHUB_OUTPUT
+              echo "true"
+            fi
+          }
+          
+          CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          if [[ -n "$CHANGED_FILES" ]]; then
+            echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+            
+            scenarios=$(check_path "consumer/scenarios/" "scenarios_changed")
+            dataplex=$(check_path "consumer/consumers/dataplex/" "dataplex_changed")
+            spark_dataproc=$(check_path "producer/spark_dataproc/" "spark_dataproc_changed")
+            
+            if [[ $scenarios || $dataplex || $spark_dataproc ]]; then
+              echo "any_changed=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: get openlineage release
         id: get-release
         run: |
-          echo " any changed value is ${{ steps.changed_files.outputs.any_changed }}"
+          echo " any changed value is ${{ steps.get-changed.outputs.any_changed }}"
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
           echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
 
