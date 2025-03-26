@@ -49,6 +49,7 @@ jobs:
           if [[ -n "$CHANGED_FILES" ]]; then
             echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
             
+<<<<<<< HEAD
             scenarios=$(check_path "consumer/scenarios/" "scenarios_changed")
             dataplex=$(check_path "consumer/consumers/dataplex/" "dataplex_changed")
             spark_dataproc=$(check_path "producer/spark_dataproc/" "spark_dataproc_changed")
@@ -56,6 +57,13 @@ jobs:
             if [[ $scenarios || $dataplex || $spark_dataproc ]]; then
               echo "any_changed=true" >> $GITHUB_OUTPUT
             fi
+=======
+            
+            check_path "consumer/scenarios/" "scenarios_changed"
+            check_path "consumer/consumers/dataplex/" "dataplex_changed"
+            check_path "producer/spark_dataproc/" "spark_dataproc_changed"
+            check_path "consumer/scenarios/,consumer/consumers/,producer/" "any_changed"
+>>>>>>> ae1e516 (dummy change)
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
