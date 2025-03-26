@@ -167,6 +167,7 @@ jobs:
         if: ${{ steps.init.outputs.scenarios }}
         id: run-producer
         run: |
+          set -e
           IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
           
           for scenario in "${scenarios[@]}"
@@ -175,7 +176,7 @@ jobs:
               
               echo "Running spark job for scenario: $scenario"
 
-              python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
+              if ! python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
               --project-id gcp-open-lineage-testing \
               --region us-west1 \
               --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
@@ -185,8 +186,10 @@ jobs:
               --spark-properties 'spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs,spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }},spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}' \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
               --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
-              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
-              || { echo "Error: Spark job failed for scenario: $scenario"; }
+              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}; then
+                echo "Error: Spark job failed for scenario: $scenario"
+                exit 1
+              fi
 
               echo "Finished running spark job for scenario: $scenario"
           done
