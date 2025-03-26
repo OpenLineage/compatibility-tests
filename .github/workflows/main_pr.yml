@@ -20,7 +20,6 @@ jobs:
       run_spark_dataproc: ${{ steps.get-changed.outputs.spark_dataproc_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
       any_run: ${{ steps.get-changed.outputs.any_changed }}
-      test_matrix: ${{ steps.set-matrix-values.outputs.spark_dataproc_matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,18 +45,14 @@ jobs:
           }
           
           CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
-          echo "CHANGED FILES"
-          echo "$CHANGED_FILES"
           if [[ -n "$CHANGED_FILES" ]]; then
             echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-            echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')"
             
             scenarios=$(check_path "consumer/scenarios/" "scenarios_changed")
             dataplex=$(check_path "consumer/consumers/dataplex/" "dataplex_changed")
             spark_dataproc=$(check_path "producer/spark_dataproc/" "spark_dataproc_changed")
             
             if [[ $scenarios || $dataplex || $spark_dataproc ]]; then
-              echo "any_changed=true"
               echo "any_changed=true" >> $GITHUB_OUTPUT
             fi
           fi
