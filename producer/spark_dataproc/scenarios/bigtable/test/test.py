@@ -62,10 +62,10 @@ def delete_bigtable_table(table_name, admin_client):
         print(f"Deleted CBT table: {table_name}")
 
 spark = SparkSession.builder.appName("BigtableExample").getOrCreate()
-
-test_name = "test"
-input_table = "input_table"
-output_table = "output_table"
+suffix = spark.conf.get('spark.scenario.suffix')
+test_name = f"test_{suffix}"
+input_table = f"input_table_{suffix}"
+output_table = f"output_table_{suffix}"
 
 # Assuming admin_client is already set up
 # create_bigtable_table(input_table, admin_client)
@@ -89,7 +89,7 @@ raw_basic_catalog = ("""
 """) % input_table
 
 project_id = "gcp-open-lineage-testing"
-instance_id = "openlineage-test"
+instance_id = f"openlineage-test_{suffix}"
 
 write_dataframe_to_bigtable(test_df, raw_basic_catalog, project_id, instance_id, True)
 
