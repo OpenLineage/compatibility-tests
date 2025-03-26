@@ -15,12 +15,12 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: ${{ steps.changed_files.outputs.dataplex_any_changed }}
-      run_scenarios: ${{ steps.changed_files.outputs.scenarios_any_changed }}
-      run_spark_dataproc: ${{ steps.changed_files.outputs.spark_dataproc_any_changed }}
+      run_dataplex: ${{ steps.get-changed.outputs.dataplex_changed }}
+      run_scenarios: ${{ steps.get-changed.outputs.scenarios_changed }}
+      run_spark_dataproc: ${{ steps.get-changed.outputs.spark_dataproc_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
       any_run: ${{ steps.get-changed.outputs.any_changed }}
-#      test_matrix: ${{ steps.set-matrix-values.outputs.spark_dataproc_matrix }}
+      test_matrix: ${{ steps.set-matrix-values.outputs.spark_dataproc_matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,7 +49,6 @@ jobs:
           if [[ -n "$CHANGED_FILES" ]]; then
             echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
             
-<<<<<<< HEAD
             scenarios=$(check_path "consumer/scenarios/" "scenarios_changed")
             dataplex=$(check_path "consumer/consumers/dataplex/" "dataplex_changed")
             spark_dataproc=$(check_path "producer/spark_dataproc/" "spark_dataproc_changed")
@@ -57,13 +56,6 @@ jobs:
             if [[ $scenarios || $dataplex || $spark_dataproc ]]; then
               echo "any_changed=true" >> $GITHUB_OUTPUT
             fi
-=======
-            
-            check_path "consumer/scenarios/" "scenarios_changed"
-            check_path "consumer/consumers/dataplex/" "dataplex_changed"
-            check_path "producer/spark_dataproc/" "spark_dataproc_changed"
-            check_path "consumer/scenarios/,consumer/consumers/,producer/" "any_changed"
->>>>>>> ae1e516 (dummy change)
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
