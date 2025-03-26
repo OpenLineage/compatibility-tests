@@ -41,7 +41,7 @@ jobs:
             local output=$2
             if echo "$CHANGED_FILES" | grep -q "$path"; then
               echo "$output=true" >> $GITHUB_OUTPUT
-              echo "$output=true" > &2
+              echo "$output=true" 1>&2
               echo "true"
             else
               echo "false"
