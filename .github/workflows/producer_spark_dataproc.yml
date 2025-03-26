@@ -184,7 +184,7 @@ jobs:
               --gcs-bucket open-lineage-e2e \
               --python-job "$run_script" \
               --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
-              --spark-properties 'spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs,spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }},spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }},spark.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}' \
+              --spark-properties 'spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs,spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }},spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }},spark.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}' \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
               --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
               --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}; then
