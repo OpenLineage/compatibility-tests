@@ -248,6 +248,8 @@ jobs:
       - name: Fail if spark jobs failed
         if: ${{ steps.init.outputs.scenarios }} && ${{ steps.run-producer.outcome }} == 'failure'
         run: |
+          echo "steps.run-producer.outcome='${{ steps.run-producer.outcome }}'"
+          echo "steps.run-producer.conclusion='${{ steps.run-producer.conclusion }}'"
           exit 1
 
       - name: Validation
