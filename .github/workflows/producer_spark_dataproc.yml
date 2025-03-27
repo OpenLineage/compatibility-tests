@@ -210,6 +210,7 @@ jobs:
 
           for scenario in "${scenarios[@]}"
           do
+              echo "Getting script for scenario $scenario"
               run_script=$(find "producer/spark_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
               
               echo "Running spark job for scenario: $scenario"
@@ -224,13 +225,16 @@ jobs:
               --spark-properties "$properties" \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
               --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
-              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}; then
+              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
+              then
                 echo "Error: Spark job failed for scenario: $scenario"
                 exit 1
               fi
 
               echo "Finished running spark job for scenario: $scenario"
           done
+
+          echo "Finished running all scenarios"
       
       - name: Terminate producer cluster
         if: ${{ always() }} && ${{ steps.init.outputs.scenarios }} && ${{ steps.start-producer.outcome }} == 'success'
