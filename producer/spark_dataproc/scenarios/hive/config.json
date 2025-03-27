@@ -279,7 +279,7 @@
           "schema"
         ],
         "lineage_level": {
-          "bigquery": [
+          "hive": [
             "dataset"
           ]
         }
@@ -296,7 +296,7 @@
           "columnLineage"
         ],
         "lineage_level": {
-          "bigquery": [
+          "hive": [
             "dataset",
             "column",
             "transformation"
