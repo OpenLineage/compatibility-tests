@@ -6,17 +6,11 @@ set -euxo pipefail
 
 readonly VM_SPARK_JARS_DIR=/usr/lib/spark/jars
 
-# Function to get metadata value with default
-get_metadata_with_default() {
-    local key=$1; local default=$2
-    echo $(/usr/share/google/get_metadata_value attributes/${key} || echo ${default})
-}
-
-readonly SPARK_BQ_CONNECTOR_URL=$(get_metadata_with_default "SPARK_BQ_CONNECTOR_URL" "gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar")
-readonly OPENLINEAGE_SPARK_URL=$(get_metadata_with_default "OPENLINEAGE_SPARK_URL" "gs://open-lineage-e2e/jars/openlineage-spark_2.12-1.29.0-SNAPSHOT.jar")
-readonly SPARK_SPANNER_CONNECTOR_URL=$(get_metadata_with_default "SPARK_SPANNER_CONNECTOR_URL" "gs://open-lineage-e2e/jars/spark-3.1-spanner-1.1.0.jar")
-readonly SPARK_BIGTABLE_CONNECTOR_URL=$(get_metadata_with_default "SPARK_BIGTABLE_CONNECTOR_URL" "")
-readonly POSTGRES_URL=$(get_metadata_with_default "POSTGRES_URL" "gs://open-lineage-e2e/jars/postgresql-42.5.6.jar")
+readonly SPARK_BQ_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attributes/SPARK_BQ_CONNECTOR_URL || echo "gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar")
+readonly OPENLINEAGE_SPARK_URL=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_SPARK_URL || echo "gs://open-lineage-e2e/jars/openlineage-spark_2.12-1.29.0-SNAPSHOT.jar")
+readonly SPARK_SPANNER_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attributes/SPARK_SPANNER_CONNECTOR_URL || echo "gs://open-lineage-e2e/jars/spark-3.1-spanner-1.1.0.jar")
+readonly SPARK_BIGTABLE_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attributes/SPARK_BIGTABLE_CONNECTOR_URL || echo "")
+readonly POSTGRES_URL=$(/usr/share/google/get_metadata_value attributes/POSTGRES_URL || echo "gs://open-lineage-e2e/jars/postgresql-42.5.6.jar")
 
 gsutil cp -P "${SPARK_BQ_CONNECTOR_URL}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${OPENLINEAGE_SPARK_URL}" "${VM_SPARK_JARS_DIR}/"

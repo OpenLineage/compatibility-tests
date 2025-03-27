@@ -237,7 +237,7 @@ jobs:
           echo "Finished running all scenarios"
       
       - name: Terminate producer cluster
-        if: ${{ always() }} && ${{ steps.init.outputs.scenarios }} && ${{ steps.start-producer.outcome }} == 'success'
+        if: ${{ always() && steps.init.outputs.scenarios && steps.start-producer.outcome == 'success' }}
         run: |
           python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
           --project-id gcp-open-lineage-testing \
