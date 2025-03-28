@@ -90,7 +90,7 @@ raw_basic_catalog = ("""
 """) % input_table
 
 project_id = "gcp-open-lineage-testing"
-instance_id = f"openlineage-test-{suffix}"
+instance_id = "openlineage-test"
 
 write_dataframe_to_bigtable(test_df, raw_basic_catalog, project_id, instance_id, True)
 
