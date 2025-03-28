@@ -86,17 +86,17 @@ jobs:
           version: '0.42.0'
           extension: 'jar'
 
-      - name: Download Spark BigTable Maven Artifact
-        id: download-spark-bigtable-connector
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: clausnz/github-action-download-maven-artifact@master
-        with:
-          url: 'https://repo1.maven.org'
-          repository: 'maven2'
-          groupId: 'com.google.cloud.spark.bigtable'
-          artifactId: 'spark-bigtable_2.12'
-          version: '0.4.0'
-          extension: 'jar'
+#      - name: Download Spark BigTable Maven Artifact
+#        id: download-spark-bigtable-connector
+#        if: ${{ steps.init.outputs.scenarios }}
+#        uses: clausnz/github-action-download-maven-artifact@master
+#        with:
+#          url: 'https://repo1.maven.org'
+#          repository: 'maven2'
+#          groupId: 'com.google.cloud.spark.bigtable'
+#          artifactId: 'spark-bigtable_2.12'
+#          version: '0.4.0'
+#          extension: 'jar'
 
       - name: Upload openlineage spark integration to GCS
         id: upload-spark-integration
@@ -125,14 +125,14 @@ jobs:
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
-      - name: Upload Spark BigTable connector to GCS
-        id: upload-spark-bigtable-connector
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.download-spark-bigtable-connector.outputs.file }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+#      - name: Upload Spark BigTable connector to GCS
+#        id: upload-spark-bigtable-connector
+#        if: ${{ steps.init.outputs.scenarios }}
+#        uses: ./.github/actions/upload_artifacts
+#        with:
+#          local-file-path: ${{ steps.download-spark-bigtable-connector.outputs.file }}
+#          gcs-path: "gs://open-lineage-e2e/jars"
+#          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Upload initialization actions to GCS
         id: upload-initialization-actions
@@ -236,14 +236,14 @@ jobs:
 
           echo "Finished running all scenarios"
       
-      - name: Terminate producer cluster
-        if: ${{ always() && steps.init.outputs.scenarios && steps.start-producer.outcome == 'success' }}
-        run: |
-          python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-          --project-id gcp-open-lineage-testing \
-          --region us-west1 \
-          --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
+#      - name: Terminate producer cluster
+#        if: ${{ always() && steps.init.outputs.scenarios && steps.start-producer.outcome == 'success' }}
+#        run: |
+#          python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
+#          --project-id gcp-open-lineage-testing \
+#          --region us-west1 \
+#          --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
+#          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
       
       - name: Fail if spark jobs failed
         if: ${{ steps.init.outputs.scenarios && steps.run-producer.outcome  == 'failure' }}
