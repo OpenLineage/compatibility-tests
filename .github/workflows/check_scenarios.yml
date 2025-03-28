@@ -20,6 +20,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: get scenarios' OL versions
+        id: get_versions
+        run: |
+          SCENARIO_DIR=./consumer/scenarios
+          if [ ! -d "$SCENARIO_DIR" ]; then
+              echo "Scenario directory '$SCENARIO_DIR' not found!"
+              exit 1
+          fi
+
+          VERSIONS=()
+          for scenario in "$SCENARIO_DIR"/*; do
+              if [ -d "$scenario" ] && [ -f "$scenario/config.json" ]; then
+                  VERSION=$(jq -r '.openlineage_version' "$scenario/config.json" 2>/dev/null)
+                  if [ -n "$VERSION" ] && [ "$VERSION" != "null" ]; then
+                      VERSIONS+=("$VERSION")
+                  fi
+              fi
+          done
+
+          UNIQUE_VERSIONS=($(printf "%s\n" "${VERSIONS[@]}" | sort -u))
+          echo "versions=$(IFS=,; echo "${UNIQUE_VERSIONS[*]}")" >> $GITHUB_OUTPUT
+
       - name: Create report.json directory
         run: mkdir -p reports/
 
@@ -27,8 +49,7 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'scenarios'
-          tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.release }}
-          release: ${{ inputs.release }}
+          release_tags: ${{ steps.get_versions.outputs.versions }}
           target-path: 'reports/scenarios-report.json'
           event-directory: './consumer/scenarios'
           producer-dir: './consumer'

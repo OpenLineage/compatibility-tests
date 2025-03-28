@@ -63,9 +63,10 @@ def delete_bigtable_table(table_name, admin_client):
 
 spark = SparkSession.builder.appName("BigtableExample").getOrCreate()
 
-test_name = "test"
-input_table = "input_table"
-output_table = "output_table"
+suffix = spark.conf.get('spark.scenario.suffix')
+test_name = f"test_{suffix}"
+input_table = f"input_table_{suffix}"
+output_table = f"output_table_{suffix}"
 
 # Assuming admin_client is already set up
 # create_bigtable_table(input_table, admin_client)
