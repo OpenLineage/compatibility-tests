@@ -15,7 +15,7 @@ if [[ -n "${OPENLINEAGE_SPARK_URL}" ]]; then
     bq_url="${SPARK_BQ_CONNECTOR_URL}"
     ol_url="${OPENLINEAGE_SPARK_URL}"
     spanner_url="${SPARK_SPANNER_CONNECTOR_URL}"
-    bigtable_url="${SPARK_BIGTABLE_CONNECTOR_URL}"
+#    bigtable_url="${SPARK_BIGTABLE_CONNECTOR_URL}"
 else
     bq_url="gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar"
     ol_url="gs://open-lineage-e2e/jars/openlineage-spark_2.12-1.29.0-SNAPSHOT.jar"
