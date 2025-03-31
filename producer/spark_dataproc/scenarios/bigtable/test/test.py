@@ -15,11 +15,10 @@ def generate_test_row(number, start_range):
         doubleCol=float(number / 3.14)
     )
 
-def drop_if_exists(instance, table_name):
-    table = instance.table(table_id=table_name)
-    if table.exists():
-        print(f"Deleting existing table: {table_name}")
-        table.delete()
+# def drop_if_exists(instance, table_name):
+#     table = instance.table(table_id=table_name)
+#     if table.exists():
+#         table.delete()
 
 def generate_table_id(test_name):
     return f"cbt-{test_name}-{uuid.uuid4().hex[:20]}"
@@ -100,8 +99,8 @@ instance_id = "openlineage-test"
 client = bigtable.Client(project=project_id, admin=True)
 instance = client.instance(instance_id)
 
-drop_if_exists(instance, input_table)
-drop_if_exists(instance, output_table)
+# drop_if_exists(instance, input_table)
+# drop_if_exists(instance, output_table)
 
 write_dataframe_to_bigtable(test_df, raw_basic_catalog, project_id, instance_id, True)
 
