@@ -5,9 +5,7 @@
       "path": "validation/processes/processes.json",
       "entity": "process",
       "tags": {
-        "facets": ["run_event"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "facets": ["run_event"]
       }
     },
     {
@@ -15,9 +13,7 @@
       "path": "validation/runs/runs.json",
       "entity": "run",
       "tags": {
-        "facets": ["run_event"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "facets": ["run_event"]
       }
     },
     {
@@ -25,9 +21,7 @@
       "path": "validation/lineage_events/lineage_events.json",
       "entity": "lineage_event",
       "tags": {
-        "facets": ["run_event"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "facets": ["run_event"]
       }
     },
     {
@@ -35,9 +29,7 @@
       "path": "validation/links/links.json",
       "entity": "link",
       "tags": {
-        "facets": ["run_event"],
-        "min_version": "1.22.0",
-        "producer": "spark"
+        "facets": ["run_event"]
       }
     }
   ]

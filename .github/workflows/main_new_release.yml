@@ -44,28 +44,7 @@ jobs:
         # also normally new release of OL should trigger all producer tests but for now they are run anyway so no need to trigger
       - name: Select components to run
         id: select-components
-        run: |
-          # assuming the version will not exceed 1000 this is the quickest way to get comparable values
-          version_sum() {
-            IFS='.' read -r var1 var2 var3 <<< "$1"
-            echo $(( var1 * 1000000 + var2 * 1000 ))
-          }
-          
-          current_ol=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
-          latest_ol=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)
-
-          sum1=$(version_sum "$latest_ol")
-          sum2=$(version_sum "$current_ol")
-          
-          if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
-              echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
-              echo "releases_updated=true" >> $GITHUB_OUTPUT
-              jq --arg latest_ol "$latest_ol" 'map(if .name == "openlineage" then .latest_version = $latest_ol else . end)' \
-              generated-files/releases.json > generated-files/updated-releases.json
-          else
-              echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
-          fi       
-
+        run: ./scripts/select_components.sh
       - uses: actions/upload-artifact@v4
         if: steps.select-components.outputs.releases_updated == 'true'
         with:
