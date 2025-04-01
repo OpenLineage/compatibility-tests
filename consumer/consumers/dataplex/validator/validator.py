@@ -42,7 +42,7 @@ class EntityHandler:
                 time.sleep(0.1)
             except InvalidArgument as exc:
                 report.append((e['name'], exc.args[0]))
-        time.sleep(1)
+        time.sleep(2)
         return report
 
     def load_validation_events(self, scenario, config):
