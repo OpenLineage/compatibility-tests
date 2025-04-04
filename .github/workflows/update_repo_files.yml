@@ -57,7 +57,10 @@ jobs:
 
       - name: Push changes
         id: push-changes
+        env:
+          TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
         run: |
           git add -u
           git commit -sm "[bot] update report with data from run ${{ github.run_id }} execution time: ${{ inputs.execution-time }}"
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/OpenLineage/compatibility-tests.git
           git push origin main
