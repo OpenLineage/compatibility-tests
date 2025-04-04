@@ -50,6 +50,11 @@ jobs:
             mv ./generated-files/updated-spec-versions.json ./generated-files/spec_versions.json || echo "updated-spec-versions.json not found"
           fi
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Push changes
         id: push-changes
         run: |
