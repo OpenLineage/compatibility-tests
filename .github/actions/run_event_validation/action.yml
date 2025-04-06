@@ -4,10 +4,19 @@ author: Tomasz Nazarewicz
 inputs:
   tag:
     description: "Version of the spec to check against"
-    required: true
-  release:
+    default: ""
+    required: false
+  release_tags:
+    description: "Versions of the spec to check against"
+    required: false
+  ol_release:
     description: "release to run the validation with"
-    required: true
+    default: ""
+    required: false
+  component_release:
+    description: "release of the component producing events"
+    default: ""
+    required: false
   target-path:
     description: "Path to save the report to"
     required: true
@@ -31,26 +40,47 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: create necessary dirs
+      id: create_dirs
+      shell: bash
+      run: |
+        mkdir -p specs
+        mkdir -p tmp
+        mkdir -p report
+
+    - name: get OpenlineageCode
+      uses: actions/checkout@v4
+      with:
+        repository: OpenLineage/OpenLineage
+        path: tmp
+
+    - name: Get spec for each tag
+      shell: bash
+      run: |
+        cd tmp
+        IFS=',' read -ra TAGS <<< "${{ inputs.release_tags }}"
+        for TAG in "${TAGS[@]}"; do
+        echo "Checking out tag: $TAG"
+            git fetch --tags --quiet
+            if git checkout --quiet "$TAG"; then
+                DEST_DIR="../specs/$TAG"
+                if [ -d "spec" ]; then
+                    mkdir -p "../specs/$TAG"
+                    find spec -path './website' -prune -o -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \) -exec cp {} "../specs/$TAG/" \;
+                    echo "success"
+                else
+                    echo "Spec directory not found in $TAG"
+                fi
+            else
+                echo "Tag $TAG not found!"
+            fi
+        done
+        cd ..
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v3
       with:
         python-version: "3.11"
-
-    - name: create dir for ol spec and report
-      id: dir_for_spec
-      shell: bash
-      run: |
-        mkdir -p spec
-        mkdir -p report
-
-    - name: get latest OL spec
-      uses: actions/checkout@v4
-      with:
-        repository: OpenLineage/OpenLineage
-        ref: ${{ inputs.tag }}
-        path: spec
-        sparse-checkout: |
-          spec/
 
     - name: Validate OpenLineage events
       shell: bash
@@ -58,8 +88,9 @@ runs:
         pip install -r ./scripts/requirements.txt
         python scripts/validate_ol_events.py \
         --event_base_dir=${{ inputs.event-directory }} \
-        --spec_dirs=spec/spec/,spec/spec/facets/,spec/spec/registry/gcp/dataproc/facets,spec/spec/registry/gcp/lineage/facets \
+        --spec_base_dir=specs \
         --target=${{ inputs.target-path }} \
         --component="${{ inputs.component }}" \
         --producer_dir=${{ inputs.producer-dir }} \
-        --release=${{ inputs.release }}
+        --openlineage_version=${{ inputs.release_tags }} \
+        --component_version=${{ inputs.component_release }}
