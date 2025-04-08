@@ -30,6 +30,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: refs/heads/main
+          token: ${{ secrets.CI_PUSH_TOKEN }}
 
       - uses: actions/download-artifact@v4
         with:
@@ -39,14 +40,16 @@ jobs:
 
       - id: update-files
         name: Replace Modified Files
+        env:
+          workflow_type: ${{ inputs.workflow-type }}
         run: |
-          if [[ "${{ inputs.workflow-type }}" == "release" ]]; then
+          if [[ ${workflow_type} == "release" ]]; then
             historical_report_name="${{inputs.trigger-type}}_${{ inputs.execution-time }}.json"
             mv ./generated-files/updated-new-report.json ./generated-files/historical_reports/${historical_report_name} || echo "updated-new-report.json not found"
             mv ./generated-files/updated-report.json ./generated-files/report.json || echo "updated-report.json not found"
             mv ./generated-files/updated-releases.json ./generated-files/releases.json || echo "updated-releases.json not found"
             mv ./generated-files/updated-compatibility-table.md ./generated-files/compatibility-table.md || echo "updated-compatibility-table.md not found"
-          elif [[ "$string" == "spec_change" ]]; then
+          elif [[ $type == "spec_change" ]]; then
             mv ./generated-files/updated-spec-versions.json ./generated-files/spec_versions.json || echo "updated-spec-versions.json not found"
           fi
 
@@ -57,10 +60,10 @@ jobs:
 
       - name: Push changes
         id: push-changes
-        env:
-          TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
+        # env:
+        #   TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
         run: |
           git add -u
           git commit -sm "[bot] update report with data from run ${{ github.run_id }} execution time: ${{ inputs.execution-time }}"
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/OpenLineage/compatibility-tests.git
+          # git remote set-url origin https://x-access-token:${TOKEN}@github.com/OpenLineage/compatibility-tests.git
           git push origin main
