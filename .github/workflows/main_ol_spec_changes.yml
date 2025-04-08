@@ -130,6 +130,8 @@ jobs:
       - notify-maintainers
     if: ${{ !failure() }}
     uses: ./.github/workflows/update_repo_files.yml
+    secrets:
+      CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
     with:
      workflow-type: 'spec_change'
      trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}

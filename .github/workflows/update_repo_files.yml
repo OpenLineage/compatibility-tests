@@ -1,6 +1,9 @@
 name: Update repo files
 on:
   workflow_call:
+    secrets:
+      CI_PUSH_TOKEN:
+        required: true
     inputs:
       trigger-type:
         type: string
