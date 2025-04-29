@@ -1,0 +1,59 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table"
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "bigquery-public-data.samples.shakespeare",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "word",
+              "type": "string",
+              "description": "A single unique word (where whitespace is the delimiter) extracted from a corpus."
+            },
+            {
+              "name": "word_count",
+              "type": "long",
+              "description": "The number of times this word appears in this corpus."
+            },
+            {
+              "name": "corpus",
+              "type": "string",
+              "description": "The work from which this word was extracted."
+            },
+            {
+              "name": "corpus_date",
+              "type": "long",
+              "description": "The year in which this corpus was published."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "data/bigquery_to_delta/e2e_delta_table",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "word",
+              "type": "string"
+            },
+            {
+              "name": "word_count",
+              "type": "long"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
