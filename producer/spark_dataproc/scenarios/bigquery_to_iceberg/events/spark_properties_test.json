@@ -1,0 +1,17 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table"
+  },
+  "run": {
+    "facets": {
+      "spark_properties": {
+        "properties": {
+          "spark.master": "yarn",
+          "spark.app.name": "BigQuery to Iceberg with BigQueryMetastoreCatalog"
+        }
+      }
+    }
+  }
+}
