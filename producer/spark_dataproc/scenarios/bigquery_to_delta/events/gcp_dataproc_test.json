@@ -1,0 +1,21 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table"
+  },
+  "run": {
+    "facets": {
+      "gcp_dataproc": {
+        "clusterUuid": "{{ is_uuid(result) }}",
+        "jobId": "{{ any(result) }}",
+        "jobUuid": "{{ is_uuid(result) }}",
+        "queryNodeName": "append_data_exec_v1",
+        "appName": "BigQuery to Delta on GCS",
+        "clusterName": "{{ match(result, 'dataproc-producer-test-.+') }}",
+        "appId": "{{ match(result, 'application_.+') }}",
+        "projectId": "gcp-open-lineage-testing"
+      }
+    }
+  }
+}

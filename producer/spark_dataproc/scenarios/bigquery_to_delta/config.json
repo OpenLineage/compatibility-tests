@@ -1,0 +1,119 @@
+{
+  "patterns": [
+    "writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_"
+  ],
+  "tests": [
+    {
+      "name": "run_event_test",
+      "path": "events/run_event_test.json",
+      "tags": {
+        "facets": [
+          "run_event"
+        ]
+      }
+    },
+    {
+      "name": "parent_test",
+      "path": "events/parent_test.json",
+      "tags": {
+        "facets": [
+          "parent"
+        ]
+      }
+    },
+    {
+      "name": "spark_properties_test",
+      "path": "events/spark_properties_test.json",
+      "tags": {
+        "facets": [
+          "spark_properties"
+        ]
+      }
+    },
+    {
+      "name": "processing_engine_test",
+      "path": "events/processing_engine_test.json",
+      "tags": {
+        "facets": [
+          "processing_engine"
+        ]
+      }
+    },
+    {
+      "name": "gcp_dataproc_test",
+      "path": "events/gcp_dataproc_test.json",
+      "tags": {
+        "facets": [
+          "gcp_dataproc"
+        ],
+        "min_version": "1.24.0"
+      }
+    },
+    {
+      "name": "jobType_test",
+      "path": "events/jobType_test.json",
+      "tags": {
+        "facets": [
+          "jobType"
+        ]
+      }
+    },
+    {
+      "name": "gcp_lineage_test",
+      "path": "events/gcp_lineage_test.json",
+      "tags": {
+        "facets": [
+          "gcp_lineage"
+        ]
+      }
+    },
+    {
+      "name": "dataSource_test",
+      "path": "events/dataSource_test.json",
+      "tags": {
+        "facets": [
+          "dataSource"
+        ]
+      }
+    },
+    {
+      "name": "schema_test",
+      "path": "events/schema_test.json",
+      "tags": {
+        "facets": [
+          "schema"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "columnLineage_test",
+      "path": "events/columnLineage_test.json",
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "storage_test",
+      "path": "events/storage_test.json",
+      "tags": {
+        "facets": [
+          "storage"
+        ]
+      }
+    }
+  ]
+}

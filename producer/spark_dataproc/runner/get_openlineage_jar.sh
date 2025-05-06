@@ -23,8 +23,12 @@ else
 fi
 
 postgresql_url="gs://open-lineage-e2e/jars/postgresql-42.5.6.jar"
+delta_spark_url="gs://open-lineage-e2e/jars/delta-spark_2.12-3.3.1.jar"
+delta_storage_url="gs://open-lineage-e2e/jars/delta-storage-3.3.1.jar"
 
 gsutil cp -P "${bq_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${ol_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${spanner_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${postgresql_url}" "${VM_SPARK_JARS_DIR}/"
+gsutil cp -P "${delta_spark_url}" "${VM_SPARK_JARS_DIR}/"
+gsutil cp -P "${delta_storage_url}" "${VM_SPARK_JARS_DIR}/"

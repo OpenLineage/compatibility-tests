@@ -1,0 +1,73 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table"
+  },
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "data/bigquery_to_delta/e2e_delta_table",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "word": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      
+                      "masking": false
+                    },
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "GROUP_BY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "word_count": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word",
+                  "transformations": [
+                    {
+                      "type": "INDIRECT",
+                      "subtype": "GROUP_BY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                },
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word_count",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "AGGREGATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
