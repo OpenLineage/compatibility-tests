@@ -1,10 +1,10 @@
 # Producers
 ## Facets Compatibility
-|     Name     |run_event|jobType|parent|dataSource|processing_engine|     sql    |  symlinks  |schema|columnLineage|gcp_dataproc_spark|gcp_lineage|spark_properties|environment-properties|gcp_dataproc|outputStatistics|
-|--------------|---------|-------|------|----------|-----------------|------------|------------|------|-------------|------------------|-----------|----------------|----------------------|------------|----------------|
-|  spark-mock  |    +    |   +   |   +  |     +    |        +        |      +     |      +     |   +  |      +      |         +        |     +     |        +       |           -          |      -     |        -       |
-|   hive-mock  |    +    |   -   |   -  |     -    |        -        |      -     |      -     |   -  |      -      |         -        |     -     |        -       |           -          |      -     |        -       |
-|spark_dataproc|    +    |   +   |   +  |     +    |        +        |above 1.24.0|above 1.22.0|   +  |      +      |         +        |     +     |        +       |           +          |      +     |        +       |
+|     Name     |run_event|jobType|parent|dataSource|processing_engine|     sql    |  symlinks  |schema|columnLineage|gcp_dataproc_spark|gcp_lineage|spark_properties|environment-properties|gcp_dataproc|outputStatistics|storage|
+|--------------|---------|-------|------|----------|-----------------|------------|------------|------|-------------|------------------|-----------|----------------|----------------------|------------|----------------|-------|
+|  spark-mock  |    +    |   +   |   +  |     +    |        +        |      +     |      +     |   +  |      +      |         +        |     +     |        +       |           -          |      -     |        -       |   -   |
+|   hive-mock  |    +    |   -   |   -  |     -    |        -        |      -     |      -     |   -  |      -      |         -        |     -     |        -       |           -          |      -     |        -       |   -   |
+|spark_dataproc|    +    |   +   |   +  |     +    |        +        |above 1.24.0|above 1.22.0|   +  |      +      |         +        |     +     |        +       |           +          |      +     |        +       |   +   |
 
 ## Lineage level support for spark-mock
 |Datasource|Dataset|Column|Transformation|

@@ -175,7 +175,7 @@
       },
       {
         "name": "spark_dataproc_simple_producer_test",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "4.json",
@@ -225,10 +225,12 @@
           },
           {
             "name": "runs",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "run",
-            "details": [],
+            "details": [
+              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .display_name: Expected value 019299c5-73cf-7069-a70f-74eb8070b577 does not equal result 019299c5-12f5-7946-b5b2-c6abab662e20"
+            ],
             "tags": {
               "facets": [
                 "run_event",
@@ -1851,6 +1853,404 @@
             "tags": {
               "facets": [
                 "spark_properties"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "bigquery_to_delta",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:big_query_to_delta_on_gcs:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ],
+              "min_version": "1.24.0"
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "storage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "storage"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "bigquery_to_iceberg",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ],
+              "min_version": "1.24.0"
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "storage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "storage"
               ]
             }
           }
