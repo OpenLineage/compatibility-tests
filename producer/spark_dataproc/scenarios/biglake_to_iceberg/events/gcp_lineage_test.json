@@ -1,0 +1,15 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_lake_to_iceberg.atomic_replace_table_as_select.e2e_dataset_e2e_another_table",
+    "facets": {
+      "gcp_lineage": {
+        "origin": {
+          "sourceType": "DATAPROC",
+          "name": "{{ match(result, 'projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-.*') }}"
+        }
+      }
+    }
+  }
+}
