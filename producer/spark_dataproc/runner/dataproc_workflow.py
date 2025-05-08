@@ -525,6 +525,7 @@ async def run_job_command(args):
         credentials=credentials,
     )
     events_path = f"events/{test_id}/"
+    print(f"EVENT PATH: {events_path}")
     job_gcs_dir = f"gs://{args.gcs_bucket}/jobs"
     uploaded_job_file = upload_to_gcs(
         source_path=args.python_job,
@@ -552,6 +553,7 @@ async def run_job_command(args):
     files_to_download = list_blobs_with_prefix(
         args.gcs_bucket, events_path, "json", credentials=credentials
     )
+    print(f"FILES TO DOWNLOAD: {files_to_download}")
     if files_to_download:
         download_files_in_parallel(
             args.gcs_bucket,

@@ -15,6 +15,10 @@ def generate_test_row(number, start_range):
         doubleCol=float(number / 3.14)
     )
 
+# def drop_if_exists(instance, table_name):
+#     table = instance.table(table_id=table_name)
+#     if table.exists():
+#         table.delete()
 
 def generate_table_id(test_name):
     return f"cbt-{test_name}-{uuid.uuid4().hex[:20]}"
@@ -63,9 +67,10 @@ def delete_bigtable_table(table_name, admin_client):
 
 spark = SparkSession.builder.appName("BigtableExample").getOrCreate()
 
-test_name = "test"
-input_table = "input_table"
-output_table = "output_table"
+suffix = spark.conf.get('spark.scenario.suffix')
+test_name = f"test_{suffix}"
+input_table = f"input_table_{suffix}"
+output_table = f"output_table_{suffix}"
 
 # Assuming admin_client is already set up
 # create_bigtable_table(input_table, admin_client)
@@ -91,6 +96,12 @@ raw_basic_catalog = ("""
 project_id = "gcp-open-lineage-testing"
 instance_id = "openlineage-test"
 
+client = bigtable.Client(project=project_id, admin=True)
+instance = client.instance(instance_id)
+
+# drop_if_exists(instance, input_table)
+# drop_if_exists(instance, output_table)
+
 write_dataframe_to_bigtable(test_df, raw_basic_catalog, project_id, instance_id, True)
 
 read_df = read_dataframe_from_bigtable(spark, raw_basic_catalog, project_id, instance_id)
@@ -112,11 +123,7 @@ write_dataframe_to_bigtable(output_df, output_catalog, project_id, instance_id, 
 
 spark.stop()
 
-#Cleanup after the run
-
-client = bigtable.Client(project=project_id, admin=True)
-
-instance = client.instance(instance_id)
+# Cleanup after the run
 
 bt_table1 = instance.table(table_id=input_table)
 bt_table2 = instance.table(table_id=output_table)
