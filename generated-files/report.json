@@ -1,1019 +1,16 @@
 [
   {
-    "name": "spark-mock",
-    "component_type": "producer",
-    "scenarios": [
-      {
-        "name": "mock",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "mock",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "parent",
-                "spark_properties",
-                "processing_engine",
-                "gcp_dataproc_spark",
-                "jobType",
-                "sql",
-                "gcp_lineage",
-                "dataSource",
-                "schema",
-                "symlinks",
-                "columnLineage"
-              ],
-              "lineage_level": {
-                "hive": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ],
-                "jdbc": [
-                  "dataset",
-                  "column"
-                ]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "hive-mock",
-    "component_type": "producer",
-    "scenarios": [
-      {
-        "name": "simple_scenario",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "mock",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "lineage_level": {
-                "hdfs": [
-                  "dataset"
-                ]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "marquez-mock",
-    "component_type": "consumer",
-    "scenarios": [
-      {
-        "name": "mock",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "mock",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "process",
-            "details": [],
-            "tags": {
-              "facets": [],
-              "max_version": "1.23.0",
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "dataplex",
-    "component_type": "consumer",
-    "scenarios": [
-      {
-        "name": "simple_run_event",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "simple_run_event.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "process",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "process",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          },
-          {
-            "name": "runs",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "run",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          },
-          {
-            "name": "lineage_events",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "event",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          },
-          {
-            "name": "links",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "link",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          }
-        ]
-      },
-      {
-        "name": "spark_dataproc_simple_producer_test",
-        "status": "FAILURE",
-        "tests": [
-          {
-            "name": "4.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "3.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "2.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "1.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "process",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "process",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          },
-          {
-            "name": "runs",
-            "status": "FAILURE",
-            "validation_type": "semantics",
-            "entity_type": "run",
-            "details": [
-              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .display_name: Expected value 019299c5-73cf-7069-a70f-74eb8070b577 does not equal result 019299c5-12f5-7946-b5b2-c6abab662e20"
-            ],
-            "tags": {
-              "facets": [
-                "run_event",
-                "processing_engine"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          },
-          {
-            "name": "lineage_events",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "event",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "spark"
-            }
-          },
-          {
-            "name": "links",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "link",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "min_version": "1.22.0",
-              "producer": "airflow"
-            }
-          }
-        ]
-      },
-      {
-        "name": "airflow",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "line_01.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_02.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_03.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_04.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_05.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_06.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_07.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_08.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_09.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_10.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_11.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_12.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_13.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_14.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_15.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_16.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_17.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_18.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_19.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_20.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_21.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_22.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_23.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_24.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_25.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_26.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_27.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_28.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_29.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_30.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_31.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "line_32.json",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "process",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "process",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "producer": "airflow"
-            }
-          },
-          {
-            "name": "runs",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "run",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "processing_engine"
-              ],
-              "producer": "airflow"
-            }
-          },
-          {
-            "name": "lineage_events",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "lineage_event",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "producer": "airflow"
-            }
-          },
-          {
-            "name": "links",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "link",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ],
-              "producer": "airflow"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
     "name": "spark_dataproc",
     "component_type": "producer",
+    "component_version": "3.3.2",
+    "openlineage_version": "1.30.0",
     "scenarios": [
-      {
-        "name": "bigquery_input",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output:RUNNING",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:reading_from_big_query:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:reading_from_big_query.adaptive_spark_plan.tmp_my_shakespeare_output:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:reading_from_big_query:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "complete_event_1.23.0",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "parent",
-                "spark_properties",
-                "processing_engine",
-                "gcp_dataproc_spark",
-                "jobType",
-                "gcp_lineage",
-                "dataSource",
-                "schema",
-                "columnLineage"
-              ],
-              "max_version": "1.23.0",
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          },
-          {
-            "name": "input_bigquery",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "dataSource",
-                "schema",
-                "columnLineage"
-              ],
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          },
-          {
-            "name": "complete_event",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "parent",
-                "spark_properties",
-                "processing_engine",
-                "gcp_dataproc",
-                "jobType",
-                "gcp_lineage",
-                "dataSource",
-                "schema",
-                "columnLineage"
-              ],
-              "min_version": "1.24.0",
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          }
-        ]
-      },
-      {
-        "name": "bigquery_output",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732182497982_0002-1bc6564b-38fe-4c8a-9a0c-874ec37ea26f:RUNNING",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732182497982_0002-1bc6564b-38fe-4c8a-9a0c-874ec37ea26f:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query.execute_save_into_data_source_command:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732182497982_0002-1bc6564b-38fe-4c8a-9a0c-874ec37ea26f:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query.execute_save_into_data_source_command:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "complete_event_1.23.0",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "parent",
-                "spark_properties",
-                "processing_engine",
-                "gcp_dataproc_spark",
-                "jobType",
-                "gcp_lineage",
-                "dataSource",
-                "schema",
-                "columnLineage"
-              ],
-              "max_version": "1.23.0",
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          },
-          {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732282398466_0002-1a47efc8-e046-4d9a-bac7-49a8fc6b9eca:RUNNING",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732282398466_0002-1a47efc8-e046-4d9a-bac7-49a8fc6b9eca:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_1732282398466_0002-1a47efc8-e046-4d9a-bac7-49a8fc6b9eca:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "complete_event",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "parent",
-                "spark_properties",
-                "processing_engine",
-                "gcp_dataproc_spark",
-                "jobType",
-                "gcp_lineage",
-                "dataSource",
-                "schema",
-                "columnLineage"
-              ],
-              "min_version": "1.24.0",
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          }
-        ]
-      },
-      {
-        "name": "simple_scenario",
-        "status": "SUCCESS",
-        "tests": [
-          {
-            "name": "default:simple_test.drop_table:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:RUNNING",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_create_table_command.warehouse_t1:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.drop_table:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "complete_event",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "run_event",
-                "parent",
-                "spark_properties",
-                "processing_engine",
-                "gcp_dataproc_spark",
-                "jobType",
-                "sql",
-                "gcp_lineage",
-                "dataSource",
-                "schema",
-                "symlinks",
-                "columnLineage"
-              ],
-              "min_version": "1.24.0",
-              "lineage_level": {
-                "hive": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          },
-          {
-            "name": "input_hive",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "dataSource",
-                "schema",
-                "symlinks",
-                "columnLineage"
-              ],
-              "min_version": "1.22.0",
-              "lineage_level": {
-                "hive": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          },
-          {
-            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          }
-        ]
-      },
       {
         "name": "hive",
         "status": "SUCCESS",
         "tests": [
           {
-            "name": "default:simple_test.drop_table:START",
+            "name": "default:simple_test.local_table_scan:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1022,6 +19,38 @@
           },
           {
             "name": "default:simple_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.local_table_scan:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1045,31 +74,7 @@
             "tags": {}
           },
           {
-            "name": "default:simple_test.drop_table:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_create_table_command.warehouse_t1:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
+            "name": "default:simple_test:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1085,15 +90,7 @@
             "tags": {}
           },
           {
-            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:simple_test:COMPLETE",
+            "name": "default:simple_test.execute_create_table_command.warehouse_t1:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1145,6 +142,19 @@
             "tags": {
               "facets": [
                 "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_spark_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "max_version": "1.23.0",
+              "facets": [
+                "gcp_dataproc_spark"
               ]
             }
           },
@@ -1232,9 +242,23 @@
                 ]
               }
             }
-          },
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spark_dataproc",
+    "component_type": "producer",
+    "component_version": "3.1.3",
+    "openlineage_version": "1.30.0",
+    "scenarios": [
+      {
+        "name": "hive",
+        "status": "SUCCESS",
+        "tests": [
           {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:RUNNING",
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1242,29 +266,821 @@
             "tags": {}
           },
           {
-            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:START",
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_table_command.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_table_command.warehouse_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_spark_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "max_version": "1.23.0",
+              "facets": [
+                "gcp_dataproc_spark"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ],
+              "min_version": "1.24.0"
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "dataplex",
+    "component_type": "consumer",
+    "component_version": "",
+    "openlineage_version": "",
+    "scenarios": [
+      {
+        "name": "spark_dataproc_simple_producer_test",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "1.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.23.0",
+              "input": "spark_dataproc"
+            }
+          },
+          {
+            "name": "2.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.23.0",
+              "input": "spark_dataproc"
+            }
+          },
+          {
+            "name": "3.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.23.0",
+              "input": "spark_dataproc"
+            }
+          },
+          {
+            "name": "4.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.23.0",
+              "input": "spark_dataproc"
+            }
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "run",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "lineage_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "lineage_event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "link",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "link",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
           }
         ]
       },
       {
-        "name": "bigquery",
-        "status": "FAILURE",
+        "name": "airflow",
+        "status": "SUCCESS",
         "tests": [
           {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_:RUNNING",
+            "name": "line_01.json",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {}
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
           },
           {
-            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_:START",
+            "name": "line_02.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_03.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_04.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_05.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_06.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_07.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_08.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_09.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_10.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_11.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_12.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_13.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_14.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_15.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_16.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_17.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_18.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_19.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_20.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_21.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_22.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_23.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_24.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_25.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_26.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_27.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_28.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_29.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_30.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_31.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "line_32.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.14.0",
+              "input": "airflow"
+            }
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "producer": "airflow"
+            }
+          },
+          {
+            "name": "run",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event",
+                "processing_engine"
+              ],
+              "producer": "airflow"
+            }
+          },
+          {
+            "name": "lineage_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "lineage_event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "producer": "airflow"
+            }
+          },
+          {
+            "name": "link",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "link",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ],
+              "producer": "airflow"
+            }
+          }
+        ]
+      },
+      {
+        "name": "simple_run_event",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "simple_run_event.json",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "openlineage_version": "1.15.0"
+            }
+          },
+          {
+            "name": "process",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "process",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "run",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "run",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "lineage_event",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "lineage_event",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "link",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "link",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spark_dataproc",
+    "component_type": "producer",
+    "component_version": "3.5.1",
+    "openlineage_version": "1.30.0",
+    "scenarios": [
+      {
+        "name": "bigquery",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1297,6 +1113,14 @@
           },
           {
             "name": "default:writing_to_big_query.execute_save_into_data_source_command:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1349,15 +1173,26 @@
           },
           {
             "name": "processing_engine_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'processing_engine_test' In .run.facets.processing_engine.version: Expected value 3.5.1 does not equal result 3.5.3"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_spark_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "max_version": "1.23.0",
+              "facets": [
+                "gcp_dataproc_spark"
               ]
             }
           },
@@ -1461,7 +1296,7 @@
             "tags": {}
           },
           {
-            "name": "default:spark_spanner_example:START",
+            "name": "default:spark_spanner_example:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1477,7 +1312,7 @@
             "tags": {}
           },
           {
-            "name": "default:spark_spanner_example:COMPLETE",
+            "name": "default:spark_spanner_example:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1646,27 +1481,651 @@
         ]
       },
       {
+        "name": "bigquery_to_delta",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:big_query_to_delta_on_gcs:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ],
+              "min_version": "1.24.0"
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "storage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "storage"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "hive",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:simple_test.execute_create_table_command.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.drop_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.drop_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "bigquery_to_iceberg",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ],
+              "min_version": "1.24.0"
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "storage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "storage"
+              ]
+            }
+          }
+        ]
+      },
+      {
         "name": "cloudsql",
         "status": "SUCCESS",
         "tests": [
           {
             "name": "default:spark_cloud_sql_example.execute_save_into_data_source_command.test:START",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:spark_cloud_sql_example:COMPLETE",
-            "status": "SUCCESS",
-            "validation_type": "syntax",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {}
-          },
-          {
-            "name": "default:spark_cloud_sql_example.deserialize_to_object:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1682,7 +2141,15 @@
             "tags": {}
           },
           {
-            "name": "default:spark_cloud_sql_example.deserialize_to_object:START",
+            "name": "default:spark_cloud_sql_example:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:spark_cloud_sql_example.execute_save_into_data_source_command.test:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1698,7 +2165,15 @@
             "tags": {}
           },
           {
-            "name": "default:spark_cloud_sql_example.execute_save_into_data_source_command.test:COMPLETE",
+            "name": "default:spark_cloud_sql_example.deserialize_to_object:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:spark_cloud_sql_example.deserialize_to_object:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1781,7 +2256,12 @@
             "tags": {
               "facets": [
                 "schema"
-              ]
+              ],
+              "lineage_level": {
+                "bigtable": [
+                  "dataset"
+                ]
+              }
             }
           },
           {
@@ -1857,13 +2337,21 @@
             }
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "name": "scenarios",
+    "component_type": "producer",
+    "component_version": "",
+    "openlineage_version": "",
+    "scenarios": [
       {
-        "name": "bigquery_to_delta",
+        "name": "spark_dataproc_simple_producer_test_complete",
         "status": "SUCCESS",
         "tests": [
           {
-            "name": "default:big_query_to_delta_on_gcs:COMPLETE",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1871,7 +2359,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:START",
+            "name": "default:cl_i_test_application.drop_table:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1879,7 +2367,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:START",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1887,7 +2375,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:COMPLETE",
+            "name": "default:cl_i_test_application.drop_table:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1895,7 +2383,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:COMPLETE",
+            "name": "default:cl_i_test_application.execute_create_hive_table_as_select_command.default_t2:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1903,7 +2391,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_delta_on_gcs:START",
+            "name": "default:cl_i_test_application.execute_create_table_command.warehouse_t1:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -1911,158 +2399,69 @@
             "tags": {}
           },
           {
-            "name": "run_event_test",
+            "name": "default:cl_i_test_application:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "parent_test",
+            "name": "default:cl_i_test_application:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "parent"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "spark_properties_test",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "spark_properties"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "processing_engine_test",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "processing_engine"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "gcp_dataproc_test",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "gcp_dataproc"
-              ],
-              "min_version": "1.24.0"
-            }
+            "tags": {}
           },
           {
-            "name": "jobType_test",
+            "name": "default:cl_i_test_application.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "jobType"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "gcp_lineage_test",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "gcp_lineage"
-              ]
-            }
-          },
-          {
-            "name": "dataSource_test",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "dataSource"
-              ]
-            }
-          },
-          {
-            "name": "schema_test",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "schema"
-              ],
-              "lineage_level": {
-                "bigquery": [
-                  "dataset"
-                ]
-              }
-            }
-          },
-          {
-            "name": "columnLineage_test",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "columnLineage"
-              ],
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
-          },
-          {
-            "name": "storage_test",
-            "status": "SUCCESS",
-            "validation_type": "semantics",
-            "entity_type": "openlineage",
-            "details": [],
-            "tags": {
-              "facets": [
-                "storage"
-              ]
-            }
+            "tags": {}
           }
         ]
       },
       {
-        "name": "bigquery_to_iceberg",
+        "name": "spark_dataproc_simple_producer_test",
         "status": "SUCCESS",
         "tests": [
           {
-            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:START",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2070,7 +2469,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:START",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2078,7 +2477,21 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog:COMPLETE",
+            "name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          }
+        ]
+      },
+      {
+        "name": "CLL",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table.execute_create_hive_table_as_select_command.default_tbl1:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2086,7 +2499,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:COMPLETE",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table.execute_create_hive_table_as_select_command.default_tbl1:RUNNING",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2094,7 +2507,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog:START",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table.execute_create_table_command.cll_test_cll_source1:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2102,7 +2515,7 @@
             "tags": {}
           },
           {
-            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:COMPLETE",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table.execute_create_table_command.cll_test_cll_source1:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2110,149 +2523,382 @@
             "tags": {}
           },
           {
-            "name": "run_event_test",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table.execute_create_hive_table_as_select_command.default_tbl1:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "run_event"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "parent_test",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "parent"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "spark_properties_test",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "spark_properties"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "processing_engine_test",
+            "name": "testColumnLevelLineage:open_lineage_integration_create_table.execute_create_table_command.cll_test_cll_source2:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "processing_engine"
-              ]
-            }
+            "tags": {}
+          }
+        ]
+      },
+      {
+        "name": "spark_dataproc_bigquery_shakespare",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:shakespeare_on_spark.adaptive_spark_plan:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           },
           {
-            "name": "gcp_dataproc_test",
+            "name": "default:shakespeare_on_spark:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "gcp_dataproc"
-              ],
-              "min_version": "1.24.0"
-            }
+            "tags": {}
           },
           {
-            "name": "jobType_test",
+            "name": "default:shakespeare_on_spark.adaptive_spark_plan.outputs_1729097570970:RUNNING",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "jobType"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "gcp_lineage_test",
+            "name": "default:shakespeare_on_spark:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "gcp_lineage"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "dataSource_test",
+            "name": "default:shakespeare_on_spark.adaptive_spark_plan.outputs_1729097570970:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "dataSource"
-              ]
-            }
+            "tags": {}
           },
           {
-            "name": "schema_test",
+            "name": "default:shakespeare_on_spark.adaptive_spark_plan:START",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "schema"
-              ],
-              "lineage_level": {
-                "bigquery": [
-                  "dataset"
-                ]
-              }
-            }
+            "tags": {}
           },
           {
-            "name": "columnLineage_test",
+            "name": "default:shakespeare_on_spark.adaptive_spark_plan:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "columnLineage"
-              ],
-              "lineage_level": {
-                "bigquery": [
-                  "dataset",
-                  "column",
-                  "transformation"
-                ]
-              }
-            }
+            "tags": {}
           },
           {
-            "name": "storage_test",
+            "name": "default:shakespeare_on_spark.adaptive_spark_plan.outputs_1729097570970:COMPLETE",
             "status": "SUCCESS",
-            "validation_type": "semantics",
+            "validation_type": "syntax",
             "entity_type": "openlineage",
             "details": [],
-            "tags": {
-              "facets": [
-                "storage"
-              ]
-            }
+            "tags": {}
+          }
+        ]
+      },
+      {
+        "name": "airflow",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "airflow:dag.task_0:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.copy_task:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.download_to_data:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.upload_for_deletion:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.upload_from_data:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.download_to_file:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:dag.task_0:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.upload_from_data:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ.copy:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.download_to_data:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.upload_for_deletion:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ.download:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.copy_task:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.rewrite_task:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ.upload:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.delete:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:dag:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ.copy:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.upload_from_file:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.compose_task:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.rewrite_task:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:dag:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.download_to_file:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.upload_from_file:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ.download:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.compose_task:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:BQ.upload:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "airflow:gcs_hook.delete:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          }
+        ]
+      },
+      {
+        "name": "simple_run_event",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "job_namespace:job_name:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }

@@ -10,7 +10,10 @@ on:
       postgresqlPassword:
         required: true
     inputs:
-      release:
+      spark_release:
+        description: "release of spark dataproc to use"
+        type: string
+      ol_release:
         description: "release tag of OpenLineage to use"
         type: string
       get-latest-snapshots:
@@ -24,37 +27,80 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: initialize tests
+        id: init
+        run: |
+          scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/spark_dataproc/scenarios/" ${{ inputs.spark_release }} ${{ inputs.ol_release }} )
+          [[ "$scenarios" == "" ]] || echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
+          echo "openlineage_cluster_suffix=$(echo '${{ inputs.ol_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
+          echo "component_cluster_suffix=$(echo '${{ inputs.spark_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
+          case "${{ inputs.spark_release }}" in
+            "3.5.1")
+              echo "spark_short=3.5" >> $GITHUB_OUTPUT
+              echo "dataproc_version=2.2-ubuntu22" >> $GITHUB_OUTPUT
+              ;;
+            "3.3.2")
+              echo "spark_short=3.3" >> $GITHUB_OUTPUT
+              echo "dataproc_version=2.1-ubuntu20" >> $GITHUB_OUTPUT
+              ;;
+            "3.1.3")
+              echo "spark_short=3.1" >> $GITHUB_OUTPUT
+              echo "dataproc_version=2.0-ubuntu18" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "spark version ${{ inputs.spark_release }} not supported"
+              exit 1
+              ;;
+          esac
+
+
       - name: GCP authorization
         id: gcp-auth
+        if: ${{ steps.init.outputs.scenarios }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
       - name: Get OL artifacts
         id: get-ol-artifacts
+        if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/get_openlineage_artifacts
         with:
-          version: ${{ inputs.release }}
+          version: ${{ inputs.ol_release }}
           get-latest-snapshots: ${{ inputs.get-latest-snapshots }}
           skip-flink: 'true'
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
 
-      # This should be somehow automated and return the newest version
-#      - name: Download Big Query Spark Maven Artifact
-#        id: download-spark-bq-connector
+#       This should be somehow automated and return the newest version
+      - name: Download Big Query Spark Maven Artifact
+        id: download-spark-bq-connector
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: clausnz/github-action-download-maven-artifact@master
+        with:
+          url: 'https://repo1.maven.org'
+          repository: 'maven2'
+          groupId: 'com.google.cloud.spark'
+          artifactId: 'spark-${{ steps.init.outputs.spark_short }}-bigquery'
+          version: '0.42.0'
+          extension: 'jar'
+
+#      - name: Download Spark BigTable Maven Artifact
+#        id: download-spark-bigtable-connector
+#        if: ${{ steps.init.outputs.scenarios }}
 #        uses: clausnz/github-action-download-maven-artifact@master
 #        with:
 #          url: 'https://repo1.maven.org'
 #          repository: 'maven2'
-#          groupId: 'com.google.cloud.spark'
-#          artifactId: 'spark-3.5-bigquery'
-#          version: '0.42.0'
+#          groupId: 'com.google.cloud.spark.bigtable'
+#          artifactId: 'spark-bigtable_2.12'
+#          version: '0.4.0'
 #          extension: 'jar'
 
       - name: Upload openlineage spark integration to GCS
         id: upload-spark-integration
+        if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/upload_artifacts
         with:
           local-file-path: ${{ steps.get-ol-artifacts.outputs.spark }}
@@ -63,28 +109,40 @@ jobs:
 
       - name: Upload openlineage GCS transport to GCS
         id: upload-gcs-transport
+        if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/upload_artifacts
         with:
           local-file-path: ${{ steps.get-ol-artifacts.outputs.gcs }}
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
-#      - name: Upload Spark BigQuery connector to GCS
-#        id: upload-spark-bq-connector
+      - name: Upload Spark BigQuery connector to GCS
+        id: upload-spark-bq-connector
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/upload_artifacts
+        with:
+          local-file-path: ${{ steps.download-spark-bq-connector.outputs.file }}
+          gcs-path: "gs://open-lineage-e2e/jars"
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+
+#      - name: Upload Spark BigTable connector to GCS
+#        id: upload-spark-bigtable-connector
+#        if: ${{ steps.init.outputs.scenarios }}
 #        uses: ./.github/actions/upload_artifacts
 #        with:
-#          local-file-path: ${{ steps.download-spark-bq-connector.outputs.file }}
+#          local-file-path: ${{ steps.download-spark-bigtable-connector.outputs.file }}
 #          gcs-path: "gs://open-lineage-e2e/jars"
 #          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Upload initialization actions to GCS
         id: upload-initialization-actions
+        if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/upload_artifacts
         with:
           local-file-path: producer/spark_dataproc/runner/get_openlineage_jar.sh
           gcs-path: "gs://open-lineage-e2e/scripts"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-    
+
       - name: Upload CloudSQL init actions to GCS
         id: upload-cloud-sql-initialization-actions
         uses: ./.github/actions/upload_artifacts
@@ -94,78 +152,129 @@ jobs:
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
       - name: Set up Python 3.11
+        if: ${{ steps.init.outputs.scenarios }}
         uses: actions/setup-python@v5
         with:
           cache: "pip"
           python-version: "3.11"
 
       - name: Install dependencies
+        if: ${{ steps.init.outputs.scenarios }}
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
           if [ -f producer/spark_dataproc/runner/requirements.txt ]; then pip install -r producer/spark_dataproc/runner/requirements.txt; fi
 
       - name: Start producer
+        id: start-producer
+        if: ${{ steps.init.outputs.scenarios }}
         run: |
+          metadata=''
+          metadata+='SPARK_BQ_CONNECTOR_URL=${{steps.upload-spark-bq-connector.outputs.uploaded-file}}'
+          metadata+=',OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }}'
+          metadata+=',SPARK_SPANNER_CONNECTOR_URL=gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar'
+          metadata+=',SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.5.0-SNAPSHOT.jar'
+          metadata+=',enable-cloud-sql-hive-metastore=false'
+          metadata+=',additional-cloud-sql-instances=gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307'
+          if [[ ${{ inputs.spark_release }} != "3.5.1" ]]; then
+            metadata+=',SKIP_ICEBERG_AND_DELTA=true'
+          fi
+
           python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
           --project-id gcp-open-lineage-testing \
           --region us-west1 \
-          --cluster-name dataproc-producer-test-${{ github.run_id }} \
+          --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
+          --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
-          --metadata 'SPARK_BQ_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.0.1-SNAPSHOT.jar,OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }},SPARK_SPANNER_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-3.1-spanner-1.1.0.jar,SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.3.0.jar,enable-cloud-sql-hive-metastore=false,additional-cloud-sql-instances=gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307' \
+          --metadata "$metadata" \
           --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }},${{ steps.upload-cloud-sql-initialization-actions.outputs.uploaded-file }}"
-#          --metadata "SPARK_BQ_CONNECTOR_URL=${{ steps.upload-spark-bq-connector.outputs.uploaded-file }},OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }}" \
 
       - name: Set producer output event dir
+        if: ${{ steps.init.outputs.scenarios }}
         id: set-producer-output
         run: | 
           echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
 
       - name: Run producer jobs and create OL events
+        if: ${{ steps.init.outputs.scenarios }}
         id: run-producer
-        run: |
-          for scenario_path in producer/spark_dataproc/scenarios/*
+        continue-on-error: true
+        run: |          
+          set -e
+          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
+          
+          properties=''
+          properties+='spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener'
+          properties+=',spark.sql.warehouse.dir=/tmp/warehouse'
+          properties+=',spark.openlineage.transport.type=gcs'
+          properties+=',spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }}'
+          properties+=',spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}'
+          properties+=',spark.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
+
+          for scenario in "${scenarios[@]}"
           do
-              scenario="${scenario_path##*/}"
-              run_script=$(find "$scenario_path/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
+              echo "Getting script for scenario $scenario"
+              run_script=$(find "producer/spark_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
               
               echo "Running spark job for scenario: $scenario"
 
-              python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
+              if ! python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
               --project-id gcp-open-lineage-testing \
               --region us-west1 \
-              --cluster-name "dataproc-producer-test-${{ github.run_id }}" \
+              --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
               --gcs-bucket open-lineage-e2e \
               --python-job "$run_script" \
               --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
-              --spark-properties 'spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.warehouse.dir=/tmp/warehouse,spark.openlineage.transport.type=gcs,spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }},spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}' \
+              --spark-properties "$properties" \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
               --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
-              --dataproc-image-version 2.2-ubuntu22 \
-              || { echo "Error: Spark job failed for scenario: $scenario"; }
+              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
+              then
+                echo "Error: Spark job failed for scenario: $scenario"
+                exit 1
+              fi
 
               echo "Finished running spark job for scenario: $scenario"
           done
-      
+
+          echo "Finished running all scenarios"
+
       - name: Terminate producer cluster
+        if: ${{ always() && steps.init.outputs.scenarios }}
         run: |
-          python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-          --project-id gcp-open-lineage-testing \
-          --region us-west1 \
-          --cluster-name dataproc-producer-test-${{ github.run_id }} \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
+          if gcloud dataproc clusters list --region us-west1 | grep -q "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}"
+          then
+            python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
+            --project-id gcp-open-lineage-testing \
+            --region us-west1 \
+            --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
+            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
+          else
+            echo "Cluster does not exist"
+          fi
+
+      - name: Fail if spark jobs failed
+        if: ${{ steps.init.outputs.scenarios && steps.run-producer.outcome  == 'failure' }}
+        run: |
+          echo "step 'Run producer jobs and create OL events' has ended with failure but to terminate the cluster we needed to continue on error but fail the job after cluster termination."
+          echo "This will become redundant if starting the cluster is extracted to custom action with post actions defined."
+          echo "For now composite actions do not support post actions."
+          exit 1
 
       - name: Validation
+        if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/run_event_validation
         with:
           component: 'spark_dataproc'
-          tag: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.release }}
-          release: ${{ inputs.release }}
+          release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
+          ol_release: ${{ inputs.ol_release }}
+          component_release: ${{ inputs.spark_release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
-          target-path: 'spark-dataproc-report.json'
+          target-path: 'spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report.json'
 
       - uses: actions/upload-artifact@v4
+        if: ${{ steps.init.outputs.scenarios }}
         with:
-          name: spark-dataproc-report
-          path: spark-dataproc-report.json
+          name: spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report
+          path: spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report.json
           retention-days: 1
