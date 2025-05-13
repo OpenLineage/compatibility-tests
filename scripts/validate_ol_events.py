@@ -15,6 +15,7 @@ from compare_releases import release_between
 from compare_events import diff
 from jsonschema import RefResolver
 
+
 class OLSyntaxValidator:
     def __init__(self, schema_validators):
         self.schema_validators = schema_validators
@@ -23,13 +24,11 @@ class OLSyntaxValidator:
     def is_custom_facet(facet, schema_type):
         if facet.get('_schemaURL') is not None:
             is_custom = any(facet.get('_schemaURL').__contains__(f'defs/{facet_type}Facet') for facet_type in
-                    ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
+                            ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
             if is_custom:
                 print(f"facet {schema_type} seems to be custom facet, validation skipped")
             return is_custom
         return False
-
-
 
     @classmethod
     def get_validators(cls, spec_path, tags):
@@ -38,8 +37,10 @@ class OLSyntaxValidator:
     @classmethod
     def get_validator(cls, spec_path, tag):
         file_paths = listdir(join(spec_path, tag))
-        facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('Facet.json')]
-        spec_schema = next(load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
+        facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if
+                         path.__contains__('Facet.json')]
+        spec_schema = next(
+            load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
         schema_validators = {}
         for schema in facet_schemas:
             name = next(iter(schema['properties']))
@@ -68,7 +69,8 @@ class OLSyntaxValidator:
             else:
                 return [f"$.{schema_type} facet type {schema_type} not recognized"]
         except Exception:
-            print(f"when validating {schema_type}, for instance of {name} following exception ocurred \n {traceback.format_exc()}")
+            print(
+                f"when validating {schema_type}, for instance of {name} following exception ocurred \n {traceback.format_exc()}")
 
     def validate(self, event, name):
         validation_result = []
@@ -172,10 +174,10 @@ def all_tests_succeeded(syntax_tests):
     return not any(t.status == "FAILURE" for t in syntax_tests.values())
 
 
-def get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version):
+def get_expected_events(producer_dir, component, scenario_name, config, openlineage_version):
     test_events = []
     for test in config['tests']:
-        if check_versions(component_version, openlineage_version, test):
+        if check_versions(openlineage_version, test):
             filepath = join(producer_dir, component, 'scenarios', scenario_name, test['path'])
             body = load_json(filepath)
             test_events.append((test['name'], body, test['tags']))
@@ -225,12 +227,9 @@ def get_arguments():
     return event_base_dir, producer_dir, target, spec_base_dir, component, component_version, openlineage_version
 
 
-def check_versions(component_version, openlineage_version, config):
-    component_versions = config.get("component_versions", {})
-    openlineage_versions = config.get("openlineage_versions", {})
-
-    return (release_between(component_version, component_versions.get("min"), component_versions.get("max")) and
-            release_between(openlineage_version, openlineage_versions.get("min"), openlineage_versions.get("max")))
+def check_versions(version, config):
+    return release_between(version,
+                           config.get("tags", {}).get("min_version"), config.get("tags", {}).get("max_version"))
 
 
 def main():
@@ -254,7 +253,7 @@ def main():
         for scenario_name in listdir(base_dir):
             config = get_config(producer_dir, component, scenario_name)
             scenario_path = get_path(base_dir, component, scenario_name)
-            expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version)
+            expected = get_expected_events(producer_dir, component, scenario_name, config, openlineage_version)
             result_events = {file: load_json(path) for file in listdir(scenario_path) if
                              isfile(path := join(scenario_path, file))}
             tests = validate_scenario_syntax(result_events, validator, config)
@@ -262,7 +261,8 @@ def main():
                 for name, res in OLSemanticValidator(expected).validate(result_events).items():
                     tests[name] = res
             scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-        report = Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
+        report = Report(
+            {component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
     with open(target, 'w') as f:
         jsonc.dump(report.to_dict(), f, indent=2)
 
