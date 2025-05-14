@@ -55,7 +55,7 @@
           "gcp_dataproc"
         ]
       },
-      "openlineage_version": {
+      "openlineage_versions": {
         "min": "1.24.0"
       }
     },

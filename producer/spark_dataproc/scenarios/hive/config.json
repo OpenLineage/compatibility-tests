@@ -62,7 +62,7 @@
       "component_versions": {
         "max": "3.3.2"
       },
-       "openlineage_version": {
+       "openlineage_versions": {
         "max": "1.23.0"
       },
       "tags": {
@@ -82,7 +82,7 @@
           "gcp_dataproc"
         ]
       },
-      "openlineage_version": {
+      "openlineage_versions": {
         "min": "1.24.0"
       }
     },
