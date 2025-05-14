@@ -53,8 +53,10 @@
       "tags": {
         "facets": [
           "gcp_dataproc"
-        ],
-        "min_version": "1.24.0"
+        ]
+      },
+      "openlineage_version": {
+        "min": "1.24.0"
       }
     },
     {

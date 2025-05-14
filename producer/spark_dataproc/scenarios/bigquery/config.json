@@ -50,8 +50,10 @@
     {
       "name": "gcp_dataproc_spark_test",
       "path": "events/gcp_dataproc_spark_test.json",
+      "component_versions": {
+        "max": "1.23.0"
+      },
       "tags": {
-        "max_version": "1.23.0",
         "facets": [
           "gcp_dataproc_spark"
         ]
@@ -60,11 +62,13 @@
     {
       "name": "gcp_dataproc_test",
       "path": "events/gcp_dataproc_test.json",
+      "component_versions": {
+        "min": "1.24.0"
+      },
       "tags": {
         "facets": [
           "gcp_dataproc"
-        ],
-        "min_version": "1.24.0"
+        ]
       }
     },
     {

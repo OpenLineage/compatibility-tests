@@ -17,8 +17,10 @@
       "tags": {
         "facets": [
           "run_event"
-        ],
-        "max_version": "1.31.0"
+        ]
+      }
+      "openlineage_version": {
+        "max": "1.31.0"
       }
     },
     {
@@ -27,8 +29,10 @@
       "tags": {
         "facets": [
           "run_event"
-        ],
-        "min_version": "1.32.0"
+        ]
+      }
+      "openlineage_version": {
+        "min": "1.32.0"
       }
     },
     {
@@ -64,8 +68,10 @@
       "tags": {
         "facets": [
           "gcp_dataproc"
-        ],
-        "min_version": "1.24.0"
+        ]
+      },
+      "openlineage_version": {
+        "min": "1.24.0"
       }
     },
     {
@@ -92,8 +98,10 @@
       "tags": {
         "facets": [
           "dataSource"
-        ],
-        "max_version": "1.31.0"
+        ]
+      },
+      "openlineage_version": {
+        "max": "1.31.0"
       }
     },
     {
@@ -102,8 +110,10 @@
       "tags": {
         "facets": [
           "dataSource"
-        ],
-        "min_version": "1.32.0"
+        ]
+      },
+      "openlineage_version": {
+        "min": "1.32.0"
       }
     },
     {
@@ -117,8 +127,10 @@
           "bigquery": [
             "dataset"
           ]
-        },
-        "max_version": "1.31.0"
+        }
+      },
+      "openlineage_version": {
+        "max": "1.31.0"
       }
     },
     {
@@ -132,8 +144,10 @@
           "bigquery": [
             "dataset"
           ]
-        },
-        "min_version": "1.32.0"
+        }
+      },
+      "openlineage_version": {
+        "min": "1.32.0"
       }
     },
     {
@@ -149,8 +163,10 @@
             "column",
             "transformation"
           ]
-        },
-        "max_version": "1.31.0"
+        }
+      },
+      "openlineage_version": {
+        "max": "1.31.0"
       }
     },
     {
@@ -166,8 +182,10 @@
             "column",
             "transformation"
           ]
-        },
-        "min_version": "1.32.0"
+        }
+      },
+      "openlineage_version": {
+        "min": "1.32.0"
       }
     },
     {
@@ -176,8 +194,10 @@
       "tags": {
         "facets": [
           "storage"
-        ],
-        "max_version": "1.31.0"
+        ]
+      },
+      "openlineage_version": {
+        "max": "1.31.0"
       }
     },
     {
@@ -186,8 +206,10 @@
       "tags": {
         "facets": [
           "storage"
-        ],
-        "min_version": "1.32.0"
+        ]
+      },
+      "openlineage_version": {
+        "min": "1.32.0"
       }
     }
   ]
