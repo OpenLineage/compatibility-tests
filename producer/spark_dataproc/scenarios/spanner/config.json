@@ -81,6 +81,21 @@
     {
       "name": "gcp_dataproc_test",
       "path": "events/gcp_dataproc.json",
+      "openlineage_versions": {
+        "max": "1.31.0"
+      },
+      "tags": {
+        "facets": [
+          "gcp_dataproc"
+        ]
+      }
+    },
+    {
+      "name": "gcp_dataproc_test_1.32.0",
+      "path": "events/gcp_dataproc.json",
+      "openlineage_versions": {
+        "min": "1.32.0"
+      },
       "tags": {
         "facets": [
           "gcp_dataproc"
