@@ -526,7 +526,7 @@ async def run_job_command(args):
     )
     events_path = f"events/{test_id}/"
     print(f"EVENT PATH: {events_path}")
-    job_gcs_dir = f"gs://{args.gcs_bucket}/jobs"
+    job_gcs_dir = f"gs://{args.gcs_bucket}/jobs/{args.scenario}"
     uploaded_job_file = upload_to_gcs(
         source_path=args.python_job,
         destination_uri=job_gcs_dir,
@@ -662,6 +662,7 @@ def main():
     parser_run.add_argument(
         "--job-args", nargs="*", default=[], help="Arguments to pass to the job"
     )
+    parser_run.add_argument("--scenario", required=True, help="Scenario name")
     parser_run.set_defaults(func=run_job_command)
 
     # Terminate cluster command
