@@ -18,7 +18,7 @@
         "facets": [
           "run_event"
         ]
-      }
+      },
       "openlineage_version": {
         "max": "1.31.0"
       }
@@ -30,7 +30,7 @@
         "facets": [
           "run_event"
         ]
-      }
+      },
       "openlineage_version": {
         "min": "1.32.0"
       }
