@@ -221,6 +221,7 @@ jobs:
               if ! python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
               --project-id gcp-open-lineage-testing \
               --region us-west1 \
+              --scenario $scenario \
               --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
               --gcs-bucket open-lineage-e2e \
               --python-job "$run_script" \
