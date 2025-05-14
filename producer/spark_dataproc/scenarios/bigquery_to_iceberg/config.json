@@ -20,7 +20,7 @@
         ]
       },
       "openlineage_versions": {
-        "max": "1.31.0"
+        "max": "1.32.0"
       }
     },
     {
@@ -32,7 +32,7 @@
         ]
       },
       "openlineage_versions": {
-        "min": "1.32.0"
+        "min": "1.33.0"
       }
     },
     {
@@ -101,7 +101,7 @@
         ]
       },
       "openlineage_versions": {
-        "max": "1.31.0"
+        "max": "1.32.0"
       }
     },
     {
@@ -113,7 +113,7 @@
         ]
       },
       "openlineage_versions": {
-        "min": "1.32.0"
+        "min": "1.33.0"
       }
     },
     {
@@ -130,7 +130,7 @@
         }
       },
       "openlineage_versions": {
-        "max": "1.31.0"
+        "max": "1.32.0"
       }
     },
     {
@@ -147,7 +147,7 @@
         }
       },
       "openlineage_versions": {
-        "min": "1.32.0"
+        "min": "1.33.0"
       }
     },
     {
@@ -166,7 +166,7 @@
         }
       },
       "openlineage_versions": {
-        "max": "1.31.0"
+        "max": "1.32.0"
       }
     },
     {
@@ -185,7 +185,7 @@
         }
       },
       "openlineage_versions": {
-        "min": "1.32.0"
+        "min": "1.33.0"
       }
     },
     {
@@ -197,7 +197,7 @@
         ]
       },
       "openlineage_versions": {
-        "max": "1.31.0"
+        "max": "1.32.0"
       }
     },
     {
@@ -209,7 +209,7 @@
         ]
       },
       "openlineage_versions": {
-        "min": "1.32.0"
+        "min": "1.33.0"
       }
     }
   ]
