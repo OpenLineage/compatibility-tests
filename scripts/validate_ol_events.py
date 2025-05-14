@@ -68,7 +68,7 @@ class OLSyntaxValidator:
             else:
                 return [f"$.{schema_type} facet type {schema_type} not recognized"]
         except Exception:
-            print(f"when validating {schema_type}, for instance of {name} following exception ocurred \n {traceback.format_exc()}")
+            print(f"when validating {schema_type}, for instance of {name} following exception occurred \n {traceback.format_exc()}")
 
     def validate(self, event, name):
         validation_result = []
@@ -91,13 +91,13 @@ class OLSyntaxValidator:
         return validation_result
 
     def validate_entity_array(self, data, entity, generic_facet_type, name):
-        return [e.replace('$', f'$.{entity}[{ind}]')
+        return [e.replace('$', f'$.{entity}[{ind}].facets')
                 for ind, i in enumerate(data[entity])
                 for k, v in (i.get(generic_facet_type).items() if generic_facet_type in i else {}.items())
                 for e in self.validate_entity({k: v}, k, name)]
 
     def validate_entity_map(self, data, entity, name):
-        return [e.replace('$', f'$.{entity}') for k, v in data[entity]['facets'].items() for e in
+        return [e.replace('$', f'$.{entity}.facets') for k, v in data[entity]['facets'].items() for e in
                 self.validate_entity({k: v}, k, name)]
 
 

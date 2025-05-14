@@ -21,7 +21,7 @@
   "outputs": [
     {
       "namespace": "gs://open-lineage-e2e",
-      "name": "data/bigquery_metastore/e2e_dataset.db/e2e_table",
+      "name": "{{ match(result, 'data/bigquery_metastore/e2e_dataset.*/e2e_table') }}",
       "facets": {},
       "outputFacets": {}
     }

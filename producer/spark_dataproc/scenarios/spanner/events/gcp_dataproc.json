@@ -8,7 +8,7 @@
     "facets": {
       "gcp_dataproc": {
         "clusterUuid": "{{ is_uuid(result) }}",
-        "jobId": "{{ is_uuid(result) }}",
+        "jobId": "{{ match(result, '(attempt_timestamp_\\d+|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})') }}",
         "jobUuid": "{{ is_uuid(result) }}",
         "queryNodeName": "adaptive_spark_plan",
         "appName": "Spark Spanner Example",

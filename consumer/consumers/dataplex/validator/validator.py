@@ -39,10 +39,10 @@ class EntityHandler:
             try:
                 response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
                 report.append((e['name'], []))
-                time.sleep(0.1)
+                time.sleep(0.5)
             except InvalidArgument as exc:
                 report.append((e['name'], exc.args[0]))
-        time.sleep(2)
+        time.sleep(5)
         return report
 
     def load_validation_events(self, scenario, config):
