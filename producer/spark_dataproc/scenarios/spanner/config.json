@@ -92,7 +92,7 @@
     },
     {
       "name": "gcp_dataproc_test_1.32.0",
-      "path": "events/gcp_dataproc.json",
+      "path": "events/gcp_dataproc_1.32.0.json",
       "openlineage_versions": {
         "min": "1.32.0"
       },
