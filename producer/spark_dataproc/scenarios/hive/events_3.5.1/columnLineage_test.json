@@ -1,0 +1,53 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2"
+  },
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/user/hive/warehouse/t2",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "a": {
+              "inputFields": [
+                {
+                  "namespace": "{{ any(result) }}",
+                  "name": "/user/hive/warehouse/t1",
+                  "field": "a",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "b": {
+              "inputFields": [
+                {
+                  "namespace": "{{ any(result) }}",
+                  "name": "/user/hive/warehouse/t1",
+                  "field": "b",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

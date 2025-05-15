@@ -1,4 +1,12 @@
 {
+  "component_versions": {
+    "min": "3.5.0",
+    "max": "3.5.1"
+  },
+  "openlineage_versions": {
+    "min": "1.0.0",
+    "max": "5.0.0"
+  },
   "patterns": [
     "writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_"
   ],
@@ -10,6 +18,21 @@
         "facets": [
           "run_event"
         ]
+      },
+      "openlineage_versions": {
+        "max": "1.32.0"
+      }
+    },
+    {
+      "name": "run_event_test_1.32.0",
+      "path": "events/run_event_test_1.32.0.json",
+      "tags": {
+        "facets": [
+          "run_event"
+        ]
+      },
+      "openlineage_versions": {
+        "min": "1.33.0"
       }
     },
     {
@@ -45,8 +68,10 @@
       "tags": {
         "facets": [
           "gcp_dataproc"
-        ],
-        "min_version": "1.24.0"
+        ]
+      },
+      "openlineage_versions": {
+        "min": "1.24.0"
       }
     },
     {
@@ -74,6 +99,21 @@
         "facets": [
           "dataSource"
         ]
+      },
+      "openlineage_versions": {
+        "max": "1.32.0"
+      }
+    },
+    {
+      "name": "dataSource_test_1.32.0",
+      "path": "events/dataSource_test_1.32.0.json",
+      "tags": {
+        "facets": [
+          "dataSource"
+        ]
+      },
+      "openlineage_versions": {
+        "min": "1.33.0"
       }
     },
     {
@@ -88,6 +128,26 @@
             "dataset"
           ]
         }
+      },
+      "openlineage_versions": {
+        "max": "1.32.0"
+      }
+    },
+    {
+      "name": "schema_test_1.32.0",
+      "path": "events/schema_test_1.32.0.json",
+      "tags": {
+        "facets": [
+          "schema"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset"
+          ]
+        }
+      },
+      "openlineage_versions": {
+        "min": "1.33.0"
       }
     },
     {
@@ -104,6 +164,28 @@
             "transformation"
           ]
         }
+      },
+      "openlineage_versions": {
+        "max": "1.32.0"
+      }
+    },
+    {
+      "name": "columnLineage_test_1.32.0",
+      "path": "events/columnLineage_test_1.32.0.json",
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      },
+      "openlineage_versions": {
+        "min": "1.33.0"
       }
     },
     {
@@ -113,6 +195,21 @@
         "facets": [
           "storage"
         ]
+      },
+      "openlineage_versions": {
+        "max": "1.32.0"
+      }
+    },
+    {
+      "name": "storage_test_1.32.0",
+      "path": "events/storage_test_1.32.0.json",
+      "tags": {
+        "facets": [
+          "storage"
+        ]
+      },
+      "openlineage_versions": {
+        "min": "1.33.0"
       }
     }
   ]

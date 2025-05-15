@@ -1,0 +1,28 @@
+{
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/user/hive/warehouse/t1",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/user/hive/warehouse/t2",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}

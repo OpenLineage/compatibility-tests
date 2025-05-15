@@ -1,4 +1,12 @@
 {
+  "component_versions": {
+    "min": "3.5.0",
+    "max": "3.5.1"
+  },
+  "openlineage_versions": {
+    "min": "1.0.0",
+    "max": "5.0.0"
+  },
   "patterns": [
     "writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_"
   ],
@@ -42,8 +50,10 @@
     {
       "name": "gcp_dataproc_spark_test",
       "path": "events/gcp_dataproc_spark_test.json",
+      "component_versions": {
+        "max": "1.23.0"
+      },
       "tags": {
-        "max_version": "1.23.0",
         "facets": [
           "gcp_dataproc_spark"
         ]
@@ -52,11 +62,13 @@
     {
       "name": "gcp_dataproc_test",
       "path": "events/gcp_dataproc_test.json",
+      "component_versions": {
+        "min": "1.24.0"
+      },
       "tags": {
         "facets": [
           "gcp_dataproc"
-        ],
-        "min_version": "1.24.0"
+        ]
       }
     },
     {
