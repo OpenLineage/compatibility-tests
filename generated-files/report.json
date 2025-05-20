@@ -1450,7 +1450,7 @@
       },
       {
         "name": "spanner",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:spark_spanner_example.adaptive_spark_plan.root_output:COMPLETE",
@@ -1585,12 +1585,10 @@
           },
           {
             "name": "gcp_dataproc_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'gcp_dataproc_test' In .run.facets.gcp_dataproc.jobId: 'attempt_timestamp_1747627316067' is not UUID"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "gcp_dataproc"
