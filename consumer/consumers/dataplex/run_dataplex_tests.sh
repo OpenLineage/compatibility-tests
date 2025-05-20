@@ -53,4 +53,5 @@ python consumer/consumers/dataplex/validator/validator.py \
   --credentials "$GCP_CREDENTIALS_JSON_PATH" \
   --consumer_dir "$CONSUMER_DIR" \
   --scenario_dir "$SCENARIO_DIR" \
-  --parent "$GCP_PARENT" ${DUMP_API_STATE}
+  --parent "$GCP_PARENT" ${DUMP_API_STATE} \
+  --target "dataplex_report.json"

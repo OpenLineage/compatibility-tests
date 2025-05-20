@@ -13,6 +13,9 @@ on:
       openlineage_release:
         description: 'Override OpenLineage release version'
         required: false
+      spark_matrix:
+        description: 'Overwrite matrix for spark tests'
+        required: false
 
 
 permissions:
@@ -27,6 +30,7 @@ jobs:
     outputs:
       changes_in_spec: ${{ github.event.inputs.run_tests || steps.check-changes.outputs.changes_found }}
       ol_release: ${{ github.event.inputs.openlineage_release || steps.get-release.outputs.openlineage_release }}
+      spark_matrix: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
       execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
       - name: Get execution time
@@ -74,7 +78,31 @@ jobs:
         id: get-release
         run: |
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
-          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT 
+
+      - name: set-matrix-values
+        id: set-matrix-values
+        run: |
+          get_matrix() {
+            local component="$1"
+            local releases_file="./generated-files/releases.json"
+            local versions_file="producer/$component/versions.json"
+
+            [[ -f "$releases_file" && -f "$versions_file" ]] || {
+              echo "Missing releases.json or versions.json" >&2
+              return 1
+            }
+
+            local latest_ol=$(jq -r '.[] | select(.name == "openlineage") | .latest_version' "$releases_file")
+            local latest_comp=$(jq -r --arg name "$component" '.[] | select(.name == $name) | .latest_version' "$releases_file")
+
+            jq -c --arg ol "$latest_ol" --arg comp "$latest_comp" '
+              .openlineage_versions |= (if $ol != "" and index($ol) == null then . + [$ol] else . end) |
+              .component_version |= (if $comp != "" and index($comp) == null then . + [$comp] else . end)
+            ' "$versions_file"
+          }
+
+          echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
 
 
   ######## COMPONENT VALIDATION ########
@@ -96,10 +124,15 @@ jobs:
       - initialize_workflow
     if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
+      postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
+      postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
-      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      ol_release: ${{ matrix.openlineage_versions }}
+      spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'true'
 
 ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
