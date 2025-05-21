@@ -229,7 +229,8 @@
             "validation_type": "semantics",
             "entity_type": "run",
             "details": [
-              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .display_name: Expected value 019299c5-73cf-7069-a70f-74eb8070b577 does not equal result 019299c5-12f5-7946-b5b2-c6abab662e20"
+              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .display_name: Expected value 019299c5-73cf-7069-a70f-74eb8070b577 does not equal result 019299c5-12f5-7946-b5b2-c6abab662e20",
+              "run ['projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs', '0d35c69fdc8ba859b16e4c77f885ccb1'], In .state: Object of type <class 'int'>: 2 does not match 1"
             ],
             "tags": {
               "facets": [
@@ -1445,6 +1446,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -2059,7 +2076,7 @@
       },
       {
         "name": "bigquery_to_iceberg",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table:START",
@@ -2071,10 +2088,12 @@
           },
           {
             "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:START",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "$.outputs[0].catalog: 'type' is a required property"
+            ],
             "tags": {}
           },
           {
@@ -2087,10 +2106,12 @@
           },
           {
             "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:COMPLETE",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "$.outputs[0].catalog: 'type' is a required property"
+            ],
             "tags": {}
           },
           {
