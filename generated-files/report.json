@@ -1606,7 +1606,7 @@
             "validation_type": "semantics",
             "entity_type": "openlineage",
             "details": [
-              "'gcp_dataproc_test' In .run.facets.gcp_dataproc.jobId: 'attempt_timestamp_1748751288170' is not UUID"
+              "'gcp_dataproc_test' In .run.facets.gcp_dataproc.jobId: 'attempt_timestamp_1748837046050' is not UUID"
             ],
             "tags": {
               "facets": [
