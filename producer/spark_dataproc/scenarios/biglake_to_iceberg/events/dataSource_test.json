@@ -1,0 +1,31 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_lake_to_iceberg.atomic_replace_table_as_select.e2e_dataset_e2e_another_table"
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "gcp-open-lineage-testing.e2e_dataset.iceberg_biglake",
+      "facets": {
+        "dataSource": {
+          "name": "bigquery",
+          "uri": "bigquery"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "data/bigquery_metastore/e2e_dataset.db/e2e_another_table",
+      "facets": {
+        "dataSource": {
+          "name": "gs://open-lineage-e2e",
+          "uri": "gs://open-lineage-e2e"
+        }
+      }
+    }
+  ]
+}

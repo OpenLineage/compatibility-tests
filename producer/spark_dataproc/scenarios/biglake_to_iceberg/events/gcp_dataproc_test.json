@@ -1,0 +1,21 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_lake_to_iceberg.atomic_replace_table_as_select.e2e_dataset_e2e_another_table"
+  },
+  "run": {
+    "facets": {
+      "gcp_dataproc": {
+        "clusterUuid": "{{ is_uuid(result) }}",
+        "jobId": "{{ any(result) }}",
+        "jobUuid": "{{ is_uuid(result) }}",
+        "queryNodeName": "append_data",
+        "appName": "BigQuery to Iceberg with BigQueryMetastoreCatalog",
+        "clusterName": "{{ match(result, 'dataproc-producer-test-.+') }}",
+        "appId": "{{ match(result, 'application_.+') }}",
+        "projectId": "gcp-open-lineage-testing"
+      }
+    }
+  }
+}
