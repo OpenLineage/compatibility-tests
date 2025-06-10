@@ -35,7 +35,9 @@ jobs:
           merge-multiple: true
 
       - name: Update site files
-        run: ./compatibility-tests/scripts/update_website_files.sh
+        run: |
+          chmod +x ./compatibility-tests/scripts/update_website_files.sh
+          ./compatibility-tests/scripts/update_website_files.sh
 
       - name: remove compatibility tests dir
         run: rm -rf ./compatibility-tests
@@ -50,7 +52,7 @@ jobs:
         # env:
         #   TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
         run: |
-          git add -u
+          git add -A
           git commit -sm "[bot] update compatibility tables with run data"
           # git remote set-url origin https://x-access-token:${TOKEN}@github.com/tnazarew/openlineage-site.git
           git push origin main
