@@ -36,9 +36,8 @@ jobs:
         with:
           name: update-website-script
           path: update_website_files.sh
-          merge-multiple: true
 
-      - name: Install dependencies
+      - name: Update site files
         run: ./update_website_files.sh
 
       - name: Configure Git
