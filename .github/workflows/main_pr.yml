@@ -146,3 +146,7 @@ jobs:
       - collect-and-compare-reports
     uses: ./.github/workflows/generate_compatibility_tables.yml
 
+  update-site:
+    needs:
+      - generate-compatibility-tables
+    uses: ./.github/workflows/update_site.yml

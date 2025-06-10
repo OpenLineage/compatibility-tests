@@ -1,10 +1,10 @@
-name: Generate compatibility tables
+name: Update website with compatibility data
 
 on:
   workflow_call:
     
 jobs:
-  generate-compatibility-tables:
+  update-site:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -49,6 +49,6 @@ jobs:
         #   TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
         run: |
           git add -u
-          git commit -sm "[bot] update compatibility tables with run data from: ${{ inputs.execution-time }}"
+          git commit -sm "[bot] update compatibility tables with run data"
           # git remote set-url origin https://x-access-token:${TOKEN}@github.com/tnazarew/openlineage-site.git
           git push origin main
