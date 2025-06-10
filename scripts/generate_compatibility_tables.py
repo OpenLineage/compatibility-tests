@@ -87,6 +87,7 @@ def fill_lineage_level_table(d):
     for key in sorted(d.keys(), key=lambda x: tuple(map(int, x.split(".")))):
         value = d[key]
         for datasource, levels in value.get('lineage_levels', {}).items():
+            print(f"lineage for datasource {datasource} with levels {levels}")
             row = {'Datasource': datasource}
             for level in ['dataset', 'column', 'transformation']:
                 row[level.capitalize()] = '+' if level in levels else '-'
@@ -159,6 +160,7 @@ def process_components(summaries, output_dir, is_producer, offset):
                 if not is_producer and inputs:
                     content_parts.append(("Producer Inputs", fill_inputs_table(inputs)))
                 if is_producer and lineage:
+                    print(f"lineage levels: {lineage}")
                     content_parts.append(("Lineage Levels", fill_lineage_level_table(lineage)))
 
                 if content_parts:
