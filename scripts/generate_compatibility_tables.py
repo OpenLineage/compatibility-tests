@@ -12,6 +12,7 @@ def get_arguments():
     args = parser.parse_args()
     return Path(args.report), Path(args.target)
 
+
 def get_sorted_facets(summary):
     f = [f for v in summary.component_versions.values() for vv in v.values() for f in vv.get('facets', [])]
     facets = set(f)
@@ -65,14 +66,8 @@ def fill_facet_table(d, facets):
 
 def fill_inputs_table(d):
     table_data = []
-    seen = set()
-    for value in d.values():
-        for producer in value.get('inputs', []):
-            if producer:
-                normalized = normalize_label(producer)
-                if normalized not in seen:
-                    table_data.append({'Producer': normalized, 'Status': '+'})
-                    seen.add(normalized)
+    for producer in d:
+        table_data.append({'Producer': normalize_label(producer), 'Status': '+'})
     table_data = sorted(table_data, key=lambda x: x['Producer'])
     if table_data:
         table = markdown_table(table_data)
@@ -81,17 +76,14 @@ def fill_inputs_table(d):
     return ""
 
 
-
 def fill_lineage_level_table(d):
     table_data = []
-    for key in sorted(d.keys(), key=lambda x: tuple(map(int, x.split(".")))):
-        value = d[key]
-        for datasource, levels in value.get('lineage_levels', {}).items():
-            print(f"lineage for datasource {datasource} with levels {levels}")
-            row = {'Datasource': datasource}
-            for level in ['dataset', 'column', 'transformation']:
-                row[level.capitalize()] = '+' if level in levels else '-'
-            table_data.append(row)
+    for datasource, levels in d.items():
+        print(f"lineage for datasource {datasource} with levels {levels}")
+        row = {'Datasource': normalize_label(datasource)}
+        for level in ['dataset', 'column', 'transformation']:
+            row[level.capitalize()] = '+' if level in levels else '-'
+        table_data.append(row)
     if table_data:
         table = markdown_table(table_data)
         table.set_params(row_sep="markdown", quote=False)
@@ -110,13 +102,15 @@ def process_components(summaries, output_dir, is_producer, offset):
             # Flat structure for unversioned component
             ol_versions = summary.component_versions[""]
             facets_data = {}
-            inputs_data = {}
+            inputs_data = set()
 
             for ol_version, data in ol_versions.items():
                 if 'facets' in data:
                     facets_data[ol_version] = data
                 if 'inputs' in data:
-                    inputs_data[ol_version] = data
+                    for i in data['inputs']:
+                        if i is not None:
+                            inputs_data.add(i)
 
             content_parts = []
             if facets_data:
@@ -142,16 +136,19 @@ def process_components(summaries, output_dir, is_producer, offset):
                 ol_versions = summary.component_versions[component_version]
 
                 facets = {}
-                inputs = {}
+                inputs = set()
                 lineage = {}
 
                 for ol_version, data in ol_versions.items():
                     if 'facets' in data:
                         facets[ol_version] = data
                     if not is_producer and 'inputs' in data:
-                        inputs[ol_version] = data
+                        for i in data['inputs']:
+                            if i is not None:
+                                inputs.update(i)
                     if is_producer and 'lineage_levels' in data:
-                        lineage[ol_version] = data
+                        for source, levels in data['lineage_levels'].items():
+                            lineage.setdefault(source, set()).update(levels)
 
                 content_parts = []
                 if facets:
