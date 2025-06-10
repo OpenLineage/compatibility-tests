@@ -2,6 +2,9 @@ name: Update website with compatibility data
 
 on:
   workflow_call:
+    secrets:
+      CI_PUSH_TOKEN:
+        required: true
     
 jobs:
   update-site:

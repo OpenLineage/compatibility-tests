@@ -150,3 +150,5 @@ jobs:
     needs:
       - generate-compatibility-tables
     uses: ./.github/workflows/update_site.yml
+    secrets:
+      CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
