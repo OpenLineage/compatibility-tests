@@ -10,15 +10,6 @@ jobs:
   update-site:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: update-website-script
-          path: scripts/update_website_files.sh
-          retention-days: 1
-
       - name: get website fork
         uses: actions/checkout@v4
         with:
@@ -26,19 +17,28 @@ jobs:
           ref: refs/heads/main
           token: ${{ secrets.CI_PUSH_TOKEN }}
 
+      - name: create dir for compatibility tests repo
+        id: create-dir-for-comp-tests
+        shell: bash
+        run: |
+          mkdir -p compatibility-tests
+
+      - name: get compatibility test repo
+        uses: actions/checkout@v4
+        with:
+          path: compatibility-tests
+
       - uses: actions/download-artifact@v4
         with:
           name: updated-compatibility-tables
           path: updated-compatibility-tables
           merge-multiple: true
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: update-website-script
-          path: update_website_files.sh
-
       - name: Update site files
-        run: ./update_website_files.sh
+        run: ./compatibility-tests/scripts/update_website_files.sh
+
+      - name: remove compatibility tests dir
+        run: rm -rf ./compatibility-tests
 
       - name: Configure Git
         run: |
