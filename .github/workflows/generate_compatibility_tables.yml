@@ -25,10 +25,10 @@ jobs:
         run: |
           python scripts/generate_compatibility_tables.py \
           --report=reports/updated-report.json \
-          --target=reports/updated-compatibility-table.md
+          --target=reports/updated-compatibility-tables
 
       - uses: actions/upload-artifact@v4
         with:
           name: updated-compatibility-tables
-          path: reports/updated-compatibility-table.md
+          path: reports/updated-compatibility-tables
           retention-days: 1

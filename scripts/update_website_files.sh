@@ -2,8 +2,8 @@
 
 set -e
 
-# Usage: ./deploy_docs.sh [output_dir] [--dry-run]
-OUT_DIR="${1:-./out}"
+
+OUT_DIR="${1:-./updated-compatibility-tables}"
 DOCS_TARGET="docs/integrations/openlineage_compatibility"
 VERSIONS_ROOT="versioned_docs"
 DRY_RUN=false
