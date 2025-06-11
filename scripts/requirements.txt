@@ -39,3 +39,4 @@ six==1.16.0
 soupsieve==2.5
 uritemplate==4.1.1
 urllib3==2.2.2
+json-with-comments==1.2.10

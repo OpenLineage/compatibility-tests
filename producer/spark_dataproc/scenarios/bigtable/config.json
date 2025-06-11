@@ -1,4 +1,12 @@
 {
+  "component_versions": {
+    "min": "3.5.0",
+    "max": "3.5.1"
+  },
+  "openlineage_versions": {
+    "min": "1.0.0",
+    "max": "1.0.0"
+  },
   "tests": [
     {
       "name": "columnLineage_test",
@@ -8,7 +16,7 @@
           "columnLineage"
         ],
        "lineage_level": {
-          "cloudsql": [
+          "bigtable": [
             "dataset",
             "column",
             "transformation"
@@ -49,7 +57,12 @@
       "tags": {
         "facets": [
           "schema"
-        ]
+        ],
+        "lineage_level": {
+          "bigtable": [
+            "dataset"
+          ]
+        }
       }
     },
     {

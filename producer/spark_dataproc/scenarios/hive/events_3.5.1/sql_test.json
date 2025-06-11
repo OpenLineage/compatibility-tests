@@ -1,0 +1,12 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2",
+    "facets": {
+      "sql": {
+        "query": "CREATE TABLE IF NOT EXISTS t2 AS SELECT * FROM t1;"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2"
+  },
+  "run": {
+    "facets": {
+      "gcp_dataproc": {
+        "queryNodeName": "execute_insert_into_hive_table",
+        "appName": "simple test",
+        "appId": "{{ any(result) }}",
+        "projectId": "gcp-open-lineage-testing"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2"
+  },
+  "run": {
+    "facets": {
+      "spark_properties": {
+        "properties": {
+          "spark.master": "local",
+          "spark.app.name": "simple test"
+        }
+      }
+    }
+  }
+}

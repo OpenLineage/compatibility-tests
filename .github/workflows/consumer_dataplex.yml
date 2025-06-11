@@ -42,7 +42,8 @@ jobs:
         --consumer_dir consumer/consumers/dataplex \
         --scenario_dir consumer/scenarios/ \
         --parent projects/gcp-open-lineage-testing/locations/us \
-        --release ${{ inputs.release }}
+        --release ${{ inputs.release }} \
+        --target dataplex-report.json
 
     - uses: actions/upload-artifact@v4
       with:

@@ -20,6 +20,7 @@ jobs:
       run_spark_dataproc: ${{ steps.get-changed.outputs.spark_dataproc_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
       any_run: ${{ steps.get-changed.outputs.any_changed }}
+      spark_matrix: ${{ steps.set-matrix-values.outputs.spark_dataproc_matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -64,7 +65,32 @@ jobs:
         run: |
           echo " any changed value is ${{ steps.get-changed.outputs.any_changed }}"
           openlineage_release=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
-          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT  
+          echo "openlineage_release=${openlineage_release}" >> $GITHUB_OUTPUT
+
+      - name: set-matrix-values
+        id: set-matrix-values
+        run: |
+          get_matrix() {
+            local component="$1"
+            local releases_file="./generated-files/releases.json"
+            local versions_file="producer/$component/versions.json"
+          
+            [[ -f "$releases_file" && -f "$versions_file" ]] || {
+              echo "Missing releases.json or versions.json" >&2
+              return 1
+            }
+          
+            local latest_ol=$(jq -r '.[] | select(.name == "openlineage") | .latest_version' "$releases_file")
+            local latest_comp=$(jq -r --arg name "$component" '.[] | select(.name == $name) | .latest_version' "$releases_file")
+          
+            jq -c --arg ol "$latest_ol" --arg comp "$latest_comp" '
+              .openlineage_versions |= (if $ol != "" and index($ol) == null then . + [$ol] else . end) |
+              .component_version |= (if $comp != "" and index($comp) == null then . + [$comp] else . end)
+            ' "$versions_file"
+          }
+          
+          echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
+          
 
   ######## COMPONENT VALIDATION ########
 
@@ -91,12 +117,15 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
       postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
       postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
-      release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      ol_release: ${{ matrix.openlineage_versions }}
+      spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
@@ -116,4 +145,3 @@ jobs:
     needs:
       - collect-and-compare-reports
     uses: ./.github/workflows/generate_compatibility_tables.yml
-

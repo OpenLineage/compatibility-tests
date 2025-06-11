@@ -1,0 +1,15 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2",
+    "facets": {
+      "gcp_lineage": {
+        "origin": {
+          "sourceType": "DATAPROC",
+          "name": "projects/gcp-open-lineage-testing/regions/us-west1/unknown/"
+        }
+      }
+    }
+  }
+}

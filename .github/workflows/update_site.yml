@@ -1,0 +1,58 @@
+name: Update website with compatibility data
+
+on:
+  workflow_call:
+    secrets:
+      CI_PUSH_TOKEN:
+        required: true
+    
+jobs:
+  update-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get website fork
+        uses: actions/checkout@v4
+        with:
+          repository: tnazarew/openlineage-site
+          ref: refs/heads/main
+          token: ${{ secrets.CI_PUSH_TOKEN }}
+
+      - name: create dir for compatibility tests repo
+        id: create-dir-for-comp-tests
+        shell: bash
+        run: |
+          mkdir -p compatibility-tests
+
+      - name: get compatibility test repo
+        uses: actions/checkout@v4
+        with:
+          path: compatibility-tests
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: updated-compatibility-tables
+          path: updated-compatibility-tables
+          merge-multiple: true
+
+      - name: Update site files
+        run: |
+          chmod +x ./compatibility-tests/scripts/update_website_files.sh
+          ./compatibility-tests/scripts/update_website_files.sh
+
+      - name: remove compatibility tests dir
+        run: rm -rf ./compatibility-tests
+
+      - name: Configure Git
+        run: |
+          git config user.name "compatibility-tests-gha[bot]"
+          git config user.email "compatibility-tests-gha[bot]@users.noreply.github.com"
+
+      - name: Push changes
+        id: push-changes
+        # env:
+        #   TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
+        run: |
+          git add -A
+          git commit -sm "[bot] update compatibility tables with run data"
+          # git remote set-url origin https://x-access-token:${TOKEN}@github.com/tnazarew/openlineage-site.git
+          git push origin main

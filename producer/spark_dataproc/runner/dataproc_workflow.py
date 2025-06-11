@@ -525,7 +525,8 @@ async def run_job_command(args):
         credentials=credentials,
     )
     events_path = f"events/{test_id}/"
-    job_gcs_dir = f"gs://{args.gcs_bucket}/jobs"
+    print(f"EVENT PATH: {events_path}")
+    job_gcs_dir = f"gs://{args.gcs_bucket}/jobs/{args.scenario}"
     uploaded_job_file = upload_to_gcs(
         source_path=args.python_job,
         destination_uri=job_gcs_dir,
@@ -552,6 +553,7 @@ async def run_job_command(args):
     files_to_download = list_blobs_with_prefix(
         args.gcs_bucket, events_path, "json", credentials=credentials
     )
+    print(f"FILES TO DOWNLOAD: {files_to_download}")
     if files_to_download:
         download_files_in_parallel(
             args.gcs_bucket,
@@ -660,6 +662,7 @@ def main():
     parser_run.add_argument(
         "--job-args", nargs="*", default=[], help="Arguments to pass to the job"
     )
+    parser_run.add_argument("--scenario", required=True, help="Scenario name")
     parser_run.set_defaults(func=run_job_command)
 
     # Terminate cluster command

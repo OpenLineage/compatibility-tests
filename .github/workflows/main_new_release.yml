@@ -16,6 +16,9 @@ on:
       openlineage_release:
         description: 'Override OpenLineage release version'
         required: false
+      spark_matrix:
+        description: 'Overwrite matrix for spark tests'
+        required: false
 
 permissions:
   id-token: write
@@ -30,6 +33,7 @@ jobs:
       run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
       run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
       openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
+      spark_matrix: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
       execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
       - name: Get execution time
@@ -44,27 +48,7 @@ jobs:
         # also normally new release of OL should trigger all producer tests but for now they are run anyway so no need to trigger
       - name: Select components to run
         id: select-components
-        run: |
-          # assuming the version will not exceed 1000 this is the quickest way to get comparable values
-          version_sum() {
-            IFS='.' read -r var1 var2 var3 <<< "$1"
-            echo $(( var1 * 1000000 + var2 * 1000 ))
-          }
-          
-          current_ol=$(cat generated-files/releases.json | jq -c '.[] | select(.name | contains("openlineage")) | .latest_version ' -r)
-          latest_ol=$(curl https://api.github.com/repos/OpenLineage/OpenLineage/releases/latest -s | jq .tag_name -r)
-
-          sum1=$(version_sum "$latest_ol")
-          sum2=$(version_sum "$current_ol")
-          
-          if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
-              echo "ol_release=${latest_ol}" >> $GITHUB_OUTPUT
-              echo "releases_updated=true" >> $GITHUB_OUTPUT
-              jq --arg latest_ol "$latest_ol" 'map(if .name == "openlineage" then .latest_version = $latest_ol else . end)' \
-              generated-files/releases.json > generated-files/updated-releases.json
-          else
-              echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT  
-          fi       
+        run: ./scripts/select_components.sh
 
       - uses: actions/upload-artifact@v4
         if: steps.select-components.outputs.releases_updated == 'true'
@@ -72,6 +56,30 @@ jobs:
           name: updated-releases
           path: generated-files/updated-releases.json
           retention-days: 1
+
+      - name: set-matrix-values
+        id: set-matrix-values
+        run: |
+          get_matrix() {
+            local component="$1"
+            local releases_file="./generated-files/releases.json"
+            local versions_file="producer/$component/versions.json"
+
+            [[ -f "$releases_file" && -f "$versions_file" ]] || {
+              echo "Missing releases.json or versions.json" >&2
+              return 1
+            }
+
+            local latest_ol=$(jq -r '.[] | select(.name == "openlineage") | .latest_version' "$releases_file")
+            local latest_comp=$(jq -r --arg name "$component" '.[] | select(.name == $name) | .latest_version' "$releases_file")
+
+            jq -c --arg ol "$latest_ol" --arg comp "$latest_comp" '
+              .openlineage_versions |= (if $ol != "" and index($ol) == null then . + [$ol] else . end) |
+              .component_version |= (if $comp != "" and index($comp) == null then . + [$comp] else . end)
+            ' "$versions_file"
+          }
+
+          echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
 
   ######## COMPONENT VALIDATION ########
 
@@ -88,12 +96,15 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
       postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
       postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
-      release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
+      ol_release: ${{ matrix.openlineage_versions }}
+      spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
@@ -135,3 +146,10 @@ jobs:
      workflow-type: 'release'
      trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
      execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}
+
+  update-site:
+    needs:
+      - update-repo-files
+    uses: ./.github/workflows/update_site.yml
+    secrets:
+      CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}

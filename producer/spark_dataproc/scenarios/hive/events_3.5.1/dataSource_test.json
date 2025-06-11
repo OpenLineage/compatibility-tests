@@ -1,0 +1,31 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "simple_test.execute_insert_into_hive_table.warehouse_t2"
+  },
+  "inputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/user/hive/warehouse/t1",
+      "facets": {
+        "dataSource": {
+          "name": "{{ any(result) }}",
+          "uri": "{{ any(result) }}"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/user/hive/warehouse/t2",
+      "facets": {
+        "dataSource": {
+          "name": "{{ any(result) }}",
+          "uri": "{{ any(result) }}"
+        }
+      }
+    }
+  ]
+}
