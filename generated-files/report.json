@@ -273,7 +273,7 @@
       },
       {
         "name": "airflow",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "line_01.json",
@@ -573,13 +573,10 @@
           },
           {
             "name": "links",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [
-              "event 2024-11-26T13:10:41.007315Z, no matching entity",
-              "event 2024-11-26T13:10:44.755944Z, no matching entity"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -1609,7 +1606,7 @@
             "validation_type": "semantics",
             "entity_type": "openlineage",
             "details": [
-              "'gcp_dataproc_test' In .run.facets.gcp_dataproc.jobId: 'attempt_timestamp_1749528091901' is not UUID"
+              "'gcp_dataproc_test' In .run.facets.gcp_dataproc.jobId: 'attempt_timestamp_1749614664084' is not UUID"
             ],
             "tags": {
               "facets": [
