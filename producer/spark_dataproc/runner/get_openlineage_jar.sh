@@ -29,7 +29,6 @@ delta_storage_url="gs://open-lineage-e2e/jars/delta-storage-3.3.1.jar"
 iceberg_bigquery_catalog_url="gs://open-lineage-e2e/jars/iceberg-bigquery-catalog-1.6.1-1.0.1-beta.jar"
 iceberg_spark_runtime_url="gs://open-lineage-e2e/jars/iceberg-spark-runtime-3.5_2.12-1.6.1.jar"
 iceberg_core_url="gs://open-lineage-e2e/jars/iceberg-core-1.6.1.jar"
-iceberg_cache_dependency_url="gs://open-lineage-e2e/jars/caffeine-2.9.3.jar"
 
 gsutil cp -P "${bq_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${ol_url}" "${VM_SPARK_JARS_DIR}/"
@@ -42,5 +41,4 @@ if [[ "${SKIP_ICEBERG_AND_DELTA}" == "" ]]; then
   gsutil cp -P "${iceberg_bigquery_catalog_url}" "${VM_SPARK_JARS_DIR}/"
   gsutil cp -P "${iceberg_spark_runtime_url}" "${VM_SPARK_JARS_DIR}/"
   gsutil cp -P "${iceberg_core_url}" "${VM_SPARK_JARS_DIR}/"
-  gsutil cp -P "${iceberg_cache_dependency_url}" "${VM_SPARK_JARS_DIR}/"
 fi
