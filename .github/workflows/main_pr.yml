@@ -113,20 +113,20 @@ jobs:
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
 
-#  spark_dataproc:
-#    needs: initialize_workflow
-#    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
-#    uses: ./.github/workflows/producer_spark_dataproc.yml
-#    strategy:
-#      matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
-#    secrets:
-#      gcpKey: ${{ secrets.GCP_SA_KEY }}
-#      postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
-#      postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
-#    with:
-#      ol_release: ${{ matrix.openlineage_versions }}
-#      spark_release: ${{ matrix.component_version }}
-#      get-latest-snapshots: 'false'
+  spark_dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_spark_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+      postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
+      postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
+    with:
+      ol_release: ${{ matrix.openlineage_versions }}
+      spark_release: ${{ matrix.component_version }}
+      get-latest-snapshots: 'false'
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
@@ -135,7 +135,7 @@ jobs:
       - initialize_workflow
       - scenarios
       - dataplex
-#      - spark_dataproc
+      - spark_dataproc
     if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
