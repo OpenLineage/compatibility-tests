@@ -13,5 +13,6 @@ if (( $(version_sum $latest_ol) > $(version_sum $current_ol) )); then
     jq --arg latest_ol "$latest_ol" 'map(if .name == "openlineage" then .latest_version = $latest_ol else . end)' \
     generated-files/releases.json > generated-files/updated-releases.json
 else
+    cp generated-files/releases.json generated-files/updated-releases.json
     echo "ol_release=${current_ol}" >> $GITHUB_OUTPUT
 fi
