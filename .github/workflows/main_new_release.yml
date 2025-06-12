@@ -62,7 +62,7 @@ jobs:
         run: |
           get_matrix() {
             local component="$1"
-            local releases_file="./generated-files/releases.json"
+            local releases_file="./generated-files/updated-releases.json"
             local versions_file="producer/$component/versions.json"
 
             [[ -f "$releases_file" && -f "$versions_file" ]] || {
