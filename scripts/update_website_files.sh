@@ -94,8 +94,8 @@ copy_summary() {
 
 stub_missing_summaries() {
   target_dir=$1
-  [[ ! -f "$target_dir/consumer_summary.md" ]] || write_stub "$target_dir/consumer_summary.md" "Consumer Summary" 1
-  [[ ! -f "$target_dir/producer_summary.md" ]] || write_stub "$target_dir/producer_summary.md" "Producer Summary" 2
+  [[ -f "$target_dir/consumer_summary.md" ]] || write_stub "$target_dir/consumer_summary.md" "Consumer Summary" 1
+  [[ -f "$target_dir/producer_summary.md" ]] || write_stub "$target_dir/producer_summary.md" "Producer Summary" 2
 }
 
 create_md_file_proxies(){
