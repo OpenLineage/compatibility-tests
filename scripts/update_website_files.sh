@@ -104,6 +104,7 @@ create_md_file_proxies(){
 
   find "$src_dir" -maxdepth 1 -name "*.md" | while read -r md_file; do
     file_name=$(basename "$md_file")
+    [[ "$file_name" == "producer_summary.md" || "$file_name" == "consumer_summary.md" ]] && continue
     log "created proxy for $md_file"
     head -n 4 "$md_file" > "$dest_dir/$file_name"
     echo -e "\nimport Transports from '@site/$src_dir/$file_name';\n\n<Transports/>\n" >> "$dest_dir/$file_name"
@@ -144,7 +145,7 @@ done
 copy_summary "$VERSIONS_ROOT/version-$latest_consumer_version/integrations/openlineage_compatibility" \
   "docs" "$latest_consumer_version" "consumer" "$latest_consumer_version"
 
-copy_summary "$VERSIONS_ROOT/version-$latest_consumer_version/integrations/openlineage_compatibility" \
+copy_summary "$VERSIONS_ROOT/version-$latest_producer_version/integrations/openlineage_compatibility" \
   "docs" "$latest_producer_version" "producer" "$latest_producer_version"
 
 
