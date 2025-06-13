@@ -152,4 +152,4 @@ jobs:
       - update-repo-files
     uses: ./.github/workflows/update_site.yml
     secrets:
-      CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
+      CI_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}
