@@ -40,7 +40,7 @@ jobs:
           ./compatibility-tests/scripts/update_website_files.sh
 
       - name: remove compatibility tests dir
-        run: rm -rf ./compatibility-tests
+        run: rm -rf ./compatibility-tests  ./updated-compatibility-tables
 
       - name: Configure Git
         run: |

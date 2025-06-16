@@ -137,8 +137,11 @@ latest_producer_version=""
 for src_dir in "$OUT_DIR/openlineage_versions/"*/; do
   version=$(basename "$src_dir")
   target_base="$VERSIONS_ROOT/version-$version"
-  latest_consumer_version=$(copy_summary "$src_dir" "$target_base" "$version" "consumer" "$latest_consumer_version")
-  latest_producer_version=$(copy_summary "$src_dir" "$target_base" "$version" "producer" "$latest_producer_version")
+  if [[ -d "$target_base" ]]
+  then
+    latest_consumer_version=$(copy_summary "$src_dir" "$target_base" "$version" "consumer" "$latest_consumer_version")
+    latest_producer_version=$(copy_summary "$src_dir" "$target_base" "$version" "producer" "$latest_producer_version")
+  fi
 done
 
 # Copy the latest versioned producer/consumer summary to docs
@@ -177,7 +180,7 @@ for version_path in "$VERSIONS_ROOT"/version-*; do
       mkdir -p "$dest_dir"
       cp "$comp_dir/_category_.json" "$dest_dir/_category_.json"
       # Proxy each .md file in the component directory
-      create_md_file_proxies "$comp_dir" "$dest_dir"
+      create_md_file_proxies "${comp_dir%/}" "$dest_dir"
     fi
   done
 
