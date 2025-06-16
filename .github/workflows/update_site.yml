@@ -13,7 +13,7 @@ jobs:
       - name: get website fork
         uses: actions/checkout@v4
         with:
-          repository: tnazarew/openlineage-site
+          repository: OpenLineage/openlineage-site
           ref: refs/heads/main
           token: ${{ secrets.CI_PUSH_TOKEN }}
 
