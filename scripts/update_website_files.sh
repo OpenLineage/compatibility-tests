@@ -16,6 +16,7 @@ log() {
 copy_file() {
   local src="$1"
   local dest="$2"
+  log "Copying: $src to $dest"
   mkdir -p "$(dirname "$dest")"
   cp "$src" "$dest"
   log "Copied: $src to $dest"
@@ -57,16 +58,17 @@ EOF
 }
 
 update_component_docs() {
+  local target_path=$1
   find "$OUT_DIR" -maxdepth 1 -name "*.md" | while read -r file; do
     base=$(basename "$file")
-    copy_file "$file" "$DOCS_TARGET/$base"
+    copy_file "$file" "$target_path"
   done
 
 
   for dir in "$OUT_DIR"/*/; do
     component=$(basename "$dir")
     if [[ "$component" != "openlineage_versions" ]]; then
-      target="$DOCS_TARGET/$component"
+      target="$target_path/$component"
       rm -rf "$target"
       cp -r "$dir" "$target"
       log "Copied versioned component directory: $component"
@@ -116,7 +118,7 @@ log ""
 log "Ensure that all openlineage_compatibility directories exist"
 log ""
 
-create_compatibility_dir "docs"
+#create_compatibility_dir "docs"
 for version_path in "$VERSIONS_ROOT"/version-*; do
   create_compatibility_dir "$version_path"
 done
@@ -124,33 +126,35 @@ done
 log ""
 log "Update component docs with latest test results"
 log ""
+for version_path in "$VERSIONS_ROOT"/version-*; do
+  update_component_docs "$version_path/integrations/openlineage_compatibility"
+done
 
-update_component_docs
 
 log ""
 log "Copy generated summaries to appropriate locations"
 log ""
 
-latest_consumer_version=""
-latest_producer_version=""
+#latest_consumer_version=""
+#latest_producer_version=""
 
 for src_dir in "$OUT_DIR/openlineage_versions/"*/; do
   version=$(basename "$src_dir")
   target_base="$VERSIONS_ROOT/version-$version"
   if [[ -d "$target_base" ]]
   then
-    latest_consumer_version=$(copy_summary "$src_dir" "$target_base" "$version" "consumer" "$latest_consumer_version")
-    latest_producer_version=$(copy_summary "$src_dir" "$target_base" "$version" "producer" "$latest_producer_version")
+    copy_summary "$src_dir" "$target_base" "$version" "consumer" "$latest_consumer_version"
+    copy_summary "$src_dir" "$target_base" "$version" "producer" "$latest_producer_version"
   fi
 done
 
-# Copy the latest versioned producer/consumer summary to docs
-copy_summary "$VERSIONS_ROOT/version-$latest_consumer_version/integrations/openlineage_compatibility" \
-  "docs" "$latest_consumer_version" "consumer" "$latest_consumer_version"
-
-copy_summary "$VERSIONS_ROOT/version-$latest_producer_version/integrations/openlineage_compatibility" \
-  "docs" "$latest_producer_version" "producer" "$latest_producer_version"
-
+## Copy the latest versioned producer/consumer summary to docs
+#copy_summary "$VERSIONS_ROOT/version-$latest_consumer_version/integrations/openlineage_compatibility" \
+#  "docs" "$latest_consumer_version" "consumer" "$latest_consumer_version"
+#
+#copy_summary "$VERSIONS_ROOT/version-$latest_producer_version/integrations/openlineage_compatibility" \
+#  "docs" "$latest_producer_version" "producer" "$latest_producer_version"
+#
 
 
 # Handle versioned_docs that have no generated summary at all
@@ -161,30 +165,30 @@ log ""
 for version_path in "$VERSIONS_ROOT"/version-*; do
   stub_missing_summaries "$version_path/integrations/openlineage_compatibility"
 done
-stub_missing_summaries "docs/integrations/openlineage_compatibility"
+#stub_missing_summaries "docs/integrations/openlineage_compatibility"
 
 
 
-log ""
-log "Replicating component structure inside versioned_docs..."
-log ""
-
-for version_path in "$VERSIONS_ROOT"/version-*; do
-  target_base="$version_path/integrations/openlineage_compatibility"
-  src_base="docs/integrations/openlineage_compatibility"
-  create_md_file_proxies $src_base $target_base
-  # Versioned components
-  for comp_dir in "$src_base"/*/; do
-    if [[ -f "$comp_dir/_category_.json" ]]; then
-      dest_dir="${comp_dir/docs/$version_path}"
-      mkdir -p "$dest_dir"
-      cp "$comp_dir/_category_.json" "$dest_dir/_category_.json"
-      # Proxy each .md file in the component directory
-      create_md_file_proxies "${comp_dir%/}" "$dest_dir"
-    fi
-  done
-
-done
+#log ""
+#log "Replicating component structure inside versioned_docs..."
+#log ""
+#
+#for version_path in "$VERSIONS_ROOT"/version-*; do
+#  target_base="$version_path/integrations/openlineage_compatibility"
+#  src_base="docs/integrations/openlineage_compatibility"
+#  create_md_file_proxies $src_base $target_base
+#  # Versioned components
+#  for comp_dir in "$src_base"/*/; do
+#    if [[ -f "$comp_dir/_category_.json" ]]; then
+#      dest_dir="${comp_dir/docs/$version_path}"
+#      mkdir -p "$dest_dir"
+#      cp "$comp_dir/_category_.json" "$dest_dir/_category_.json"
+#      # Proxy each .md file in the component directory
+#      create_md_file_proxies "${comp_dir%/}" "$dest_dir"
+#    fi
+#  done
+#
+#done
 
 log ""
 log "Success."
