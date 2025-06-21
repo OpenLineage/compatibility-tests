@@ -7,7 +7,7 @@
     "scenarios": [
       {
         "name": "hive",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:RUNNING",
@@ -99,10 +99,12 @@
           },
           {
             "name": "run_event_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'run_event_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "run_event"
@@ -111,10 +113,12 @@
           },
           {
             "name": "parent_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'parent_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "parent"
@@ -123,10 +127,12 @@
           },
           {
             "name": "spark_properties_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'spark_properties_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "spark_properties"
@@ -135,10 +141,12 @@
           },
           {
             "name": "processing_engine_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'processing_engine_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "processing_engine"
@@ -147,10 +155,12 @@
           },
           {
             "name": "gcp_dataproc_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'gcp_dataproc_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "gcp_dataproc"
@@ -159,10 +169,12 @@
           },
           {
             "name": "jobType_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'jobType_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "jobType"
@@ -171,10 +183,12 @@
           },
           {
             "name": "gcp_lineage_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'gcp_lineage_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "gcp_lineage"
@@ -183,10 +197,12 @@
           },
           {
             "name": "dataSource_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'dataSource_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "dataSource"
@@ -195,10 +211,12 @@
           },
           {
             "name": "schema_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'schema_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "schema"
@@ -212,10 +230,12 @@
           },
           {
             "name": "columnLineage_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'columnLineage_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "columnLineage"
@@ -10835,7 +10855,7 @@
       },
       {
         "name": "bigquery_to_iceberg",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:START",
@@ -10887,12 +10907,10 @@
           },
           {
             "name": "run_event_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'run_event_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -10973,12 +10991,10 @@
           },
           {
             "name": "dataSource_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'dataSource_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "dataSource"
@@ -10987,12 +11003,10 @@
           },
           {
             "name": "schema_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'schema_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "schema"
@@ -11006,12 +11020,10 @@
           },
           {
             "name": "columnLineage_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'columnLineage_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "columnLineage"
@@ -11027,12 +11039,10 @@
           },
           {
             "name": "storage_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'storage_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "storage"
