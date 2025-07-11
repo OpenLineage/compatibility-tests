@@ -1,0 +1,112 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "createtable_as_select.default.monthly_transaction_summary"
+  },
+  "outputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.monthly_transaction_summary",
+      "facets": {
+        "columnLineage": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.34.0/integration/hive",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-2-0/ColumnLineageDatasetFacet.json#/$defs/ColumnLineageDatasetFacet",
+          "fields": {
+            "month": {
+              "inputFields": [
+                {
+                  "namespace": "hive://hive-ol-cluster-m:9083",
+                  "name": "default.transactions",
+                  "field": "submissiondate",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "TRANSFORMATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "transactiontype": {
+              "inputFields": [
+                {
+                  "namespace": "hive://hive-ol-cluster-m:9083",
+                  "name": "default.transactions",
+                  "field": "transactiontype",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "totalamount": {
+              "inputFields": [
+                {
+                  "namespace": "hive://hive-ol-cluster-m:9083",
+                  "name": "default.transactions",
+                  "field": "transactionamount",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "AGGREGATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "hive://hive-ol-cluster-m:9083",
+              "name": "default.transactions",
+              "field": "submissiondate",
+              "transformations": [
+                {
+                  "type": "INDIRECT",
+                  "subtype": "GROUP_BY",
+                  "description": "",
+                  "masking": false
+                },
+                {
+                  "type": "INDIRECT",
+                  "subtype": "SORT",
+                  "description": "",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "hive://hive-ol-cluster-m:9083",
+              "name": "default.transactions",
+              "field": "transactiontype",
+              "transformations": [
+                {
+                  "type": "INDIRECT",
+                  "subtype": "GROUP_BY",
+                  "description": "",
+                  "masking": false
+                },
+                {
+                  "type": "INDIRECT",
+                  "subtype": "SORT",
+                  "description": "",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

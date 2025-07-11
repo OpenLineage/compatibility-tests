@@ -1,0 +1,41 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "createtable_as_select.default.monthly_transaction_summary"
+  },
+  "inputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.transactions",
+      "facets": {
+        "symlinks": {
+          "identifiers": [
+            {
+              "namespace": "gs://open-lineage-e2e",
+              "name": "warehouse/transactions",
+              "type": "LOCATION"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.monthly_transaction_summary",
+      "facets": {
+        "symlinks": {
+          "identifiers": [
+            {
+              "namespace": "hdfs://hive-ol-cluster-m",
+              "name": "/user/hive/warehouse/monthly_transaction_summary",
+              "type": "LOCATION"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

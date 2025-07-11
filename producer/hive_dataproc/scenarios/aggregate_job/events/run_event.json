@@ -1,0 +1,29 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "createtable_as_select.default.monthly_transaction_summary",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.transactions",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.monthly_transaction_summary",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}
