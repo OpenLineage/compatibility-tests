@@ -2,10 +2,6 @@ name: Run syntax validation for OL events
 description: "Runs syntax validation for OL events using spec from given release of OL"
 author: Tomasz Nazarewicz
 inputs:
-  tag:
-    description: "Version of the spec to check against"
-    default: ""
-    required: false
   release_tags:
     description: "Versions of the spec to check against"
     required: false

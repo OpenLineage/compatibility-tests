@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "createtable_as_select.default.monthly_transaction_summary"
+  },
+  "run": {
+    "facets": {
+      "hive_session": {
+        "username": "hive",
+        "clientIp": "{{ any(result) }}",
+        "sessionId": "{{ is_uuid(result) }}"
+      }
+    }
+  }
+}

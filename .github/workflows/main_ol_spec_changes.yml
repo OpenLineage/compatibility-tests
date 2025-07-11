@@ -135,6 +135,20 @@ jobs:
       spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'true'
 
+  hive-dataproc:
+    needs:
+      - initialize_workflow
+    if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
+    uses: ./.github/workflows/producer_hive_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.hive_matrix) }}
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      ol_release: ${{ matrix.openlineage_versions }}
+      component_release: ${{ matrix.component_version }}
+      get-latest-snapshots: 'true'
+
 ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
   collect-and-compare-reports:
@@ -142,6 +156,7 @@ jobs:
       - initialize_workflow
       - scenarios_check
       - spark-dataproc
+      - hive-dataproc
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
       fail-for-new-failures: true

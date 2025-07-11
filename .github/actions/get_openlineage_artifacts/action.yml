@@ -18,7 +18,11 @@ inputs:
     required: false
     default: 'false'
   skip-flink:
-    description: "Skip spark integration download"
+    description: "Skip flink integration download"
+    required: false
+    default: 'false'
+  skip-hive:
+    description: "Skip hive integration download"
     required: false
     default: 'false'
   skip-sql:
@@ -53,6 +57,9 @@ outputs:
   flink:
     value: ${{ steps.consolidate-outputs.outputs.flink }}
     description: "File path of the downloaded openlineage-flink jar"
+  hive:
+    value: ${{ steps.consolidate-outputs.outputs.hive }}
+    description: "File path of the downloaded openlineage-hive jar"
   sql:
     value: ${{ steps.consolidate-outputs.outputs.sql }}
     description: "File path of the downloaded openlineage-sql-java jar"
@@ -87,6 +94,7 @@ runs:
         --skip-java=${{ inputs.skip-java }} \
         --skip-spark=${{ inputs.skip-spark }} \
         --skip-flink=${{ inputs.skip-flink }} \
+        --skip-hive=${{ inputs.skip-hive }} \
         --skip-sql=${{ inputs.skip-sql }} \
         --skip-extensions=${{ inputs.skip-extensions }} \
         --skip-gcp-lineage=${{ inputs.skip-gcp-lineage }} \
@@ -120,6 +128,7 @@ runs:
         echo "skip-java=true" >> $GITHUB_OUTPUT
         echo "skip-spark=true" >> $GITHUB_OUTPUT
         echo "skip-flink=true" >> $GITHUB_OUTPUT
+        echo "skip-hive=true" >> $GITHUB_OUTPUT
         echo "skip-sql=true" >> $GITHUB_OUTPUT
         echo "skip-extensions=true" >> $GITHUB_OUTPUT
         echo "skip-gcp-lineage=true" >> $GITHUB_OUTPUT
@@ -129,6 +138,7 @@ runs:
         check_artifact_downloaded openlineage-java-*.jar ${{ inputs.skip-java }} "java"
         check_artifact_downloaded openlineage-spark_*.jar ${{ inputs.skip-spark }} "spark"
         check_artifact_downloaded openlineage-flink-*.jar ${{ inputs.skip-flink }} "flink"
+        check_artifact_downloaded openlineage-hive-*.jar ${{ inputs.skip-hive }} "hive"
         check_artifact_downloaded openlineage-sql-java*.jar ${{ inputs.skip-sql }} "sql"
         check_artifact_downloaded spark-extension-interfaces-*.jar ${{ inputs.skip-extensions }} "extensions"
         check_artifact_downloaded transports-dataplex-*.jar ${{ inputs.skip-gcp-lineage }} "gcp-lineage"
@@ -168,6 +178,18 @@ runs:
         repository: 'maven2'
         groupId: 'io.openlineage'
         artifactId: 'openlineage-flink'
+        version: ${{ inputs.version }}
+        extension: 'jar'
+
+    - name: Download openlineage hive Maven Artifact
+      id: download-hive-integration
+      if: ${{ steps.set-action-outputs.outputs.skip-hive == 'false' }}
+      uses: clausnz/github-action-download-maven-artifact@master
+      with:
+        url: 'https://repo1.maven.org'
+        repository: 'maven2'
+        groupId: 'io.openlineage'
+        artifactId: 'openlineage-hive'
         version: ${{ inputs.version }}
         extension: 'jar'
 
@@ -239,6 +261,7 @@ runs:
         echo "java=${{ steps.set-action-outputs.outputs.java || steps.download-java-client.outputs.file }}" >> $GITHUB_OUTPUT
         echo "spark=${{ steps.set-action-outputs.outputs.spark || steps.download-spark-integration.outputs.file }}" >> $GITHUB_OUTPUT
         echo "flink=${{ steps.set-action-outputs.outputs.flink || steps.download-flink-integration.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "flink=${{ steps.set-action-outputs.outputs.hive || steps.download-hive-integration.outputs.file }}" >> $GITHUB_OUTPUT
         echo "sql=${{ steps.set-action-outputs.outputs.sql || steps.download-java-sql.outputs.file }}" >> $GITHUB_OUTPUT
         echo "extensions=${{ steps.set-action-outputs.outputs.extensions || steps.download-spark-extension-interfaces.outputs.file }}" >> $GITHUB_OUTPUT
         echo "gcp-lineage=${{ steps.set-action-outputs.outputs.gcp-lineage || steps.download-transports-gcp-lineage.outputs.file }}" >> $GITHUB_OUTPUT
