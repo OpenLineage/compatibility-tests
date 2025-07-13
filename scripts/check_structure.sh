@@ -84,7 +84,7 @@ for producer_dir in "$BASE_PATH/producer/"*/; do
         check_path "$scenario_dir/config.json"
         check_path "$scenario_dir/maintainers.json"
         check_path "$scenario_dir/scenario.md"
-        check_path "$scenario_dir/test/test.py"
+        check_path "$scenario_dir/test/test.*"
 
         # Check if at least one event file is present
         if ! compgen -G "$scenario_dir/events/"*.json > /dev/null; then
