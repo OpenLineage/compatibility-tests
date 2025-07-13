@@ -145,7 +145,7 @@ jobs:
           IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
           
           properties=''
-          properties+='hive.extraListeners=io.openlineage.hive.agent.OpenLineagehiveListener'
+          properties+='hive.extraListeners=io.openlineage.hive.hooks.HiveOpenLineageHook'
           properties+=',hive.sql.warehouse.dir=/tmp/warehouse'
           properties+=',hive.openlineage.transport.type=gcs'
           properties+=',hive.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'

@@ -224,6 +224,7 @@ async def create_cluster(
         "cluster_name": cluster_name,
         "config": {
             "gce_cluster_config": {
+                "staging_bucket": "open-lineage-e2e",
                 "network_uri": "default",
                 "internal_ip_only": False,
                 "zone_uri": f"{region}-a",
