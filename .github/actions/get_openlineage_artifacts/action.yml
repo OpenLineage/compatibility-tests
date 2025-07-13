@@ -261,7 +261,7 @@ runs:
         echo "java=${{ steps.set-action-outputs.outputs.java || steps.download-java-client.outputs.file }}" >> $GITHUB_OUTPUT
         echo "spark=${{ steps.set-action-outputs.outputs.spark || steps.download-spark-integration.outputs.file }}" >> $GITHUB_OUTPUT
         echo "flink=${{ steps.set-action-outputs.outputs.flink || steps.download-flink-integration.outputs.file }}" >> $GITHUB_OUTPUT
-        echo "flink=${{ steps.set-action-outputs.outputs.hive || steps.download-hive-integration.outputs.file }}" >> $GITHUB_OUTPUT
+        echo "hive=${{ steps.set-action-outputs.outputs.hive || steps.download-hive-integration.outputs.file }}" >> $GITHUB_OUTPUT
         echo "sql=${{ steps.set-action-outputs.outputs.sql || steps.download-java-sql.outputs.file }}" >> $GITHUB_OUTPUT
         echo "extensions=${{ steps.set-action-outputs.outputs.extensions || steps.download-spark-extension-interfaces.outputs.file }}" >> $GITHUB_OUTPUT
         echo "gcp-lineage=${{ steps.set-action-outputs.outputs.gcp-lineage || steps.download-transports-gcp-lineage.outputs.file }}" >> $GITHUB_OUTPUT
