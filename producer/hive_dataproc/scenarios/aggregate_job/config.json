@@ -9,7 +9,7 @@
   "tests": [
     {
       "name": "columnLineage_test",
-      "path": "events/columnLineage_test.json",
+      "path": "events/columnLineage.json",
       "tags": {
         "facets": [
           "columnLineage"
@@ -25,7 +25,7 @@
     },
     {
       "name": "hive_properties_test",
-      "path": "events/hive_properties_test.json",
+      "path": "events/hive_properties.json",
       "tags": {
         "facets": [
           "hive_properties"
@@ -34,7 +34,7 @@
     },
     {
       "name": "hive_query_test",
-      "path": "events/hive_query_test.json",
+      "path": "events/hive_query.json",
       "tags": {
         "facets": [
           "hive_query"
@@ -43,7 +43,7 @@
     },
     {
       "name": "hive_session_test",
-      "path": "events/hive_session_test.json",
+      "path": "events/hive_session.json",
       "tags": {
         "facets": [
           "hive_session"
@@ -52,7 +52,7 @@
     },
     {
       "name": "processing_engine_test",
-      "path": "events/processing_engine_test.json",
+      "path": "events/processing_engine.json",
       "tags": {
         "facets": [
           "processing_engine"
@@ -61,7 +61,7 @@
     },
     {
       "name": "run_event_test",
-      "path": "events/run_event_test.json",
+      "path": "events/run_event.json",
       "tags": {
         "facets": [
           "run_event"
@@ -70,7 +70,7 @@
     },
     {
       "name": "schema_test",
-      "path": "events/schema_test.json",
+      "path": "events/schema.json",
       "tags": {
         "facets": [
           "schema"
@@ -84,7 +84,7 @@
     },
     {
       "name": "sql_test",
-      "path": "events/sql_test.json",
+      "path": "events/sql.json",
       "tags": {
         "facets": [
           "sql"
@@ -93,7 +93,7 @@
     },
     {
       "name": "symlinks_test",
-      "path": "events/symlinks_test.json",
+      "path": "events/symlinks.json",
       "tags": {
         "facets": [
           "symlinks"
