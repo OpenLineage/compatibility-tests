@@ -1,0 +1,222 @@
+name: Hive Dataproc
+
+on:
+  workflow_call:
+    secrets:
+      gcpKey:
+        required: true
+    inputs:
+      component_release:
+        description: "release of hive dataproc to use"
+        type: string
+      ol_release:
+        description: "release tag of OpenLineage to use"
+        type: string
+      get-latest-snapshots:
+        description: "Should the artifact be downloaded from maven repo or circleci"
+        type: string
+
+jobs:
+  run-hive-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: initialize tests
+        id: init
+        run: |
+          scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/hive_dataproc/scenarios/" ${{ inputs.component_release }} ${{ inputs.ol_release }} )
+          [[ "$scenarios" == "" ]] || echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
+          echo "openlineage_cluster_suffix=$(echo '${{ inputs.ol_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
+          echo "component_cluster_suffix=$(echo '${{ inputs.component_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
+          case "${{ inputs.component_release }}" in
+            "3.1.3")
+              echo "hive_short=3" >> $GITHUB_OUTPUT
+              echo "dataproc_version=2.1-debian11" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "hive version ${{ inputs.component_release }} not supported"
+              exit 1
+              ;;
+          esac
+
+
+      - name: GCP authorization
+        id: gcp-auth
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
+      - name: Get OL artifacts
+        id: get-ol-artifacts
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/get_openlineage_artifacts
+        with:
+          version: ${{ inputs.ol_release }}
+          get-latest-snapshots: ${{ inputs.get-latest-snapshots }}
+          skip-java: 'true'
+          skip-spark: 'true'
+          skip-flink: 'true'
+          skip-s3: 'true'
+          skip-gcp-lineage: 'true'
+          skip-sql: 'true'
+
+      - name: Upload openlineage hive integration to GCS
+        id: upload-hive-integration
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/upload_artifacts
+        with:
+          local-file-path: ${{ steps.get-ol-artifacts.outputs.hive }}
+          gcs-path: "gs://open-lineage-e2e/jars"
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+
+      - name: Upload openlineage GCS transport to GCS
+        id: upload-gcs-transport
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/upload_artifacts
+        with:
+          local-file-path: ${{ steps.get-ol-artifacts.outputs.gcs }}
+          gcs-path: "gs://open-lineage-e2e/jars"
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+
+      - name: Upload initialization actions to GCS
+        id: upload-initialization-actions
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/upload_artifacts
+        with:
+          local-file-path: producer/hive_dataproc/runner/get_hive_openlineage_jars.sh
+          gcs-path: "gs://open-lineage-e2e/scripts"
+          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+
+      - name: Set up Python 3.11
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: actions/setup-python@v5
+        with:
+          cache: "pip"
+          python-version: "3.11"
+
+      - name: Install dependencies
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f producer/hive_dataproc/runner/requirements.txt ]; then pip install -r producer/spark_dataproc/runner/requirements.txt; fi
+
+
+      - name: Start producer
+        id: start-producer
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          metadata=''
+          metadata+='GCS_TRANSPORT_JAR=${{ steps.upload-gcs-transport.outputs.uploaded-file }}'
+          metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
+          
+          properties=''
+          properties+='hive:hive.exec.post.hooks=io.openlineage.hive.hooks.HiveOpenLineageHook'
+          properties+=',hive:hive.conf.validation=false'
+          properties+=',hive:hive.server2.logging.operation.level=VERBOSE'
+          properties+=',hive:hive.root.logger=DEBUG'
+          properties+=',hive:hive.log.explain.output=true'
+          
+          python producer/hive_dataproc/runner/dataproc_workflow.py create-cluster \
+            --project-id "gcp-open-lineage-testing" \
+            --region "us-west1" \
+            --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
+            --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
+            --cluster-properties "$properties" \
+            --metadata "$metadata" \
+            --initialization-actions "${{ steps.upload-initialization-actions.outputs.uploaded-file }}" \
+            --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}"
+
+      - name: Set producer output event dir
+        if: ${{ steps.init.outputs.scenarios }}
+        id: set-producer-output
+        run: | 
+          echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
+
+      - name: Run producer jobs and create OL events
+        if: ${{ steps.init.outputs.scenarios }}
+        id: run-producer
+        continue-on-error: true
+        run: |          
+          set -e
+          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
+          
+          properties=''
+          properties+='hive.extraListeners=io.openlineage.hive.hooks.HiveOpenLineageHook'
+          properties+=',hive.sql.warehouse.dir=/tmp/warehouse'
+          properties+=',hive.openlineage.transport.type=gcs'
+          properties+=',hive.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
+
+          for scenario in "${scenarios[@]}"
+          do
+              echo "Getting script for scenario $scenario"
+              query_file=$(find "producer/hive_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.sql" | head -n 1)
+              query=$(cat $query_file)
+
+              echo "Running hive job for scenario: $scenario"
+              
+              properties=''
+              properties+='hive.openlineage.transport.type=gcs'
+              properties+=",hive.openlineage.transport.bucketName=open-lineage-e2e"
+              properties+=",hive.openlineage.transport.fileNamePrefix=events/$scenario/$(date +%s%3N)/"
+
+              if ! python producer/hive_dataproc/runner/dataproc_workflow.py run-hive-query \
+                --project-id gcp-open-lineage-testing \
+                --region us-west1 \
+                --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
+                --query "$query" \
+                --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
+                --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
+                --properties "$properties"
+              then
+                echo "Error: hive job failed for scenario: $scenario"
+                exit 1
+              fi
+
+              echo "Finished running hive job for scenario: $scenario"
+          done
+
+          echo "Finished running all scenarios"
+
+      - name: Terminate producer cluster
+        if: ${{ always() && steps.init.outputs.scenarios }}
+        run: |
+          if gcloud dataproc clusters list --region us-west1 | grep -q "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}"
+          then
+            python producer/hive_dataproc/runner/dataproc_workflow.py terminate-cluster \
+            --project-id gcp-open-lineage-testing \
+            --region us-west1 \
+            --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
+            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
+          else
+            echo "Cluster does not exist"
+          fi
+
+      - name: Fail if hive jobs failed
+        if: ${{ steps.init.outputs.scenarios && steps.run-producer.outcome  == 'failure' }}
+        run: |
+          echo "step 'Run producer jobs and create OL events' has ended with failure but to terminate the cluster we needed to continue on error but fail the job after cluster termination."
+          echo "This will become redundant if starting the cluster is extracted to custom action with post actions defined."
+          echo "For now composite actions do not support post actions."
+          exit 1
+
+      - name: Validation
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/run_event_validation
+        with:
+          component: 'hive_dataproc'
+          release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
+          ol_release: ${{ inputs.ol_release }}
+          component_release: ${{ inputs.component_release }}
+          event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
+          target-path: 'hive-dataproc-${{inputs.hive_release}}-${{inputs.ol_release}}-report.json'
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.init.outputs.scenarios }}
+        with:
+          name: hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report
+          path: hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report.json
+          retention-days: 1

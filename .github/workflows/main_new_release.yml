@@ -13,11 +13,18 @@ on:
         description: 'Run Spark Dataproc tests'
         required: false
         default: 'true'
+      run_hive_dataproc:
+        description: 'Run Hive Dataproc tests'
+        required: false
+        default: 'true'
       openlineage_release:
         description: 'Override OpenLineage release version'
         required: false
       spark_matrix:
         description: 'Overwrite matrix for spark tests'
+        required: false
+      hive_matrix:
+        description: 'Overwrite matrix for hive tests'
         required: false
 
 permissions:
@@ -32,8 +39,10 @@ jobs:
     outputs:
       run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
       run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
+      run_hive_dataproc: ${{ github.event.inputs.run_hive_dataproc || 'true' }}
       openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
       spark_matrix: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
+      hive_matrix: ${{ github.event.inputs.hive_matrix || steps.set-matrix-values.outputs.hive_dataproc_matrix }}
       execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
       - name: Get execution time
@@ -80,6 +89,7 @@ jobs:
           }
 
           echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
+          echo "hive_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
 
   ######## COMPONENT VALIDATION ########
 
@@ -107,6 +117,19 @@ jobs:
       spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
 
+  hive-dataproc:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_hive_dataproc == 'true' }}
+    uses: ./.github/workflows/producer_hive_dataproc.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.hive_matrix) }}
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      ol_release: ${{ matrix.openlineage_versions }}
+      component_release: ${{ matrix.component_version }}
+      get-latest-snapshots: 'false'
+
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
   collect-and-compare-reports:
@@ -114,6 +137,7 @@ jobs:
       - initialize_workflow
       - dataplex
       - spark-dataproc
+      - hive-dataproc
     if: ${{ !failure() }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
 

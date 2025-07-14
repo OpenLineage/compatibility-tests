@@ -41,8 +41,6 @@ config file contains the metadata of the tests
           "supported",
           "facets"
         ],
-        "max_version": "9.99.9",
-        "min_version": "0.0.1",
         "producer": "producer"
       }
     }
@@ -82,6 +80,6 @@ mapping file contains the mapping between Openlineage events and consumer API en
   }
 }
 
-
+```
 
 

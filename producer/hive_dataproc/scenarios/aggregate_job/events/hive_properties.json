@@ -1,0 +1,19 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "createtable_as_select.default.monthly_transaction_summary"
+  },
+  "run": {
+    "facets": {
+      "hive_properties": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.34.0/integration/hive",
+        "_schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunFacet",
+        "properties": {
+          "hive.query.id": "{{ match(result, 'hive_.*') }}",
+          "hive.execution.engine": "tez"
+        }
+      }
+    }
+  }
+}

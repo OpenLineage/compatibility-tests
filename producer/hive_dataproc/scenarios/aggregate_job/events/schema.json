@@ -1,0 +1,59 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "createtable_as_select.default.monthly_transaction_summary"
+  },
+  "inputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.transactions",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "submissiondate",
+              "type": "date"
+            },
+            {
+              "name": "transactionamount",
+              "type": "double"
+            },
+            {
+              "name": "transactiontype",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "hive://hive-ol-cluster-m:9083",
+      "name": "default.monthly_transaction_summary",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "month",
+              "type": "string"
+            },
+            {
+              "name": "transactiontype",
+              "type": "string"
+            },
+            {
+              "name": "totalamount",
+              "type": "double"
+            },
+            {
+              "name": "transactioncount",
+              "type": "bigint"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
