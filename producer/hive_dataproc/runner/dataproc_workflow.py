@@ -746,9 +746,6 @@ def main():
         "--query", required=True, help="Hive query string to execute"
     )
     parser_hive.add_argument(
-        "--scenario", required=True, help="Scenario name"
-    )
-    parser_hive.add_argument(
         "--credentials-file", required=False, help="Path to GCP credentials file"
     )
     parser_hive.add_argument(
