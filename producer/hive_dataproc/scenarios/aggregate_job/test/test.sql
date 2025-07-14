@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS monthly_transaction_summary;
       TRUNC(submissiondate, 'MM') AS Month,
       transactiontype,
       SUM(transactionamount) AS TotalAmount,
-      COUNT(\*) AS TransactionCount
+      COUNT(*) AS TransactionCount
   FROM
       transactions
   GROUP BY
