@@ -154,7 +154,7 @@ jobs:
           do
               echo "Getting script for scenario $scenario"
               query_file=$(find "producer/hive_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.sql" | head -n 1)
-              query=$(cat $query_file))
+              query=$(cat $query_file)
 
               echo "Running hive job for scenario: $scenario"
               
