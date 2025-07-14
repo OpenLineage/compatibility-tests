@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS transactions;
-CREATE EXTERNAL TABLE transactions (SubmissionDate DATE, TransactionAmount DOUBLE, TransactionType STRING) STORED AS PARQUET LOCATION 'gs://$BUCKET/warehouse/transactions';
+CREATE EXTERNAL TABLE transactions (SubmissionDate DATE, TransactionAmount DOUBLE, TransactionType STRING) STORED AS PARQUET ;
 
 
 
