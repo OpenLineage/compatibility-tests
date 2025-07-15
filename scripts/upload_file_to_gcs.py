@@ -90,6 +90,15 @@ def main():
 
         # Upload the file to GCS
         print(f"Uploading {local_file_path} to gs://{bucket_name}/{blob_name}...")
+        # Preserve POSIX file attributes using reserved metadata keys
+        stat = os.stat(local_file_path)
+        blob.metadata = {
+            "goog-reserved-posix-mode": str(oct(stat.st_mode & 0o777))[2:],
+            "goog-reserved-file-mtime": str(int(stat.st_mtime)),
+            "goog-reserved-file-atime": str(int(stat.st_atime)),
+            "goog-reserved-posix-uid": str(stat.st_uid),
+            "goog-reserved-posix-gid": str(stat.st_gid)
+        }
         blob.upload_from_filename(local_file_path)
         print(f"File {local_file_path} uploaded successfully.")
 
