@@ -72,6 +72,7 @@ jobs:
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
+          skip-hive: 'true'
 
 #       This should be somehow automated and return the newest version
       - name: Download Big Query Spark Maven Artifact
