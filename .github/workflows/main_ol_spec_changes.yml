@@ -16,6 +16,9 @@ on:
       spark_matrix:
         description: 'Overwrite matrix for spark tests'
         required: false
+      hive_matrix:
+        description: 'Overwrite matrix for hive tests'
+        required: false
 
 
 permissions:
@@ -31,6 +34,7 @@ jobs:
       changes_in_spec: ${{ github.event.inputs.run_tests || steps.check-changes.outputs.changes_found }}
       ol_release: ${{ github.event.inputs.openlineage_release || steps.get-release.outputs.openlineage_release }}
       spark_matrix: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
+      hive_matrix: ${{ github.event.inputs.hive_matrix || steps.set-matrix-values.outputs.hive_dataproc_matrix }}
       execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
       - name: Get execution time
@@ -103,6 +107,7 @@ jobs:
           }
 
           echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
+          echo "hive_dataproc_matrix=$(get_matrix hive_dataproc)" >> $GITHUB_OUTPUT
 
 
   ######## COMPONENT VALIDATION ########

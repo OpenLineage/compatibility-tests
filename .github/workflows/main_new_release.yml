@@ -89,7 +89,7 @@ jobs:
           }
 
           echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
-          echo "hive_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
+          echo "hive_dataproc_matrix=$(get_matrix hive_dataproc)" >> $GITHUB_OUTPUT
 
   ######## COMPONENT VALIDATION ########
 
