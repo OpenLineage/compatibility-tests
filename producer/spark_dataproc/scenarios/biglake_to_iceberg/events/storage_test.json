@@ -1,0 +1,19 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_lake_to_iceberg.atomic_replace_table_as_select.e2e_dataset_e2e_another_table"
+  },
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "data/bigquery_metastore/e2e_dataset.db/e2e_another_table",
+      "facets": {
+        "storage": {
+          "storageLayer": "iceberg",
+          "fileFormat": "parquet"
+        }
+      }
+    }
+  ]
+}
