@@ -2326,7 +2326,7 @@
     "scenarios": [
       {
         "name": "hive",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
@@ -2410,12 +2410,10 @@
           },
           {
             "name": "run_event_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'run_event_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -2424,12 +2422,10 @@
           },
           {
             "name": "parent_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'parent_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "parent"
@@ -2438,12 +2434,10 @@
           },
           {
             "name": "spark_properties_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'spark_properties_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "spark_properties"
@@ -2452,12 +2446,10 @@
           },
           {
             "name": "processing_engine_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'processing_engine_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "processing_engine"
@@ -2466,12 +2458,10 @@
           },
           {
             "name": "gcp_dataproc_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'gcp_dataproc_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "gcp_dataproc"
@@ -2480,12 +2470,10 @@
           },
           {
             "name": "jobType_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'jobType_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "jobType"
@@ -2494,12 +2482,10 @@
           },
           {
             "name": "gcp_lineage_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'gcp_lineage_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "gcp_lineage"
@@ -2508,12 +2494,10 @@
           },
           {
             "name": "dataSource_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'dataSource_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "dataSource"
@@ -2522,12 +2506,10 @@
           },
           {
             "name": "schema_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'schema_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "schema"
@@ -2541,12 +2523,10 @@
           },
           {
             "name": "columnLineage_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'columnLineage_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "columnLineage"
@@ -3629,7 +3609,7 @@
       },
       {
         "name": "bigquery_to_delta",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table:COMPLETE",
@@ -3753,10 +3733,12 @@
           },
           {
             "name": "gcp_lineage_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'gcp_lineage_test' In .job.facets.gcp_lineage.origin.name: 'projects/gcp-open-lineage-testing/regions//clusters/dataproc-producer-test-351-1320-17753525000' doesn't match 'projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-.*'"
+            ],
             "tags": {
               "facets": [
                 "gcp_lineage"
@@ -12999,7 +12981,7 @@
     "scenarios": [
       {
         "name": "hive",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "default:simple_test.local_table_scan:COMPLETE",
@@ -13091,10 +13073,12 @@
           },
           {
             "name": "run_event_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'run_event_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "run_event"
@@ -13103,10 +13087,12 @@
           },
           {
             "name": "parent_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'parent_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "parent"
@@ -13115,10 +13101,12 @@
           },
           {
             "name": "spark_properties_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'spark_properties_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "spark_properties"
@@ -13127,10 +13115,12 @@
           },
           {
             "name": "processing_engine_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'processing_engine_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "processing_engine"
@@ -13139,10 +13129,12 @@
           },
           {
             "name": "gcp_dataproc_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'gcp_dataproc_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "gcp_dataproc"
@@ -13151,10 +13143,12 @@
           },
           {
             "name": "jobType_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'jobType_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "jobType"
@@ -13163,10 +13157,12 @@
           },
           {
             "name": "gcp_lineage_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'gcp_lineage_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "gcp_lineage"
@@ -13175,10 +13171,12 @@
           },
           {
             "name": "dataSource_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'dataSource_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "dataSource"
@@ -13187,10 +13185,12 @@
           },
           {
             "name": "schema_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'schema_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "schema"
@@ -13204,10 +13204,12 @@
           },
           {
             "name": "columnLineage_test",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [],
+            "details": [
+              "'columnLineage_test' event with .eventType: COMPLETE, .job.name: simple_test.execute_create_hive_table_as_select_command.default_t2 and .job.namespace: default not found in result events"
+            ],
             "tags": {
               "facets": [
                 "columnLineage"
