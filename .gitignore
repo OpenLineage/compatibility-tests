@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+#Status files and documentation
+Status/
+
 # Distribution / packaging
 .Python
 build/
@@ -165,3 +168,15 @@ cython_debug/
 
 ignored/
 bin/
+
+# OpenLineage event files generated during local testing
+openlineage_events.jsonl
+*/openlineage_events.jsonl
+**/events/openlineage_events.jsonl
+
+# Virtual environments  
+venv/
+test_venv/
+*/venv/
+*/test_venv/
+**/test_venv/

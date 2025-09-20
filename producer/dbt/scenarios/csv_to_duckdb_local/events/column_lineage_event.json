@@ -1,0 +1,32 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "{{ any(result) }}",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": "{{ any(result) }}"
+  },
+  "job": {
+    "namespace": "{{ any(result) }}",
+    "name": "{{ any(result) }}",
+    "facets": "{{ any(result) }}"
+  },
+  "inputs": "{{ any(result) }}",
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "{{ any(result) }}",
+      "facets": {
+        "columnLineage": {
+          "_producer": "{{ any(result) }}",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/ColumnLineageDatasetFacet.json",
+          "fields": "{{ any(result) }}"
+        },
+        "schema": {
+          "_producer": "{{ any(result) }}",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+          "fields": "{{ any(result) }}"
+        }
+      }
+    }
+  ]
+}

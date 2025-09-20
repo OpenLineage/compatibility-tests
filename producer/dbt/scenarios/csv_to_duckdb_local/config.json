@@ -1,0 +1,52 @@
+{
+    "tests": [
+      {
+        "name": "schema_facet_test",
+        "path": "events/schema_event.json",
+        "tags": {
+          "facets": ["schema", "dataSource", "run"],
+          "max_version": "1.23.0",
+          "min_version": "1.0.0",
+          "lineage_level": {
+            "duckdb": ["dataset", "column"]
+          }
+        }
+      },
+      {
+        "name": "sql_facet_test",
+        "path": "events/sql_event.json", 
+        "tags": {
+          "facets": ["sql", "dataSource"],
+          "max_version": "1.23.0",
+          "min_version": "1.0.0",
+          "lineage_level": {
+            "duckdb": ["dataset"]
+          }
+        }
+      },
+      {
+        "name": "lineage_test",
+        "path": "events/lineage_event.json",
+        "tags": {
+          "facets": ["dataSource", "run"],
+          "max_version": "1.23.0", 
+          "min_version": "1.0.0",
+          "lineage_level": {
+            "duckdb": ["dataset", "transformation"]
+          }
+        }
+      },
+      {
+        "name": "column_lineage_test",
+        "path": "events/column_lineage_event.json",
+        "tags": {
+          "facets": ["columnLineage", "schema", "dataSource"],
+          "max_version": "1.23.0",
+          "min_version": "1.0.0", 
+          "lineage_level": {
+            "duckdb": ["column", "transformation"]
+          }
+        }
+      }
+    ]
+}

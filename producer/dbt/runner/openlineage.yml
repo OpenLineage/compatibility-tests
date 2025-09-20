@@ -1,0 +1,4 @@
+transport:
+  type: file
+  log_file_path: ../events/openlineage_events.jsonl
+  append: true
