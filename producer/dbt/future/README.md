@@ -1,10 +1,15 @@
 # Future Enhancements for dbt Producer Compatibility Testing
 
-This directory contains **future enhancement designs** for the dbt producer compatibility test framework.
+This directory contains **design documents and prototypes** for enhanced compatibility testing capabilities.
 
-## Current Status: Design Phase Only
+## 🚧 Status: Design Phase / Incomplete Implementation
 
-⚠️ **These are design documents and prototypes, not production-ready features.**
+⚠️ **Important**: These are design documents and prototype code, not production-ready features.
+
+**Purpose**: Document future enhancement possibilities relevant to OpenLineage TSC discussions about:
+- Multi-specification version testing
+- Compatibility matrix validation
+- Forward/backward compatibility requirements
 
 ## Future Enhancement: Multi-Spec Testing
 
@@ -35,10 +40,19 @@ This directory contains **future enhancement designs** for the dbt producer comp
 ## Current Production Feature
 
 The current production-ready dbt producer compatibility test is in the parent directory:
-- `../run_dbt_tests.sh` - Single-spec dbt compatibility test
-- `../README.md` - Production documentation
+- `../run_dbt_tests.sh` - Single-spec dbt compatibility test (OpenLineage 2-0-2)
+- `../README.md` - Production documentation and specification coverage analysis
 
-## Implementation Priority
+## TSC Discussion Value
+
+These designs address key questions relevant to OpenLineage community discussions:
+
+1. **Specification Versioning**: How should producers handle multiple spec versions?
+2. **Compatibility Requirements**: What constitutes adequate backward/forward compatibility?
+3. **Testing Standards**: Should the community require multi-spec validation?
+4. **Implementation Guidance**: How should integrations handle spec version evolution?
+
+The prototype code and analysis documents provide concrete examples for these architectural discussions.
 
 1. **High Priority:** Multi-spec testing (same implementation, different specs)
 2. **Lower Priority:** Multi-implementation testing (different versions, requires research)

@@ -5,7 +5,7 @@
         "path": "events/schema_event.json",
         "tags": {
           "facets": ["schema", "dataSource", "run"],
-          "max_version": "1.23.0",
+          "max_version": "2-0-2",
           "min_version": "1.0.0",
           "lineage_level": {
             "duckdb": ["dataset", "column"]
@@ -17,7 +17,7 @@
         "path": "events/sql_event.json", 
         "tags": {
           "facets": ["sql", "dataSource"],
-          "max_version": "1.23.0",
+          "max_version": "2-0-2",
           "min_version": "1.0.0",
           "lineage_level": {
             "duckdb": ["dataset"]
@@ -29,7 +29,7 @@
         "path": "events/lineage_event.json",
         "tags": {
           "facets": ["dataSource", "run"],
-          "max_version": "1.23.0", 
+          "max_version": "2-0-2", 
           "min_version": "1.0.0",
           "lineage_level": {
             "duckdb": ["dataset", "transformation"]
@@ -41,7 +41,7 @@
         "path": "events/column_lineage_event.json",
         "tags": {
           "facets": ["columnLineage", "schema", "dataSource"],
-          "max_version": "1.23.0",
+          "max_version": "2-0-2",
           "min_version": "1.0.0", 
           "lineage_level": {
             "duckdb": ["column", "transformation"]

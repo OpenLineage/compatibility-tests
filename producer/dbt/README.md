@@ -72,7 +72,7 @@ To run dbt compatibility tests locally use the command:
 
 ### Optional Arguments  
 - `--producer-output-events-dir`: Directory for output events (default: `output`)
-- `--openlineage-release`: OpenLineage version (default: `1.23.0`)
+- `--openlineage-release`: OpenLineage version (default: `2-0-2`)
 - `--report-path`: Test report location (default: `../dbt_producer_report.json`)
 
 ### Example
@@ -80,7 +80,7 @@ To run dbt compatibility tests locally use the command:
 ./run_dbt_tests.sh \
   --openlineage-directory /path/to/OpenLineage \
   --producer-output-events-dir ./output \
-  --openlineage-release 1.23.0
+  --openlineage-release 2-0-2
 ```
 
 ## Prerequisites
@@ -181,17 +181,17 @@ Tests validate against OpenLineage specification requirements:
 This appears to be intentional for backward/forward compatibility but requires further investigation.
 
 ### What We Validate
-✅ **Core OpenLineage 2-0-2 compliance**: Event structure, required fields, data types  
-✅ **dbt-specific features**: Test events, model events, column lineage, data quality facets  
-✅ **Lineage accuracy**: Input/output relationships, parent/child job relationships  
-✅ **Event completeness**: All expected events generated for dbt operations  
+- **Core OpenLineage 2-0-2 compliance**: Event structure, required fields, data types  
+- **dbt-specific features**: Test events, model events, column lineage, data quality facets  
+- **Lineage accuracy**: Input/output relationships, parent/child job relationships  
+- **Event completeness**: All expected events generated for dbt operations  
 
-### What Requires Further Analysis  
-🔍 **Mixed facet versioning**: Whether this is spec-compliant or requires separate validation  
-🔍 **Cross-version compatibility**: How different facet spec versions interact  
-🔍 **Facet-specific validation**: Each facet type against its declared spec version  
+### Areas Requiring Further Analysis  
+- **Mixed facet versioning**: Whether this is spec-compliant or requires separate validation  
+- **Cross-version compatibility**: How different facet spec versions interact  
+- **Facet-specific validation**: Each facet type against its declared spec version  
 
-See `SPEC_COMPLIANCE_ANALYSIS.md` for detailed analysis of spec version usage.
+See `SPECIFICATION_COVERAGE_ANALYSIS.md` for detailed facet coverage analysis.
 
 ## Test Structure
 
@@ -293,6 +293,19 @@ This compatibility test framework is designed for contribution to the OpenLineag
 See the `future/` directory for design documents and prototypes of upcoming features:
 - **Multi-spec testing**: Test same implementation against multiple OpenLineage spec versions
 - **Multi-implementation testing**: Test different dbt-openlineage versions
+
+## Future Enhancements
+
+This producer includes design work for enhanced testing capabilities relevant to ongoing TSC discussions about specification version coverage and compatibility testing:
+
+- **Multi-Spec Testing**: Test same implementation against multiple OpenLineage specification versions
+- **Spec Version Matrix**: N×M compatibility testing (implementations × spec versions)  
+- **Forward/Backward Compatibility**: Systematic validation across version ranges
+
+**Status**: Design phase documentation in `future/` directory  
+**Relevance**: Supports TSC discussions on specification versioning and compatibility requirements
+
+See `future/README.md` for detailed design documents and prototype implementations.
 
 ## Maintainers
 

@@ -11,12 +11,12 @@ usage() {
     echo "Options:"
     echo "  --openlineage-directory PATH        Path to openlineage repository directory (required)"
     echo "  --producer-output-events-dir PATH   Path to producer output events directory (default: output)"
-    echo "  --openlineage-release VERSION       OpenLineage release version (default: 1.23.0)"
+    echo "  --openlineage-release VERSION       OpenLineage release version (default: 2-0-2)"
     echo "  --report-path PATH                  Path to report directory (default: ../dbt_producer_report.json)"
     echo "  -h, --help                          Show this help message and exit"
     echo ""
     echo "Example:"
-    echo "  $0 --openlineage-directory /path/to/specs --producer-output-events-dir output --openlineage-release 1.23.0"
+    echo "  $0 --openlineage-directory /path/to/specs --producer-output-events-dir output --openlineage-release 2-0-2"
     exit 0
 }
 
@@ -25,7 +25,7 @@ OPENLINEAGE_DIRECTORY=""
 
 # Variables with default values
 PRODUCER_OUTPUT_EVENTS_DIR=output
-OPENLINEAGE_RELEASE=1.23.0
+OPENLINEAGE_RELEASE=2-0-2
 REPORT_PATH="../dbt_producer_report.json"
 
 # If -h or --help is passed, print usage and exit

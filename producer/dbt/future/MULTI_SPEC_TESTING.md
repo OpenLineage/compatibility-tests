@@ -53,16 +53,25 @@ output/
 # - Reports: output/dbt_producer_report_{version}.json
 ```
 
-## Implementation vs Specification Testing Matrix
+## Current Production Reality vs Future Design
 
-### ✅ Currently Supported (Multi-Spec Schema Validation)
+### ✅ What's Actually Implemented (Production)
 | Implementation | Specification | Status |
 |----------------|---------------|---------|
-| dbt-ol 1.37.0  | 2-0-2        | ✅ Tested |
-| dbt-ol 1.37.0  | 2-0-1        | ✅ Tested |
-| dbt-ol 1.37.0  | 1-1-1        | ✅ Tested |
+| dbt-ol 1.37.0  | 2-0-2        | ✅ Tested (single-spec production implementation) |
 
-**Tests:** Forward/backward compatibility of current implementation against different OpenLineage spec schema versions.
+**Location**: `../run_dbt_tests.sh` - Production dbt compatibility test  
+**Scope**: Single specification version (OpenLineage 2-0-2) validation
+
+### 🔮 Proposed Multi-Spec Schema Validation (Not Currently Implemented)
+| Implementation | Specification | Status |
+|----------------|---------------|---------|
+| dbt-ol 1.37.0  | 2-0-2        | 🔮 Would be tested |
+| dbt-ol 1.37.0  | 2-0-1        | 🔮 Would be tested |
+| dbt-ol 1.37.0  | 1-1-1        | 🔮 Would be tested |
+
+**Current Reality**: Only OpenLineage spec 2-0-2 is tested in production implementation.  
+**Proposal**: Framework design for testing same implementation against multiple spec versions.
 
 ### 🔮 Future Enhancement: Multi-Implementation Testing
 | Implementation | Specification | Status |
@@ -75,12 +84,14 @@ output/
 
 ## Compatibility Validation
 
-### Forward Compatibility Testing
+### Forward Compatibility Testing (Design Only)
 ```bash
-# New implementation vs older specification
-dbt-ol 1.37.0 → OpenLineage spec 2-0-1  ✅ Tested
-dbt-ol 1.37.0 → OpenLineage spec 1-1-1  ✅ Tested
+# Proposed: New implementation vs older specification
+dbt-ol 1.37.0 → OpenLineage spec 2-0-1  🔮 Design only
+dbt-ol 1.37.0 → OpenLineage spec 1-1-1  🔮 Design only
 ```
+
+**Current Reality**: Only tests against OpenLineage spec 2-0-2
 
 ### Cross-Version Event Analysis
 ```bash
@@ -122,12 +133,14 @@ jq -r '.schemaURL' output/spec_2-0-1/openlineage_events_2-0-1.jsonl | head -1
 
 ## Framework Enhancement Roadmap
 
-### Phase 1: Multi-Spec Schema Validation ✅ COMPLETE
-- [x] Spec-version-aware event files
-- [x] Spec-version-aware reports  
-- [x] Multi-spec test runner
-- [x] Clear spec version identification
-- [x] Forward/backward compatibility testing (same implementation, different schemas)
+### Phase 1: Multi-Spec Schema Validation 🔮 DESIGN PHASE
+- [ ] Spec-version-aware event files
+- [ ] Spec-version-aware reports  
+- [ ] Multi-spec test runner
+- [ ] Clear spec version identification
+- [ ] Forward/backward compatibility testing (same implementation, different schemas)
+
+**Current Status**: Design documents and prototype code only
 
 ### Phase 2: Multi-Implementation Support 🔮 FUTURE ENHANCEMENT
 - [ ] Multiple dbt-ol version management
