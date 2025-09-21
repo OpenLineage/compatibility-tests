@@ -1,316 +1,150 @@
-# dbt Producer Compatibility Tests
+# dbt Producer Compatibility Test
 
-## Description
+## Purpose and Scope
 
-This test validates dbt's OpenLineage integration compliance using a controlled testing environment. It uses synthetic data to test dbt's ability to generate compliant OpenLineage events, focusing on validation rather than representing production use cases.
+This directory contains a compatibility test for the `openlineage-dbt` integration. Its purpose is to provide a standardized and reproducible framework for validating that dbt's OpenLineage integration produces events compliant with the OpenLineage specification.
 
-## Purpose
+This framework is designed as a reference for the community to:
+-   Verify that `dbt-ol` generates syntactically and semantically correct OpenLineage events for common dbt operations.
+-   Provide a consistent testing environment for `openlineage-dbt` across different versions.
+-   Serve as a foundation for more advanced testing scenarios, such as multi-spec or multi-implementation validation.
 
-**Primary Goal**: Validate that dbt + OpenLineage integration produces compliant events according to OpenLineage specification standards.
+It is important to note that this is a **compatibility validation framework** using synthetic data. It is not intended to be a demonstration of a production data pipeline.
 
-**What this is**: 
-- A compatibility validation framework for dbt → OpenLineage integration
-- A test harness using synthetic data to verify event generation compliance
-- A reference implementation for testing dbt OpenLineage compatibility
+## Test Architecture and Workflow
 
-**What this is NOT**:
-- A production-ready data pipeline
-- A real-world use case demonstration  
-- Representative of typical production dbt implementations
+The test is orchestrated by the `run_dbt_tests.sh` script and follows a clear, sequential workflow designed for reliability and ease of use. This structure ensures that each component of the integration is validated systematically.
 
-## Test Architecture
+The end-to-end process is as follows:
 
-**Test Pipeline**: Synthetic CSV → dbt Models → DuckDB  
-**Transport**: Local file-based OpenLineage event capture  
-**Validation**: Comprehensive facet compliance testing (schema, SQL, lineage, column lineage)
+1.  **Test Orchestration**: The `run_dbt_tests.sh` script serves as the main entry point. It sets up the environment and initiates the Python-based test runner (`test_runner/cli.py`).
 
-## Test Scenarios
+2.  **Scenario Execution**: The test runner executes the dbt project defined in the `runner/` directory. The specific dbt commands to be run (e.g., `dbt seed`, `dbt run`, `dbt test`) are defined in the test scenarios located under `scenarios/`.
 
-### csv_to_duckdb_local
+3.  **Event Generation and Capture**: During the execution, the `dbt-ol` wrapper intercepts the dbt commands and emits OpenLineage events. The `runner/openlineage.yml` configuration directs these events to be captured as a local file (`events/openlineage_events.jsonl`) using the `file` transport.
 
-Controlled testing scenario with synthetic data that validates:
-- dbt → OpenLineage integration functionality
-- File transport event generation compliance
-- Schema and SQL facet structural validation  
-- Dataset and column lineage relationship accuracy
+4.  **Event Validation**: Once the dbt process is complete, the test framework performs a two-stage validation on the generated `openlineage_events.jsonl` file:
+    *   **Syntax Validation**: Each event is validated against the official OpenLineage JSON schema (e.g., version `2-0-2`) to ensure it is structurally correct.
+    *   **Semantic Validation**: The content of the events is compared against expected templates. This deep comparison, powered by the `scripts/compare_events.py` utility, verifies the accuracy of job names, dataset identifiers, lineage relationships, and the presence and structure of key facets.
 
-**Test Data**: Synthetic customer/order data designed for validation testing
+5.  **Reporting**: Upon completion, the test runner generates a standardized JSON report (`dbt_producer_report.json`) that details the results of each validation step. This report is designed to be consumed by higher-level aggregation scripts in a CI/CD environment.
 
-## Running Tests
+## Validation Scope
 
-### Atomic Validation Tests
-```bash
-cd test_runner
-python cli.py run-atomic --verbose
-```
+This test validates that the `openlineage-dbt` integration correctly generates OpenLineage events for core dbt operations.
 
-### Framework Validation Tests  
-```bash
-cd test_runner
-python cli.py validate-events
-```
+#### dbt Operations Covered:
+-   `dbt seed`: To load initial data.
+-   `dbt run`: To execute dbt models.
+-   `dbt test`: To run data quality tests.
 
-### Complete Test Suite
-```bash
-./run_dbt_tests.sh --openlineage-directory /path/to/openlineage/specs
-```
+#### Validation Checks:
+-   **Event Generation**: Correctly creates `START` and `COMPLETE` events for jobs and runs.
+-   **Core Facet Structure and Content**: Validates key facets, including:
+    -   `jobType`
+    -   `sql`
+    -   `processing_engine`
+    -   `parent` (for job/run relationships)
+    -   `dbt_run`, `dbt_version`
+    -   `schema`, `dataSource`
+    -   `documentation`
+    -   `columnLineage`
+    -   `dataQualityAssertions` (for dbt tests)
+-   **Specification Compliance**: Events are validated against the OpenLineage specification schema (version `2-0-2`).
 
-## Running Locally
-
-To run dbt compatibility tests locally use the command:
-
-```bash
-./run_dbt_tests.sh \
-  --openlineage-directory <path to your local openlineage repository containing spec> \
-  --producer-output-events-dir <path where OpenLineage events will be saved> \
-  --openlineage-release <OpenLineage release version> \
-  --report-path <path where test report will be generated>
-```
-
-### Required Arguments
-- `--openlineage-directory`: Path to local OpenLineage repository containing specifications
-
-### Optional Arguments  
-- `--producer-output-events-dir`: Directory for output events (default: `output`)
-- `--openlineage-release`: OpenLineage version (default: `2-0-2`)
-- `--report-path`: Test report location (default: `../dbt_producer_report.json`)
-
-### Example
-```bash
-./run_dbt_tests.sh \
-  --openlineage-directory /path/to/OpenLineage \
-  --producer-output-events-dir ./output \
-  --openlineage-release 2-0-2
-```
-
-## Prerequisites
-
-1. **dbt**: Install dbt with DuckDB adapter
-   ```bash
-   pip install dbt-core dbt-duckdb
-   ```
-
-2. **OpenLineage dbt Integration**: Install the OpenLineage dbt package
-   ```bash
-   pip install openlineage-dbt
-   ```
-
-3. **Python Dependencies**: Install test runner dependencies
-   ```bash
-   cd test_runner
-   pip install -r requirements.txt
-   ```
-
-4. **OpenLineage Configuration**: Review the [dbt integration documentation](https://openlineage.io/docs/integrations/dbt) for important configuration details and nuances when using the `dbt-ol` wrapper.
-
-## OpenLineage Configuration
-
-### Configuration File Location
-The OpenLineage configuration is located at:
-```
-runner/openlineage.yml
-```
-
-This file configures:
-- **Transport**: File-based event capture to the `events/` directory
-- **Event Storage**: Where OpenLineage events are written
-- **Schema Version**: Which OpenLineage specification version to use
-
-### Event Output Location
-Generated OpenLineage events are stored in:
-```
-events/openlineage_events.jsonl
-```
-
-Each line in this JSONL file contains a complete OpenLineage event with:
-- Event metadata (eventTime, eventType, producer)
-- Job information (namespace, name, facets)
-- Run information (runId, facets)
-- Dataset lineage (inputs, outputs)
-- dbt-specific facets (dbt_version, processing_engine, etc.)
-
-### Important dbt Integration Notes
-
-**⚠️ Please review the [OpenLineage dbt documentation](https://openlineage.io/docs/integrations/dbt) before running tests.**
-
-Key considerations:
-- The `dbt-ol` wrapper has specific configuration requirements
-- Event emission timing depends on dbt command type (`run`, `test`, `build`)
-- Some dbt facets require specific dbt versions
-- File transport configuration affects event file location and format
-
-## What Gets Tested
-
-### Atomic Tests (5 tests)
-- **Environment Validation**: dbt and duckdb availability
-- **Data Pipeline**: Synthetic CSV data loading and model execution
-- **Event Generation**: OpenLineage event capture via file transport
-- **Event Structure**: Basic event validity and format compliance
-
-### Framework Tests (5 tests)  
-- **Schema Facet Validation**: Schema structure and field compliance
-- **SQL Facet Validation**: SQL query capture and dialect specification
-- **Lineage Structure Validation**: Event structure and required fields
-- **Column Lineage Validation**: Column-level lineage relationship accuracy
-- **dbt Job Naming Validation**: dbt-specific naming convention compliance
-
-## Validation Standards
-
-Tests validate against OpenLineage specification requirements:
-- Event structure compliance (eventTime, eventType, job, run, producer)
-- Required facets presence and structure
-- Schema validation for dataset facets
-- Lineage relationship accuracy and completeness
-- dbt-specific integration patterns
-
-## Spec Compliance Analysis
-
-### Primary Specification Under Test
-**OpenLineage Specification 2-0-2** (Latest)
-- Implementation: dbt-openlineage 1.37.0
-- Core event structure: Fully compliant with 2-0-2 schema
-- Main schema URL: `https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent`
-
-### Mixed Facet Versioning (Important Finding)
-⚠️ **The implementation uses mixed facet spec versions**:
-- **Core event**: 2-0-2 (latest)
-- **Job facets**: 2-0-3 (newer than main spec)
-- **Run facets**: 1-1-1 (older spec versions)  
-- **Dataset facets**: 1-0-1 (older spec versions)
-
-This appears to be intentional for backward/forward compatibility but requires further investigation.
-
-### What We Validate
-- **Core OpenLineage 2-0-2 compliance**: Event structure, required fields, data types  
-- **dbt-specific features**: Test events, model events, column lineage, data quality facets  
-- **Lineage accuracy**: Input/output relationships, parent/child job relationships  
-- **Event completeness**: All expected events generated for dbt operations  
-
-### Areas Requiring Further Analysis  
-- **Mixed facet versioning**: Whether this is spec-compliant or requires separate validation  
-- **Cross-version compatibility**: How different facet spec versions interact  
-- **Facet-specific validation**: Each facet type against its declared spec version  
-
-See `SPECIFICATION_COVERAGE_ANALYSIS.md` for detailed facet coverage analysis.
+A detailed, facet-by-facet analysis of specification coverage is available in `SPECIFICATION_COVERAGE_ANALYSIS.md`.
 
 ## Test Structure
+
+The test is organized into the following key directories, each with a specific role in the validation process:
 
 ```
 producer/dbt/
 ├── run_dbt_tests.sh           # Main test execution script
-├── test_runner/               # Python test framework
-│   ├── cli.py                # Command-line interface
-│   ├── openlineage_test_runner.py  # Atomic test runner
-│   └── validation_runner.py   # Event validation logic
-├── scenarios/                 # Test scenarios
-│   └── csv_to_duckdb_local/   
-│       ├── config.json        # Scenario configuration
-│       ├── events/            # Expected event templates
-│       └── test/              # Scenario-specific tests
-├── events/                    # 📁 OpenLineage event output directory
-│   └── openlineage_events.jsonl  # Generated events (JSONL format)
-├── runner/                    # dbt project for testing
-│   ├── dbt_project.yml        # dbt configuration
-│   ├── openlineage.yml        # 🔧 OpenLineage transport configuration
-│   ├── models/                # dbt models
-│   ├── seeds/                 # Sample data
-│   └── profiles.yml           # Database connections
-└── future/                    # Future enhancement designs
-    └── run_multi_spec_tests.sh   # Multi-spec testing prototypes
+├── test_runner/               # Python test framework for orchestration and validation
+├── scenarios/                 # Defines the dbt commands and expected outcomes for each test case
+├── events/                    # Default output directory for generated OpenLineage events
+├── runner/                    # A self-contained dbt project used as the test target
+└── future/                    # Design documents for future enhancements
 ```
 
-## Internal Test Framework
+-   **`runner/`**: A self-contained dbt project with models, seeds, and configuration. This is the target of the `dbt-ol` command.
+-   **`scenarios/`**: Defines the dbt commands to be executed and contains the expected event templates for validation.
+-   **`test_runner/`**: A custom Python application that orchestrates the end-to-end test workflow. It uses the `click` library to provide a command-line interface, execute the dbt process, and trigger the validation of the generated OpenLineage events.
+-   **`events/`**: The default output directory for the generated `openlineage_events.jsonl` file.
 
-The test framework consists of:
+## How to Run the Tests
 
-### CLI Interface (`test_runner/cli.py`)
-- Command-line interface for running tests
-- Supports both atomic tests and event validation
-- Provides detailed output and error reporting
+To execute the test suite, you will need a local clone of the main [OpenLineage repository](https://github.com/OpenLineage/OpenLineage), as the validation tool requires access to the specification files.
 
-### Atomic Test Runner (`test_runner/openlineage_test_runner.py`)
-- Individual validation tests for dbt project components
-- Database connectivity validation
-- dbt project structure validation
-- OpenLineage configuration validation
+### Prerequisites
 
-### Event Validation Runner (`test_runner/validation_runner.py`)
-- Framework integration for event validation
-- Schema compliance checking
-- Event structure validation
+1.  **Install Python Dependencies**:
+    ```bash
+    # From the producer/dbt/ directory
+    pip install -r test_runner/requirements.txt
+    ```
 
-## Event Generation Process
+2.  **Install dbt and the DuckDB adapter**:
+    ```bash
+    pip install dbt-core dbt-duckdb
+    ```
 
-### How Events Are Generated
+3.  **Install the OpenLineage dbt integration**:
+    ```bash
+    pip install openlineage-dbt
+    ```
 
-1. **dbt-ol Wrapper Execution**: The test uses `dbt-ol` instead of `dbt` directly
-2. **OpenLineage Integration**: Events are emitted during dbt model runs and tests
-3. **File Transport**: Events are written to `events/openlineage_events.jsonl`
-4. **Event Types**: Both `START` and `COMPLETE` events are generated for each dbt operation
+### Execution
 
-### Event File Format
+Run the main test script, providing the path to your local OpenLineage repository.
 
-The generated `events/openlineage_events.jsonl` contains one JSON event per line:
+#### Basic Example
+This command runs the test suite with default settings, validating against the `2-0-2` OpenLineage release and saving events to the `events/` directory.
 
-```json
-{
-  "eventTime": "2025-09-21T08:11:06.838051+00:00",
-  "eventType": "START",
-  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.37.0/integration/dbt",
-  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
-  "job": { "namespace": "dbt", "name": "..." },
-  "run": { "runId": "...", "facets": { "dbt_version": {...}, "processing_engine": {...} } },
-  "inputs": [...],
-  "outputs": [...]
-}
+```bash
+# Example assuming the OpenLineage repo is cloned in a sibling directory
+./run_dbt_tests.sh --openlineage-directory ../OpenLineage
 ```
 
-### dbt-Specific Event Features
+#### Full Example
+This command demonstrates how to override the default settings by specifying all available arguments.
 
-- **dbt Test Events**: Include `dataQualityAssertions` facets with test results
-- **dbt Model Events**: Include schema, SQL, and column lineage facets
-- **dbt Version Tracking**: Events include dbt and openlineage-dbt version information
-- **Parent/Child Relationships**: Test events reference their parent dbt run
+```bash
+./run_dbt_tests.sh \
+  --openlineage-directory /path/to/your/OpenLineage \
+  --producer-output-events-dir /tmp/dbt_events \
+  --openlineage-release 2-0-2 \
+  --report-path /tmp/dbt_report.json
+```
 
-## Important Notes
+### Command-Line Arguments
+-   `--openlineage-directory` (**Required**): Path to the root of a local clone of the OpenLineage repository, which contains the `spec/` directory.
+-   `--producer-output-events-dir`: Directory where generated OpenLineage events will be saved. (Default: `events/`)
+-   `--openlineage-release`: The OpenLineage release version to validate against. (Default: `2-0-2`)
+-   `--report-path`: Path where the final JSON test report will be generated. (Default: `../dbt_producer_report.json`)
 
-**Test Purpose**: This is a compatibility validation test with synthetic data, not a production use case. The purpose is to validate that dbt properly integrates with OpenLineage and generates compliant events.
+## Important dbt Integration Notes
 
-**Data**: Uses toy/synthetic data specifically designed for testing OpenLineage compliance, not representative of real-world scenarios.
+**⚠️ Please review the [OpenLineage dbt documentation](https://openlineage.io/docs/integrations/dbt) before running tests.**
 
-## Community Contribution
+This integration has several nuances that are important to understand when analyzing test results or extending the framework:
 
-This compatibility test framework is designed for contribution to the OpenLineage community testing infrastructure. It provides:
-
-- **Validation Framework**: Reusable test patterns for dbt OpenLineage integration
-- **Reference Implementation**: Example of comprehensive compatibility testing
-- **Community Standards**: Alignment with OpenLineage compatibility test conventions
-
-**Scope**: Compatibility validation using synthetic test data, not production use case demonstration.
+-   The `dbt-ol` wrapper has specific configuration requirements that differ from a standard `dbt` execution.
+-   Event emission timing can vary depending on the dbt command being run (`run`, `test`, `build`).
+-   The availability of certain dbt-specific facets may depend on the version of `dbt-core` being used.
+-   The file transport configuration in `openlineage.yml` directly controls the location and format of the event output.
 
 ## Future Enhancements
 
-See the `future/` directory for design documents and prototypes of upcoming features:
-- **Multi-spec testing**: Test same implementation against multiple OpenLineage spec versions
-- **Multi-implementation testing**: Test different dbt-openlineage versions
+To support community discussions around forward and backward compatibility, the `future/` directory contains design documents exploring a potential approach to multi-spec and multi-implementation version testing.
 
-## Future Enhancements
+These documents outline a methodology for testing a single producer implementation against multiple versions of the OpenLineage specification and client libraries. We hope these ideas can serve as a useful starting point for this important conversation within the OpenLineage community.
 
-This producer includes design work for enhanced testing capabilities relevant to ongoing TSC discussions about specification version coverage and compatibility testing:
-
-- **Multi-Spec Testing**: Test same implementation against multiple OpenLineage specification versions
-- **Spec Version Matrix**: N×M compatibility testing (implementations × spec versions)  
-- **Forward/Backward Compatibility**: Systematic validation across version ranges
-
-**Status**: Design phase documentation in `future/` directory  
-**Relevance**: Supports TSC discussions on specification versioning and compatibility requirements
-
-See `future/README.md` for detailed design documents and prototype implementations.
+See `future/README.md` for more details.
 
 ## Maintainers
 
-**Maintainer**: BearingNode Team  
-**Contact**: contact@bearingnode.com  
+**Maintainer**: BearingNode Team
+**Contact**: contact@bearingnode.com
 **Website**: https://www.bearingnode.com
-
-See `maintainers.json` for current maintainer contact information.

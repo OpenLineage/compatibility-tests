@@ -89,7 +89,6 @@ This document analyzes the OpenLineage specification coverage achieved by our db
 - **Simple Dataset**: Only customer/order tables limit facet complexity
 - **No Real Business Logic**: Missing complex transformations that would generate more facets
 - **No External Systems**: Missing integrations that would generate external query facets
-- **No Quality Tests**: dbt tests not included in scenario
 
 ### 🏗️ Infrastructure Constraints  
 - **Local File Transport**: Missing network-based transport scenarios
@@ -104,20 +103,19 @@ This document analyzes the OpenLineage specification coverage achieved by our db
 
 ## Specification Coverage Score
 
-**Overall Coverage: ~35%** (10 of 28 available facets tested)
+**Overall Coverage: ~39%** (11 of 28 available facets tested)
 
 ### By Facet Category:
 - **Job Facets**: 33% (2/6)
 - **Run Facets**: 44% (4/9) 
-- **Dataset Facets**: 31% (4/13)
+- **Dataset Facets**: 38% (5/13)
 
 ## Recommendations for Coverage Improvement
 
 ### 🎯 High-Impact Additions (Easy wins)
-1. **Add dbt tests** → Enable `dataQualityAssertions` facet testing
-2. **Add environment variables** → Enable `environmentVariables` facet testing  
-3. **Add documentation** → Enable job-level `documentation` facet
-4. **Add error scenario** → Enable `errorMessage` facet testing
+1. **Add environment variables** → Enable `environmentVariables` facet testing  
+2. **Add documentation** → Enable job-level `documentation` facet
+3. **Add error scenario** → Enable `errorMessage` facet testing
 
 ### 🔧 Medium-Impact Additions (Moderate effort)
 1. **Add source code tracking** → Enable `sourceCode` and `sourceCodeLocation` facets
