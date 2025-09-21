@@ -8,6 +8,7 @@ pip install -r requirements.txt
 
 # Core dependencies for test runner
 pyyaml>=6.0
+jsonschema>=4.0.0
 duckdb>=0.8.0
 
 # dbt dependencies

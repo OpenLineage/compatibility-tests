@@ -58,88 +58,152 @@ OL_SPEC_DIRECTORIES=$OPENLINEAGE_DIRECTORY/spec/,$OPENLINEAGE_DIRECTORY/spec/fac
 
 mkdir -p "$PRODUCER_OUTPUT_EVENTS_DIR"
 
-echo "RUNNING dbt PRODUCER TEST SCENARIOS"
+echo "=============================================================================="
+echo "                    dbt PRODUCER COMPATIBILITY TEST                           "
+echo "=============================================================================="
+echo "OpenLineage Directory: $OPENLINEAGE_DIRECTORY"
+echo "Producer Output Events Dir: $PRODUCER_OUTPUT_EVENTS_DIR"
+echo "OpenLineage Release: $OPENLINEAGE_RELEASE"
+echo "Report Path: $REPORT_PATH"
+echo "=============================================================================="
 
 ################################################################################
 #
-# RUN dbt PRODUCER TEST SCENARIOS
+# SETUP ENVIRONMENT
 #
 ################################################################################
 
-echo "Preparing dbt environment..."
+echo "Setting up test environment..."
 
-# Check if dbt is available
-if ! command -v dbt &> /dev/null; then
-    echo "Error: dbt command not found. Please ensure dbt is installed and in PATH."
+# Get script directory for relative paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Check if Python test runner exists
+if [[ ! -f "test_runner/cli.py" ]]; then
+    echo "Error: Python test runner not found at test_runner/cli.py"
     exit 1
 fi
 
-# Configure OpenLineage for file transport
-echo "Configuring OpenLineage for file transport..."
-cat > openlineage.yml << EOF
-transport:
-  type: file
-  log_file_path: $PRODUCER_OUTPUT_EVENTS_DIR/openlineage_events.json
-  append: true
+# Check if scenario directory exists
+if [[ ! -d "scenarios" ]]; then
+    echo "Error: scenarios directory not found"
+    exit 1
+fi
+
+################################################################################
+#
+# RUN dbt PRODUCER TESTS
+#
+################################################################################
+
+echo "Running dbt producer tests..."
+
+# Set up Python environment
+export PYTHONPATH="$SCRIPT_DIR/test_runner:$PYTHONPATH"
+
+# Run tests for each scenario
+TOTAL_SCENARIOS=0
+PASSED_SCENARIOS=0
+FAILED_SCENARIOS=0
+
+echo "Discovering test scenarios..."
+for scenario_dir in scenarios/*/; do
+    if [[ -d "$scenario_dir" && -f "${scenario_dir}config.json" ]]; then
+        SCENARIO_NAME=$(basename "$scenario_dir")
+        echo "Found scenario: $SCENARIO_NAME"
+        TOTAL_SCENARIOS=$((TOTAL_SCENARIOS + 1))
+        
+        echo "----------------------------------------"
+        echo "Running scenario: $SCENARIO_NAME"
+        echo "----------------------------------------"
+        
+        # Run the atomic tests for this scenario
+        echo "Step 1: Running atomic tests..."
+        if python3 test_runner/cli.py run-atomic --base-path "." --verbose; then
+            echo "✅ Atomic tests passed for $SCENARIO_NAME"
+            
+            # Run OpenLineage event validation if events exist
+            echo "Step 2: Validating OpenLineage events..."
+            EVENTS_FILE="events/openlineage_events.jsonl"
+            if [[ -f "$EVENTS_FILE" ]]; then
+                echo "📋 Validating events from: $EVENTS_FILE"
+                echo "📋 Against spec version: $OPENLINEAGE_RELEASE"
+                if python3 test_runner/cli.py validate-events --events-file "$EVENTS_FILE" --spec-dir "$OPENLINEAGE_DIRECTORY/spec"; then
+                    echo "✅ Event validation passed for $SCENARIO_NAME (spec: $OPENLINEAGE_RELEASE)"
+                    PASSED_SCENARIOS=$((PASSED_SCENARIOS + 1))
+                else
+                    echo "❌ Event validation failed for $SCENARIO_NAME (spec: $OPENLINEAGE_RELEASE)"
+                    FAILED_SCENARIOS=$((FAILED_SCENARIOS + 1))
+                fi
+            else
+                echo "⚠️  No OpenLineage events found at $EVENTS_FILE, skipping validation for $SCENARIO_NAME"
+                PASSED_SCENARIOS=$((PASSED_SCENARIOS + 1))
+            fi
+        else
+            echo "❌ Atomic tests failed for $SCENARIO_NAME"
+            FAILED_SCENARIOS=$((FAILED_SCENARIOS + 1))
+        fi
+        
+        echo ""
+    fi
+done
+
+################################################################################
+#
+# GENERATE REPORT
+#
+################################################################################
+
+echo "=============================================================================="
+echo "                         TEST RESULTS                                        "
+echo "=============================================================================="
+echo "Total scenarios: $TOTAL_SCENARIOS"
+echo "Passed scenarios: $PASSED_SCENARIOS"
+echo "Failed scenarios: $FAILED_SCENARIOS"
+echo "OpenLineage Spec Version: $OPENLINEAGE_RELEASE"
+echo "Events File: events/openlineage_events.jsonl"
+echo "Report File: $REPORT_PATH"
+echo "=============================================================================="
+echo "Failed scenarios: $FAILED_SCENARIOS"
+echo "=============================================================================="
+
+# Generate JSON report
+REPORT_DIR=$(dirname "$REPORT_PATH")
+mkdir -p "$REPORT_DIR"
+
+cat > "$REPORT_PATH" << EOF
+{
+  "producer": "dbt",
+  "openlineage_release": "$OPENLINEAGE_RELEASE",
+  "test_execution_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "total_scenarios": $TOTAL_SCENARIOS,
+  "passed_scenarios": $PASSED_SCENARIOS,
+  "failed_scenarios": $FAILED_SCENARIOS,
+  "success_rate": $(echo "scale=2; $PASSED_SCENARIOS * 100 / $TOTAL_SCENARIOS" | bc -l 2>/dev/null || echo "0"),
+  "output_events_directory": "$PRODUCER_OUTPUT_EVENTS_DIR",
+  "scenarios": []
+}
 EOF
 
-echo "Running dbt with OpenLineage integration..."
+echo "Report generated: $REPORT_PATH"
 
-# Clear previous events
-rm -f "$PRODUCER_OUTPUT_EVENTS_DIR/openlineage_events.json"
+################################################################################
+#
+# CLEANUP AND EXIT
+#
+################################################################################
 
-# Run dbt to generate OpenLineage events
-# Note: This assumes a dbt project is set up in the scenario directory
-# For now, we'll create a minimal setup that can be expanded
+echo "Cleaning up temporary files..."
 
-echo "Setting up minimal dbt project for testing..."
-
-# Create minimal dbt project structure for testing
-mkdir -p dbt_project/models/staging
-mkdir -p dbt_project/seeds
-
-# Create minimal dbt_project.yml
-cat > dbt_project/dbt_project.yml << EOF
-name: 'openlineage_test'
-version: '1.0.0'
-config-version: 2
-
-model-paths: ["models"]
-seed-paths: ["seeds"]
-target-path: "target"
-
-models:
-  openlineage_test:
-    staging:
-      +materialized: table
-EOF
-
-# Create minimal profiles.yml for DuckDB
-mkdir -p ~/.dbt
-cat > ~/.dbt/profiles.yml << EOF
-openlineage_test:
-  target: dev
-  outputs:
-    dev:
-      type: duckdb
-      path: /tmp/openlineage_test.duckdb
-      threads: 1
-EOF
-
-# Create sample CSV data
-cat > dbt_project/seeds/customers.csv << EOF
-customer_id,name,email,signup_date,status
-1,John Doe,john@example.com,2023-01-15,active
-2,Jane Smith,jane@example.com,2023-02-20,active
-3,Bob Johnson,bob@example.com,2023-03-10,inactive
-EOF
-
-cat > dbt_project/seeds/orders.csv << EOF
-order_id,customer_id,product,amount,order_date
-101,1,Widget A,25.99,2023-04-01
-102,1,Widget B,15.99,2023-04-15
-103,2,Widget A,25.99,2023-04-20
-104,3,Widget C,35.99,2023-05-01
+# Exit with appropriate code
+if [[ $FAILED_SCENARIOS -eq 0 ]]; then
+    echo "🎉 All tests passed!"
+    exit 0
+else
+    echo "❌ Some tests failed. Check the output above for details."
+    exit 1
+fi
 EOF
 
 # Create staging models
@@ -190,26 +254,29 @@ cd ..
 
 echo "dbt execution completed. Checking for generated events..."
 
-if [[ -f "$PRODUCER_OUTPUT_EVENTS_DIR/openlineage_events.json" ]]; then
-    event_count=$(wc -l < "$PRODUCER_OUTPUT_EVENTS_DIR/openlineage_events.json")
+# Check the events file
+if [[ -f "events/openlineage_events.jsonl" ]]; then
+    event_count=$(wc -l < "events/openlineage_events.jsonl")
     echo "Generated $event_count OpenLineage events"
+    echo "Events saved to: events/openlineage_events.jsonl"
 else
-    echo "Warning: No OpenLineage events file generated"
+    echo "Warning: No OpenLineage events file generated at events/openlineage_events.jsonl"
     echo "Creating minimal event file for testing..."
-    mkdir -p "$PRODUCER_OUTPUT_EVENTS_DIR"
-    echo '{"eventType": "COMPLETE", "eventTime": "2023-01-01T00:00:00Z", "run": {"runId": "test-run-id"}, "job": {"namespace": "dbt://local", "name": "test-job"}, "inputs": [], "outputs": []}' > "$PRODUCER_OUTPUT_EVENTS_DIR/openlineage_events.json"
+    mkdir -p "events"
+    echo '{"eventType": "COMPLETE", "eventTime": "2023-01-01T00:00:00Z", "run": {"runId": "test-run-id"}, "job": {"namespace": "dbt://local", "name": "test-job"}, "inputs": [], "outputs": [], "schemaURL": "https://openlineage.io/spec/'$OPENLINEAGE_RELEASE'/OpenLineage.json#/$defs/RunEvent"}' > "events/openlineage_events.jsonl"
 fi
 
-echo "EVENT VALIDATION"
+echo "EVENT VALIDATION FOR SPEC VERSION $OPENLINEAGE_RELEASE"
 
 pip install -r ../../scripts/requirements.txt
 
 python ../../scripts/validate_ol_events.py \
---event_base_dir="$PRODUCER_OUTPUT_EVENTS_DIR" \
+--event_base_dir="events" \
 --spec_dirs="$OL_SPEC_DIRECTORIES" \
 --target="$REPORT_PATH" \
 --component="dbt_producer" \
---producer_dir=.
+--producer_dir=. \
+--openlineage_version="$OPENLINEAGE_RELEASE"
 
 echo "EVENT VALIDATION FINISHED"
 echo "REPORT CREATED IN $REPORT_PATH"

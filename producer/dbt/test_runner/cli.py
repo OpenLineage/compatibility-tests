@@ -138,19 +138,29 @@ def setup():
 
 
 @cli.command()
-def validate_events():
-    """Run PIE framework validation tests against generated OpenLineage events"""
-    click.echo("🔍 Validating OpenLineage events with PIE framework tests...\n")
+@click.option('--events-file', required=True, help='Path to OpenLineage events JSONL file')
+@click.option('--spec-dir', required=True, help='Path to OpenLineage specification directory')
+def validate_events(events_file, spec_dir):
+    """Run schema validation against OpenLineage specifications"""
+    click.echo("🔍 Validating OpenLineage events against official schemas...\n")
     
     try:
-        import subprocess
-        import sys
+        from validation_runner import run_schema_validation
         
-        validation_script = Path(__file__).parent / "validation_runner.py"
+        events_path = Path(events_file)
+        spec_path = Path(spec_dir)
         
-        result = subprocess.run([sys.executable, str(validation_script)], 
-                              capture_output=False, text=True)
-        exit(result.returncode)
+        if not events_path.exists():
+            click.echo(f"❌ Events file not found: {events_path}")
+            exit(1)
+            
+        if not spec_path.exists():
+            click.echo(f"❌ Spec directory not found: {spec_path}")
+            exit(1)
+        
+        success = run_schema_validation(events_path, spec_path)
+        exit(0 if success else 1)
+        
     except Exception as e:
         click.echo(f"❌ Error running validation: {e}")
         exit(1)

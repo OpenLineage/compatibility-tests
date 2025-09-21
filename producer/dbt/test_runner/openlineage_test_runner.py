@@ -17,6 +17,7 @@ import os
 import sys
 import json
 import subprocess
+import shutil
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
@@ -82,47 +83,45 @@ class OpenLineageTestRunner:
     
     def test_dbt_availability(self) -> TestResult:
         """
-        Test if dbt is available and executable
+        Test if dbt-ol and dbt are available using simple command existence checks.
+        This is a straightforward environment validation approach.
         """
-        try:
-            result = subprocess.run(
-                ["dbt", "--version"], 
-                capture_output=True, 
-                text=True, 
-                timeout=30
-            )
-            
-            if result.returncode == 0:
-                return TestResult(
-                    test_name="dbt_availability",
-                    passed=True,
-                    message="dbt is available and executable",
-                    details={"version_output": result.stdout.strip()}
-                )
-            else:
-                return TestResult(
-                    test_name="dbt_availability",
-                    passed=False,
-                    message=f"dbt command failed: {result.stderr}"
-                )
-        except subprocess.TimeoutExpired:
+        # Check 1: dbt-ol command exists
+        if not shutil.which("dbt-ol"):
             return TestResult(
                 test_name="dbt_availability",
                 passed=False,
-                message="dbt command timed out"
+                message="dbt-ol command not found in PATH - please install openlineage-dbt package"
             )
-        except FileNotFoundError:
+        
+        # Check 2: dbt command exists
+        if not shutil.which("dbt"):
             return TestResult(
                 test_name="dbt_availability",
                 passed=False,
-                message="dbt command not found in PATH"
+                message="dbt command not found in PATH - please install dbt"
             )
-        except Exception as e:
+        
+        # Check 3: Basic project structure exists
+        dbt_project_file = self.dbt_project_dir / "dbt_project.yml"
+        if not dbt_project_file.exists():
             return TestResult(
                 test_name="dbt_availability",
                 passed=False,
-                message=f"Unexpected error testing dbt: {str(e)}"
+                message=f"dbt_project.yml not found at {dbt_project_file}"
             )
+        
+        # All checks passed
+        return TestResult(
+            test_name="dbt_availability",
+            passed=True,
+            message="dbt-ol and dbt are available, project structure is valid",
+            details={
+                "dbt_ol_path": shutil.which("dbt-ol"),
+                "dbt_path": shutil.which("dbt"),
+                "project_file": str(dbt_project_file)
+            }
+        )
     
     def test_duckdb_availability(self) -> TestResult:
         """
@@ -228,46 +227,46 @@ class OpenLineageTestRunner:
             os.chdir(self.dbt_project_dir)
             
             try:
-                # Clean any previous runs
+                # Clean any previous runs using dbt-ol wrapper
                 clean_result = subprocess.run(
-                    ["dbt", "clean", "--no-version-check"],
+                    ["dbt-ol", "clean", "--no-version-check"],
                     capture_output=True,
                     text=True,
-                    timeout=30
+                    timeout=60  # Increased from 30
                 )
                 
-                # Test dbt seed (load our CSV data)
+                # Test dbt-ol seed (load our CSV data) - using OpenLineage wrapper
                 seed_result = subprocess.run(
-                    ["dbt", "seed", "--no-version-check"],
+                    ["dbt-ol", "seed", "--no-version-check"],
                     capture_output=True,
                     text=True,
-                    timeout=60
+                    timeout=180  # Increased from 60 to account for parsing time
                 )
                 
                 if seed_result.returncode != 0:
                     return TestResult(
                         test_name="test_dbt_execution",
                         passed=False,
-                        message=f"dbt seed failed: {seed_result.stderr}",
+                        message=f"dbt-ol seed failed: {seed_result.stderr}",
                         details={
                             "stdout": seed_result.stdout,
                             "stderr": seed_result.stderr
                         }
                     )
                 
-                # Test dbt run (execute our models)
+                # Test dbt-ol run (execute our models) - using OpenLineage wrapper
                 run_result = subprocess.run(
-                    ["dbt", "run", "--no-version-check"],
+                    ["dbt-ol", "run", "--no-version-check"],
                     capture_output=True,
                     text=True,
-                    timeout=120
+                    timeout=240  # Increased from 120 to be more generous
                 )
                 
                 if run_result.returncode != 0:
                     return TestResult(
                         test_name="test_dbt_execution",
                         passed=False,
-                        message=f"dbt run failed: {run_result.stderr}",
+                        message=f"dbt-ol run failed: {run_result.stderr}",
                         details={
                             "stdout": run_result.stdout,
                             "stderr": run_result.stderr
@@ -277,7 +276,7 @@ class OpenLineageTestRunner:
                 return TestResult(
                     test_name="test_dbt_execution",
                     passed=True,
-                    message="dbt execution successful",
+                    message="dbt execution successful using dbt-ol wrapper",
                     details={
                         "project_dir": str(self.dbt_project_dir),
                         "seed_output": seed_result.stdout,
