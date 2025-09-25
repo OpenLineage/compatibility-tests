@@ -27,7 +27,7 @@ postgresql_url="gs://open-lineage-e2e/jars/postgresql-42.5.6.jar"
 delta_spark_url="gs://open-lineage-e2e/jars/delta-spark_2.12-3.3.1.jar"
 delta_storage_url="gs://open-lineage-e2e/jars/delta-storage-3.3.1.jar"
 iceberg_bigquery_catalog_url="gs://open-lineage-e2e/jars/iceberg-bigquery-catalog-1.6.1-1.0.1-beta.jar"
-iceberg_spark_runtime_url="gs://open-lineage-e2e/jars/iceberg-spark-runtime-3.5_2.12-1.6.1.jar"
+iceberg_spark_runtime_url="gs://open-lineage-e2e/jars/iceberg-spark-runtime-3.5_2.12-1.9.0.jar"
 iceberg_core_url="gs://open-lineage-e2e/jars/iceberg-core-1.6.1.jar"
 
 gsutil cp -P "${bq_url}" "${VM_SPARK_JARS_DIR}/"
