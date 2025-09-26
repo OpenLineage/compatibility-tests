@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 
 spark = (
         SparkSession.builder
-        .appName("BigQuery to Iceberg with BigQueryMetastoreCatalog")
+        .appName("BigLake to Iceberg")
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
         .config("spark.sql.catalog.gcp_iceberg_catalog", "org.apache.iceberg.spark.SparkCatalog")
         .config("spark.sql.catalog.gcp_iceberg_catalog.catalog-impl", "org.apache.iceberg.gcp.bigquery.BigQueryMetastoreCatalog")
@@ -17,13 +17,14 @@ spark.catalog.setCurrentCatalog("gcp_iceberg_catalog")
 
 spark.sql(f"CREATE NAMESPACE IF NOT EXISTS e2e_dataset")
 
+# this is an BigLake Iceberg table
 words = spark.read.format('bigquery') \
-  .option('table', 'bigquery-public-data:samples.shakespeare') \
+  .option('table', 'e2e_dataset.iceberg_biglake') \
   .load()
+  
 words.createOrReplaceTempView('words')
 
-# Perform word count.
 word_count = spark.sql(
     'SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word')
 
-word_count.write.format("iceberg").mode("overwrite").saveAsTable("e2e_dataset.e2e_table")
+word_count.write.format("iceberg").mode("overwrite").saveAsTable("e2e_dataset.e2e_another_table")
