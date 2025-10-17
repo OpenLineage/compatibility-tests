@@ -14668,6 +14668,14 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:simple_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -15228,6 +15236,22 @@
                 "storage"
               ]
             }
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.union:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.union:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -15936,6 +15960,14 @@
             "details": [
               "$.outputs[0].facets.catalog: 'name' is a required property"
             ],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.local_table_scan:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
             "tags": {}
           }
         ]
