@@ -1,0 +1,17 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "big_lake_to_iceberg.atomic_replace_table_as_select.e2e_dataset_e2e_another_table"
+  },
+  "run": {
+    "facets": {
+      "spark_properties": {
+        "properties": {
+          "spark.master": "yarn",
+          "spark.app.name": "BigQuery to Iceberg with BigQueryMetastoreCatalog"
+        }
+      }
+    }
+  }
+}
