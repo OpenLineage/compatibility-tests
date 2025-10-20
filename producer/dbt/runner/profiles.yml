@@ -1,0 +1,8 @@
+openlineage_compatibility_test:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: './openlineage_test.duckdb'
+      schema: main
+      threads: 1
