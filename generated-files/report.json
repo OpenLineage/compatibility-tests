@@ -15969,6 +15969,14 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_table_command.warehouse_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
