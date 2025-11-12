@@ -1,0 +1,31 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "{{ any(result) }}",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": "{{ any(result) }}"
+  },
+  "job": {
+    "namespace": "{{ any(result) }}",
+    "name": "{{ any(result) }}",
+    "facets": "{{ any(result) }}"
+  },
+  "inputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "{{ any(result) }}",
+      "facets": {
+        "dataSource": "{{ any(result) }}"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "{{ any(result) }}",
+      "facets": {
+        "dataSource": "{{ any(result) }}"
+      }
+    }
+  ]
+}
