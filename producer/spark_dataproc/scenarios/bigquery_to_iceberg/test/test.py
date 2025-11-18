@@ -7,6 +7,7 @@ spark = (
         .config("spark.sql.catalog.gcp_iceberg_catalog", "org.apache.iceberg.spark.SparkCatalog")
         .config("spark.sql.catalog.gcp_iceberg_catalog.catalog-impl", "org.apache.iceberg.gcp.bigquery.BigQueryMetastoreCatalog")
         .config("spark.sql.catalog.gcp_iceberg_catalog.gcp_project", "gcp-open-lineage-testing")
+        .config("spark.sql.catalog.gcp_iceberg_catalog.gcp.bigquery.project-id", "gcp-open-lineage-testing")
         .config("spark.sql.catalog.gcp_iceberg_catalog.gcp_location", "us-west1")
         .config("spark.sql.catalog.gcp_iceberg_catalog.blms_catalog", "e2e_blms_catalog")
         .config("spark.sql.catalog.gcp_iceberg_catalog.warehouse", f"gs://open-lineage-e2e/data/bigquery_metastore/") 

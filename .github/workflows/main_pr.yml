@@ -152,6 +152,7 @@ jobs:
       - initialize_workflow
       - scenarios
       - dataplex
+      - spark_dataproc
       - hive_dataproc
     if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
