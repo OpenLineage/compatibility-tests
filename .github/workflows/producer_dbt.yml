@@ -112,7 +112,7 @@ jobs:
         uses: ./.github/actions/run_event_validation
         with:
           component: 'dbt'
-          producer-dir: 'producer/dbt'
+          producer-dir: 'producer'
           release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
           ol_release: ${{ inputs.ol_release }}
           component_release: ${{ inputs.dbt_release }}
