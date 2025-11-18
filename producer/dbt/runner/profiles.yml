@@ -2,7 +2,11 @@ openlineage_compatibility_test:
   target: dev
   outputs:
     dev:
-      type: duckdb
-      path: './openlineage_test.duckdb'
-      schema: main
-      threads: 1
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | as_number }}"
+      user: "{{ env_var('DBT_POSTGRES_USER', 'testuser') }}"
+      password: "{{ env_var('DBT_POSTGRES_PASSWORD', 'testpass') }}"
+      dbname: "{{ env_var('DBT_POSTGRES_DB', 'dbt_test') }}"
+      schema: "{{ env_var('DBT_POSTGRES_SCHEMA', 'main') }}"
+      threads: 4

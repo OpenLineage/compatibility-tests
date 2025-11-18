@@ -85,9 +85,9 @@ To execute the test suite, you will need a local clone of the main [OpenLineage 
     pip install -r test_runner/requirements.txt
     ```
 
-2.  **Install dbt and the DuckDB adapter**:
+2.  **Install dbt and the PostgreSQL adapter**:
     ```bash
-    pip install dbt-core dbt-duckdb
+    pip install dbt-core dbt-postgres
     ```
 
 3.  **Install the OpenLineage dbt integration**:

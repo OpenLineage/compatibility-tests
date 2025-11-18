@@ -6,7 +6,7 @@ This document analyzes the OpenLineage specification coverage achieved by our db
 ## Test Configuration
 - **OpenLineage Specification**: 2-0-2 (target specification)
 - **dbt-openlineage Implementation**: 1.37.0  
-- **Test Scenario**: CSV → dbt models → DuckDB (includes data quality tests)
+- **Test Scenario**: CSV → dbt models → PostgreSQL (includes data quality tests)
 - **Events Generated**: 20 events total
   - 3 dbt models (START/COMPLETE pairs)
   - 5 data quality test suites (START/COMPLETE pairs) 
@@ -31,7 +31,7 @@ This document analyzes the OpenLineage specification coverage achieved by our db
 
 | Facet | Status | Coverage | Notes |
 |-------|--------|----------|-------|
-| ✅ `processing_engine` | **TESTED** | Full validation | DuckDB processing engine captured |
+| ✅ `processing_engine` | **TESTED** | Full validation | PostgreSQL processing engine captured |
 | ✅ `parent` | **TESTED** | Full validation | Parent-child run relationships |
 | ✅ `dbt_run` | **TESTED** | Basic validation | dbt-specific run metadata (non-standard) |
 | ✅ `dbt_version` | **TESTED** | Basic validation | dbt version information (non-standard) |
@@ -92,7 +92,7 @@ This document analyzes the OpenLineage specification coverage achieved by our db
 
 ### 🏗️ Infrastructure Constraints  
 - **Local File Transport**: Missing network-based transport scenarios
-- **DuckDB Only**: Missing other database-specific facets
+- **PostgreSQL Only**: Missing other database-specific facets
 - **No CI/CD Context**: Missing environment variables, build metadata
 - **No Version Control**: Missing source code location tracking
 

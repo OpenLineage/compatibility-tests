@@ -4,11 +4,11 @@
 # Core dependencies for test runner
 pyyaml>=6.0
 jsonschema>=4.0.0
-duckdb>=0.8.0
 
 # dbt dependencies
 dbt-core>=1.5.0
-dbt-duckdb>=1.5.0
+dbt-postgres>=1.5.0
+psycopg2-binary>=2.9.9
 
 # OpenLineage integration (if available)
 openlineage-dbt>=0.28.0

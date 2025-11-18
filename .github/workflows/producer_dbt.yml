@@ -30,6 +30,22 @@ on:
 jobs:
   run-dbt-tests:
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: dbt_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser -d dbt_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,7 +72,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install dbt-core==${{ inputs.dbt_release }}
-          pip install dbt-duckdb
+          pip install dbt-postgres
           pip install openlineage-dbt==${{ inputs.ol_release }}
           pip install -r producer/dbt/test_runner/requirements.txt
 
