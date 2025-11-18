@@ -12,6 +12,20 @@ on:
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
+  workflow_dispatch:
+    inputs:
+      dbt_release:
+        description: "release of dbt-core to use"
+        type: string
+        default: "1.8.0"
+      ol_release:
+        description: "release tag of OpenLineage to use"
+        type: string
+        default: "1.23.0"
+      get-latest-snapshots:
+        description: "Should the artifact be downloaded from maven repo or circleci"
+        type: string
+        default: "false"
 
 jobs:
   run-dbt-tests:
