@@ -55,8 +55,9 @@ jobs:
             dataplex=$(check_path "consumer/consumers/dataplex/" "dataplex_changed")
             spark_dataproc=$(check_path "producer/spark_dataproc/" "spark_dataproc_changed")
             hive_dataproc=$(check_path "producer/hive_dataproc/" "hive_dataproc_changed")
+            dbt=$(check_path "producer/dbt/" "dbt_changed")
             
-            if [[ $scenarios || $dataplex || $spark_dataproc || $hive_dataproc ]]; then
+            if [[ $scenarios || $dataplex || $spark_dataproc || $hive_dataproc || $dbt ]]; then
               echo "any_changed=true" >> $GITHUB_OUTPUT
             fi
           fi
