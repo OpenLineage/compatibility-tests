@@ -3,6 +3,7 @@ version: 2
 sources:
   - name: raw_data
     description: Raw CSV data files
+    schema: main
     tables:
       - name: raw_customers
         description: Raw customer data
