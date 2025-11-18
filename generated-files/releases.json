@@ -8,6 +8,10 @@
     "latest_version": ""
   },
   {
+    "name": "dbt",
+    "latest_version": "1.8.0"
+  },
+  {
     "name": "openlineage",
     "latest_version": "1.39.0"
   }

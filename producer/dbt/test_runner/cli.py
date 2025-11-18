@@ -166,5 +166,123 @@ def validate_events(events_file, spec_dir):
         exit(1)
 
 
+@cli.command()
+@click.option('--scenario', required=True, help='Scenario name to run')
+@click.option('--output-dir', required=True, help='Output directory for events')
+def run_scenario(scenario, output_dir):
+    """Run a specific scenario for CI/CD workflow using dbt-ol wrapper"""
+    import subprocess
+    import os
+    
+    click.echo(f"🚀 Running scenario: {scenario}")
+    click.echo(f"📁 Output directory: {output_dir}\n")
+    
+    # Validate scenario exists
+    scenario_path = Path(__file__).parent.parent / "scenarios" / scenario
+    if not scenario_path.exists():
+        click.echo(f"❌ Scenario not found: {scenario}")
+        exit(1)
+    
+    # Ensure output directory exists
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # Path to runner directory
+    runner_dir = Path(__file__).parent.parent / "runner"
+    
+    # Create scenario-specific output directory
+    scenario_output_dir = output_path / scenario
+    scenario_output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Temporary events file for this run
+    temp_events_file = scenario_output_dir / "openlineage_events.jsonl"
+    
+    # Backup and modify openlineage.yml
+    openlineage_config = runner_dir / "openlineage.yml"
+    openlineage_backup = runner_dir / "openlineage.yml.backup"
+    
+    import shutil
+    import yaml
+    
+    try:
+        # Backup original config
+        if openlineage_config.exists():
+            shutil.copy(openlineage_config, openlineage_backup)
+        
+        # Update config to write to our output directory
+        config = {
+            'transport': {
+                'type': 'file',
+                'log_file_path': str(temp_events_file.absolute()),
+                'append': False
+            }
+        }
+        
+        with open(openlineage_config, 'w') as f:
+            yaml.dump(config, f)
+        
+        click.echo("📝 Updated OpenLineage configuration")
+        
+        # Run dbt-ol commands (wrapper that emits OpenLineage events)
+        click.echo("🔨 Running dbt-ol seed...")
+        result = subprocess.run(
+            ['dbt-ol', 'seed', '--project-dir', str(runner_dir), '--profiles-dir', str(runner_dir), 
+             '--vars', f'scenario: {scenario}', '--no-version-check'],
+            cwd=runner_dir,
+            check=True
+        )
+        
+        click.echo("🔨 Running dbt-ol run...")
+        subprocess.run(
+            ['dbt-ol', 'run', '--project-dir', str(runner_dir), '--profiles-dir', str(runner_dir),
+             '--vars', f'scenario: {scenario}', '--no-version-check'],
+            cwd=runner_dir,
+            check=True
+        )
+        
+        click.echo("🔨 Running dbt-ol test...")
+        result = subprocess.run(
+            ['dbt-ol', 'test', '--project-dir', str(runner_dir), '--profiles-dir', str(runner_dir),
+             '--vars', f'scenario: {scenario}', '--no-version-check'],
+            cwd=runner_dir
+        )
+        if result.returncode != 0:
+            click.echo("⚠️  dbt test had failures (continuing to capture events)")
+        
+        # The file transport creates individual JSON files with timestamps
+        # Find and rename them to sequential format
+        import glob
+        event_files = sorted(glob.glob(str(scenario_output_dir / "openlineage_events.jsonl-*.json")))
+        
+        if event_files:
+            click.echo(f"📋 Generated {len(event_files)} OpenLineage events")
+            
+            # Rename to sequential format
+            for i, event_file in enumerate(event_files, 1):
+                old_path = Path(event_file)
+                new_path = scenario_output_dir / f"event_{i:03d}.json"
+                old_path.rename(new_path)
+            
+            click.echo(f"✅ Events written to {scenario_output_dir}")
+        else:
+            click.echo(f"⚠️  No events generated in {scenario_output_dir}")
+        
+        exit(0)
+        
+    except subprocess.CalledProcessError as e:
+        click.echo(f"❌ dbt command failed: {e}")
+        if e.output:
+            click.echo(f"   Output: {e.output.decode()}")
+        exit(1)
+    except Exception as e:
+        click.echo(f"❌ Error running scenario: {e}")
+        exit(1)
+    finally:
+        # Restore original config
+        if openlineage_backup.exists():
+            shutil.move(openlineage_backup, openlineage_config)
+            click.echo("🔄 Restored original OpenLineage configuration")
+
+
 if __name__ == '__main__':
     cli()

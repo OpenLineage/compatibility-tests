@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-"""
-OpenLineage dbt Producer Test Dependencies
-
-Install required dependencies for test runner:
-pip install -r requirements.txt
-"""
+# OpenLineage dbt Producer Test Dependencies
+# Install: pip install -r requirements.txt
 
 # Core dependencies for test runner
 pyyaml>=6.0
