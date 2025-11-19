@@ -118,25 +118,16 @@ The GitHub Actions workflow:
 
 ---
 
-### Running Tests Locally (Development & Debugging)
+### Local Debugging (Optional)
 
-**Use this approach for iterative development, debugging, and testing changes before pushing to GitHub.**
+**For development debugging, you may optionally run PostgreSQL locally. The standard test environment is GitHub Actions.**
 
-Local testing provides:
-- Faster feedback loops for development
-- Direct access to event files and logs
-- Ability to inspect database state
-- Control over specific test scenarios
+If you need to debug event generation locally:
 
-#### Prerequisites
-
-1.  **Start PostgreSQL Container**:
+1.  **Start PostgreSQL (Optional)**:
     ```bash
-    # From the producer/dbt/ directory
-    docker-compose up -d
-    
-    # Verify container is healthy
-    docker-compose ps
+    # Quick one-liner for debugging
+    docker run -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:15-alpine
     ```
 
 2.  **Install Python Dependencies**:
@@ -159,95 +150,27 @@ Local testing provides:
     pip install openlineage-dbt
     ```
 
-5.  **Verify dbt Connection**:
+3.  **Run Test Scenario**:
     ```bash
-    cd runner/
-    dbt debug
-    cd ..
+    # Using the test runner CLI (same as GitHub Actions uses)
+    python test_runner/cli.py run-scenario \
+      --scenario csv_to_postgres_local \
+      --output-dir ./test_output/$(date +%s)
+
+    # List available scenarios
+    python test_runner/cli.py list-scenarios
     ```
 
-#### Local Execution Options
+4.  **Inspect Generated Events**:
+    ```bash
+    # View events
+    cat events/openlineage_events.jsonl | jq '.'
+    
+    # Or check test output directory
+    ls -la test_output/
+    ```
 
-**Option 1: Using the Test Runner CLI (Recommended)**
-
-The test runner CLI provides the same orchestration used in GitHub Actions:
-
-```bash
-# Run a specific scenario
-python test_runner/cli.py run-scenario \
-  --scenario csv_to_postgres_local \
-  --output-dir ./test_output/$(date +%s)
-
-# List available scenarios
-python test_runner/cli.py list-scenarios
-```
-
-**Option 2: Direct dbt-ol Execution (For debugging)**
-
-For fine-grained control and debugging, run `dbt-ol` commands directly:
-
-```bash
-cd runner/
-
-# Generate events for seed operation
-dbt-ol seed
-
-# Generate events for model execution
-dbt-ol run
-
-# Generate events for tests
-dbt-ol test
-
-# Inspect generated events
-cat ../events/openlineage_events.jsonl | jq '.'
-```
-
-**Option 3: Legacy Shell Script (Deprecated)**
-
-The `run_dbt_tests.sh` script is deprecated but still available:
-
-```bash
-./run_dbt_tests.sh \
-  --openlineage-directory /path/to/OpenLineage \
-  --producer-output-events-dir ./events \
-  --openlineage-release 2-0-2 \
-  --report-path ./dbt_report.json
-```
-
-#### Local vs. GitHub Actions: Key Differences
-
-| Aspect | Local Testing | GitHub Actions |
-|--------|---------------|----------------|
-| **Database** | Docker Compose (manual start) | PostgreSQL service container (auto-provisioned) |
-| **Environment** | Uses local environment variables from `profiles.yml` | Uses workflow-defined environment variables |
-| **Event Output** | Writes to `events/openlineage_events.jsonl` by default | Writes to temporary directory defined by workflow |
-| **Validation** | Manual inspection or via test runner CLI | Automated validation against OpenLineage schemas |
-| **Use Case** | Development, debugging, local verification | CI/CD, PR validation, compatibility reporting |
-| **Cleanup** | Manual (`docker-compose down -v`) | Automatic container cleanup |
-
-#### Cleaning Up Local Environment
-
-```bash
-# Stop PostgreSQL container
-docker-compose down
-
-# Remove PostgreSQL data volume (clean slate)
-docker-compose down -v
-
-# Remove generated event files
-rm -rf events/*.jsonl test_output/
-```
-
----
-
-### Command-Line Arguments (Legacy Script)
-
-For the deprecated `run_dbt_tests.sh` script:
-
--   `--openlineage-directory` (**Required**): Path to a local clone of the OpenLineage repository
--   `--producer-output-events-dir`: Directory for generated OpenLineage events (Default: `events/`)
--   `--openlineage-release`: OpenLineage release version to validate against (Default: `2-0-2`)
--   `--report-path`: Path for the final JSON test report (Default: `../dbt_producer_report.json`)
+**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The test runner CLI (`cli.py`) is the same code used by CI/CD, ensuring consistency.
 
 ## Important dbt Integration Notes
 

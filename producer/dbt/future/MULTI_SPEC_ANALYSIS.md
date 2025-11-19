@@ -1,136 +1,273 @@
-# Multi-Spec Testing Implementation Analysis
+# Cross-Version Compatibility Testing Analysis
 
 ## Problem Statement
 
-Current multi-spec testing approaches in the compatibility testing space often implement **schema-level validation** rather than **true implementation compatibility testing**. This analysis examines the difference and proposes a comprehensive solution.
+OpenLineage has two distinct version numbers that are currently treated as locked together:
+1. **Implementation Version** (e.g., 1.23.0, 1.30.0) - The code in openlineage-dbt package
+2. **Specification Version** (e.g., 2-0-2, 2-0-1) - The JSON schema for event validation
 
-## Current Implementation Limitations
+Current testing locks these together, preventing validation of critical compatibility scenarios.
 
-### Schema-Level Multi-Spec Testing
+## Critical Distinction
+
+### Implementation Version vs Specification Version
 ```bash
-# Current approach: Same OpenLineage client library (1.37.0)
-# Same dbt-openlineage integration  
-# Same Python environment
+# Implementation Version (Git Tag / PyPI Package Version)
+# File: integration/dbt/setup.py
+__version__ = "1.30.0"  # The openlineage-dbt code version
 
-# Only changes schema validation target:
-./run_dbt_tests.sh --openlineage-release "2-0-2"  # Validates against 2-0-2 schema
-./run_dbt_tests.sh --openlineage-release "2-0-1"  # Validates against 2-0-1 schema  
-./run_dbt_tests.sh --openlineage-release "1-1-1"  # Validates against 1-1-1 schema
+# Specification Version (Schema $id in JSON)
+# File: spec/OpenLineage.json (in same git tag)
+"$id": "https://openlineage.io/spec/2-0-2/OpenLineage.json"  # The schema version
 ```
 
-### Limitations:
-- **Same library implementation** across all spec versions
-- **Same validation logic** for all specifications
-- **Same event generation code** 
-- **Limited compatibility insights** between different library versions
-- **No implementation evolution testing**
+**Key Finding**: Multiple implementation versions can bundle the same specification:
+- Implementation 1.23.0 → bundles spec 2-0-2
+- Implementation 1.30.0 → bundles spec 2-0-2 (same spec!)
+- Implementation 1.37.0 → bundles spec 2-0-2 (same spec!)
 
-### Schema-Level Output Example:
+## Current Framework Analysis
+
+### What CI/CD Framework Does Today
+```yaml
+# .github/workflows/producer_dbt.yml
+pip install openlineage-dbt==${{ inputs.ol_release }}        # Implementation version
+release_tags: ${{ inputs.ol_release }}                       # Spec version (SAME VALUE)
+```
+
+**Result**: Implementation version X is ONLY validated against spec from tag X.
+- Install 1.30.0 → validate against spec from 1.30.0 (which is spec 2-0-2)
+- Install 1.37.0 → validate against spec from 1.37.0 (which is also spec 2-0-2)
+
+### Locked Version Testing
+```bash
+# Current testing: Implementation and spec versions are LOCKED
+matrix:
+  openlineage_versions: ["1.23.0", "1.30.0"]
+  
+# Results in:
+# Test 1: Install 1.23.0 → validate against spec from tag 1.23.0
+# Test 2: Install 1.30.0 → validate against spec from tag 1.30.0
+```
+
+### Framework Capability (Currently Unused)
+The validation action DOES accept separate parameters:
+```yaml
+# .github/actions/run_event_validation/action.yml
+inputs:
+  ol_release: "1.30.0"           # Could be different
+  release_tags: "1.37.0"         # Could be different!
+```
+
+**The framework CAN test cross-version scenarios but doesn't currently use this capability.**
+
+### Current Limitations
+- **No cross-version testing**: Implementation 1.30.0 never validated against spec from 1.37.0
+- **Unknown forward compatibility**: Does old implementation work with newer specs?
+- **Unknown backward compatibility**: Does new implementation work with older specs?
+- **No version mapping documentation**: Which implementations bundle which specs?
+- **Missed compatibility insights**: Can't detect breaking changes across versions
+
+### Example of Missing Coverage
 ```json
-// All events use same producer, different schema validation targets
+// What we test today (locked versions):
 {
-  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.37.0/integration/dbt",
-  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent"
+  "producer": "...tree/1.30.0/integration/dbt",     // Implementation 1.30.0
+  "schemaURL": "...spec/2-0-2/OpenLineage.json"     // Spec from 1.30.0 (which is 2-0-2)
 }
+
+// What we DON'T test (cross-version scenarios):
 {
-  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.37.0/integration/dbt", 
-  "schemaURL": "https://openlineage.io/spec/2-0-1/OpenLineage.json#/$defs/RunEvent"
+  "producer": "...tree/1.30.0/integration/dbt",     // Implementation 1.30.0
+  "schemaURL": "...spec/2-0-2/OpenLineage.json"     // Spec from 1.37.0 (also 2-0-2, but potentially different!)
 }
 ```
 
-## Proposed Implementation-Level Multi-Spec Testing 
+## Proposed Cross-Version Compatibility Testing 
 
-### Implementation-Level Approach:
+### Cross-Version Testing Approach
 ```bash
-# Different virtual environments
-# Different OpenLineage client versions
-# Different dbt-openlineage integration versions
+# Test EVERY combination of implementation × specification
 
-# Spec 2-0-2 → venv with openlineage-python==1.37.0
-# Spec 2-0-1 → venv with openlineage-python==1.35.0  
-# Spec 1-1-1 → venv with openlineage-python==1.30.0
+# Forward Compatibility Testing:
+# Old implementation → newer spec (will old code work with new validators?)
+Implementation 1.30.0 → validate against spec from tag 1.37.0
+Implementation 1.23.0 → validate against spec from tag 1.37.0
+
+# Backward Compatibility Testing:
+# New implementation → older spec (will new code work with old validators?)
+Implementation 1.37.0 → validate against spec from tag 1.30.0
+Implementation 1.37.0 → validate against spec from tag 1.23.0
+
+# Native Testing (what we do today):
+Implementation 1.30.0 → validate against spec from tag 1.30.0
 ```
 
-### Implementation-Level Benefits:
-- **Different library implementations** per specification version
-- **Different validation logic** based on actual library capabilities
-- **True backward/forward compatibility testing**
-- **Isolated environments** prevent version conflicts
-- **Comprehensive multi-implementation validation**
+### Cross-Version Testing Benefits
+- **Forward compatibility validation**: Ensure old implementations don't break with new specs
+- **Backward compatibility validation**: Ensure new implementations maintain compatibility
+- **Comprehensive compatibility matrix**: Document which versions work together
+- **Breaking change detection**: Identify when spec changes break implementations
+- **Upgrade planning**: Help users understand version upgrade paths
+- **Framework utilization**: Leverage existing CI/CD capability (`ol_release` ≠ `release_tags`)
 
-### Implementation-Level Output Example:
+### Cross-Version Testing Output Example
 ```json
-// Events from different actual implementations
+// Test 1: Implementation 1.30.0 against its native spec (Current behavior)
 {
-  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.37.0/integration/dbt",
-  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent"
+  "producer": "...tree/1.30.0/integration/dbt",
+  "schemaURL": "...spec/2-0-2/OpenLineage.json"  // From tag 1.30.0
 }
+// Result: ✅ PASS (expected)
+
+// Test 2: Implementation 1.30.0 against newer spec (Forward compatibility)
 {
-  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.35.0/integration/dbt",
-  "schemaURL": "https://openlineage.io/spec/2-0-1/OpenLineage.json#/$defs/RunEvent"  
+  "producer": "...tree/1.30.0/integration/dbt",
+  "schemaURL": "...spec/2-0-2/OpenLineage.json"  // From tag 1.37.0
 }
+// Result: ✅ PASS or ❌ FAIL? (Currently unknown!)
+
+// Test 3: Implementation 1.37.0 against older spec (Backward compatibility)
+{
+  "producer": "...tree/1.37.0/integration/dbt",
+  "schemaURL": "...spec/2-0-2/OpenLineage.json"  // From tag 1.30.0
+}
+// Result: ✅ PASS or ❌ FAIL? (Currently unknown!)
 ```
 
-## Implementation Challenges
+## Implementation Requirements
 
-### Version Mapping Research Requirements
+### 1. Version Mapping Research (Critical First Step)
 ```bash
-# Research needed: Which OpenLineage client versions support which specifications
-SPEC_TO_CLIENT_VERSION["2-0-2"]="1.37.0"  # Requires verification
-SPEC_TO_CLIENT_VERSION["2-0-1"]="1.35.0"  # Requires verification  
-SPEC_TO_CLIENT_VERSION["1-1-1"]="1.30.0"  # ← Need to verify
+# Document which implementation versions bundle which specification versions
+# This mapping is essential for understanding compatibility relationships
+
+# Research needed: Check each git tag
+Implementation 1.37.0 → Spec version?  # Check spec/OpenLineage.json $id
+Implementation 1.30.0 → Spec version?  # Check spec/OpenLineage.json $id
+Implementation 1.23.0 → Spec version?  # Check spec/OpenLineage.json $id
+
+# Initial findings:
+# Tag 1.23.0 → spec 2-0-2
+# Tag 1.30.0 → spec 2-0-2 (SAME SPEC as 1.23.0!)
+# Tag 1.37.0 → spec 2-0-2 (SAME SPEC as 1.30.0!)
 ```
 
-### 2. Virtual Environment Management
-- Creating isolated Python environments per spec version
-- Installing specific OpenLineage client versions
-- Managing dependencies and conflicts
+### 2. Framework Configuration Enhancement
+```yaml
+# Enable cross-version testing in CI/CD
+# Option A: Add to versions.json
+{
+  "openlineage_versions": ["1.23.0", "1.30.0", "1.37.0"],
+  "spec_versions_to_test": ["1.23.0", "1.30.0", "1.37.0"],  # NEW
+  "component_version": ["1.8.0"]
+}
 
-### 3. Compatibility Matrix Complexity
-| OpenLineage Client | Spec 2-0-2 | Spec 2-0-1 | Spec 1-1-1 |
-|-------------------|-------------|-------------|-------------|
-| 1.37.0            | ✅ Native   | ✅ Compat   | ✅ Compat   |
-| 1.35.0            | ❓ Unknown  | ✅ Native   | ✅ Compat   |
-| 1.30.0            | ❓ Unknown  | ❓ Unknown  | ✅ Native   |
+# Option B: Matrix expansion in workflow
+strategy:
+  matrix:
+    implementation: ["1.30.0", "1.37.0"]
+    spec_tag: ["1.23.0", "1.30.0", "1.37.0"]  # Cross-product testing
+```
 
-## Next Steps
+### 3. Comprehensive Compatibility Matrix
+| Implementation | Native Spec | Spec from 1.23.0 | Spec from 1.30.0 | Spec from 1.37.0 |
+|----------------|-------------|------------------|------------------|------------------|
+| 1.37.0         | 2-0-2       | ✅ Backward?     | ✅ Backward?     | ✅ Native        |
+| 1.30.0         | 2-0-2       | ✅ Backward?     | ✅ Native        | ✅ Forward?      |
+| 1.23.0         | 2-0-2       | ✅ Native        | ✅ Forward?      | ✅ Forward?      |
 
-### 1. Research Required
+**Note**: Even though all bundle spec 2-0-2, the spec files may have evolved between tags!
+
+## Implementation Path Forward
+
+### 1. Version Mapping Research (Critical First Step)
 ```bash
-# Find out which OpenLineage Python client versions were released with which specs
-# Check OpenLineage release history
-# Verify dbt-openlineage compatibility matrix
+# Document which implementation versions bundle which specification versions
+# This is foundational for understanding compatibility relationships
+
+# For each OpenLineage release tag:
+git checkout <tag>
+cat spec/OpenLineage.json | jq -r '."$id"'  # Extract spec version
+cat integration/dbt/setup.py | grep __version__  # Extract implementation version
+
+# Build comprehensive mapping table:
+# Implementation 1.23.0 → Spec 2-0-2
+# Implementation 1.30.0 → Spec 2-0-2
+# Implementation 1.37.0 → Spec 2-0-2
 ```
 
-### 2. Test The True Multi-Spec Runner
-```bash
-cd /path/to/compatibility-tests/producer/dbt
+### 2. Framework Configuration Prototype
+```yaml
+# Modify workflow to enable cross-version testing
+# Using existing framework capability (separate parameters):
 
-# Run true multi-spec testing (once we have version mappings)
-./run_true_multi_spec_tests.sh \
-  --openlineage-directory /path/to/openlineage \
-  --spec-versions 2-0-2,2-0-1
+jobs:
+  cross-version-test:
+    strategy:
+      matrix:
+        implementation: ["1.30.0", "1.37.0"]
+        spec_tag: ["1.23.0", "1.30.0", "1.37.0"]
+    steps:
+      - name: Install implementation
+        run: pip install openlineage-dbt==${{ matrix.implementation }}
+      
+      - name: Validate against spec
+        uses: ./.github/actions/run_event_validation
+        with:
+          ol_release: ${{ matrix.implementation }}      # Implementation version
+          release_tags: ${{ matrix.spec_tag }}           # Spec version (DIFFERENT!)
 ```
 
-### Cross-Implementation Analysis
-```bash
-# Compare events from different actual implementations
-diff output/spec_2-0-2/openlineage_events_2-0-2.jsonl \
-     output/spec_2-0-1/openlineage_events_2-0-1.jsonl
-
-# Analyze real implementation differences beyond schema URLs
-```
+### 3. Compatibility Analysis
+Once cross-version testing is implemented, analyze results to:
+- Identify breaking changes between spec versions
+- Document forward/backward compatibility boundaries
+- Guide users on safe upgrade paths
+- Detect when spec evolution breaks older implementations
 
 ## Analysis Summary
 
-Current compatibility testing approaches often implement **schema-level validation** rather than **implementation-level compatibility testing**. 
+The OpenLineage compatibility testing framework currently locks implementation and specification versions together, preventing validation of critical cross-version compatibility scenarios.
 
-The proposed `run_true_multi_spec_tests.sh` framework addresses this gap by providing:
+### Key Findings
 
-### Required Research & Development
-1. **Version Mapping Research**: Determine correct OpenLineage client to specification version mappings
-2. **Implementation Testing**: Validate with real version combinations  
-3. **Compatibility Matrix Documentation**: Document actual compatibility results
+1. **Two Distinct Version Numbers**:
+   - Implementation version (e.g., 1.30.0) - The openlineage-dbt code
+   - Specification version (e.g., 2-0-2) - The JSON schema
+   - Currently locked together in testing
+
+2. **Framework Capability Exists But Unused**:
+   - Validation action accepts separate `ol_release` and `release_tags` parameters
+   - Could enable cross-version testing with minimal changes
+   - Currently both parameters set to same value
+
+3. **Multiple Implementations Can Share Same Spec**:
+   - Implementation 1.23.0, 1.30.0, 1.37.0 all bundle spec 2-0-2
+   - But spec files may have evolved between tags
+   - Need to test these cross-version scenarios
+
+### Proposed Enhancement
+
+This analysis proposes cross-version compatibility testing that would:
+
+1. **Version Mapping Research**: Document implementation→spec relationships across all releases
+2. **Cross-Version Testing**: Test implementation X against spec Y (where X ≠ Y)
+3. **Compatibility Matrix**: Comprehensive N×M matrix of compatibility results
+4. **Framework Integration**: Leverage existing CI/CD capability (separate `ol_release` and `release_tags`)
 
 ### Expected Outcome
-**Comprehensive implementation-level multi-spec compatibility testing** rather than schema-only validation, providing genuine insights into backward/forward compatibility behavior across OpenLineage library versions.
+
+**Systematic cross-version compatibility testing** that validates:
+- Forward compatibility (old implementations with new specs)
+- Backward compatibility (new implementations with old specs)
+- Breaking change detection across version boundaries
+- Clear documentation of version compatibility for users
+
+### Community Discussion Value
+
+This proposal is valuable for OpenLineage TSC discussions about:
+- Whether cross-version compatibility testing should be a community standard
+- How to document and communicate compatibility boundaries
+- Balance between testing comprehensiveness and CI/CD resource usage
+- User guidance for version upgrade planning
