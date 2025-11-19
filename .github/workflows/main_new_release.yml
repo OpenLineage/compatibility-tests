@@ -152,16 +152,10 @@ jobs:
       trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
       execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}
 
-  generate-compatibility-tables:
-    needs: collect-and-compare-reports
-    if: ${{ !failure() }}
-    uses: ./.github/workflows/generate_compatibility_tables.yml
-
   update-repo-files:
     needs:
       - initialize_workflow
       - notify-maintainers
-      - generate-compatibility-tables
     if: ${{ !failure() }}
     uses: ./.github/workflows/update_repo_files.yml
     secrets:
@@ -171,9 +165,13 @@ jobs:
      trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
      execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}
 
+  generate-compatibility-tables:
+    needs: update-repo-files
+    if: ${{ !failure() && needs.update-repo-files.outputs.changes_made == 'true' }}
+    uses: ./.github/workflows/generate_compatibility_tables.yml
+
   update-site:
-    needs:
-      - update-repo-files
+    needs: generate-compatibility-tables
     uses: ./.github/workflows/update_site.yml
     secrets:
       CI_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}
