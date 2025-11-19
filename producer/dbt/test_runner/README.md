@@ -46,11 +46,11 @@ The atomic test runner validates:
 
 1. **Environment Availability**
    - dbt command availability
-   - DuckDB Python package installation
+   - PostgreSQL adapter package installation
 
 2. **dbt Project Creation**
    - Minimal dbt project structure
-   - Profile configuration for DuckDB
+   - Profile configuration for PostgreSQL
 
 3. **dbt Execution**
    - Model compilation and execution
@@ -62,7 +62,7 @@ The atomic test runner validates:
 
 ## CLI Commands
 
-- `check-environment`: Verify dbt and DuckDB availability
+- `check-environment`: Verify dbt and PostgreSQL adapter availability
 - `run-atomic`: Run all atomic validation tests
 - `setup`: Install dependencies (requires virtual environment)
 
@@ -73,6 +73,6 @@ This test runner provides the foundation for OpenLineage event validation. When 
 ## Troubleshooting
 
 1. **Python Environment Issues**: Use virtual environment as shown above
-2. **dbt Not Found**: Install dbt-core and dbt-duckdb in your environment
-3. **DuckDB Issues**: Ensure duckdb Python package is installed
+2. **dbt Not Found**: Install dbt-core and dbt-postgres in your environment
+3. **PostgreSQL Issues**: Ensure psycopg2-binary Python package is installed
 4. **Permission Errors**: Make sure scripts are executable (`chmod +x`)

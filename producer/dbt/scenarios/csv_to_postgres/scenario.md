@@ -1,8 +1,8 @@
-# CSV to PostgreSQL Local Scenario
+# CSV to PostgreSQL Scenario
 
 ## Overview
 
-This scenario validates dbt's OpenLineage integration compliance using synthetic test data in a controlled CSV → dbt → PostgreSQL pipeline with local file transport.
+This scenario validates dbt's OpenLineage integration compliance using synthetic test data in a controlled CSV → dbt → PostgreSQL pipeline with file transport.
 
 **Purpose**: Compatibility testing and validation, not production use case demonstration.
 
@@ -40,8 +40,8 @@ Synthetic customer analytics scenario designed for validation testing:
 
 - **Source**: Synthetic CSV files with test customer and order data
 - **Transform**: dbt models with staging and analytics layers
-- **Target**: DuckDB database (local file)
-- **Transport**: OpenLineage file transport (JSONL events)
+- **Target**: PostgreSQL database (CI/CD service container)
+- **Transport**: OpenLineage file transport (JSON Lines format)
 - **Validation**: Comprehensive facet compliance testing
 
 ## Expected Outputs

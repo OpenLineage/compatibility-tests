@@ -154,7 +154,7 @@ If you need to debug event generation locally:
     ```bash
     # Using the test runner CLI (same as GitHub Actions uses)
     python test_runner/cli.py run-scenario \
-      --scenario csv_to_postgres_local \
+      --scenario csv_to_postgres \
       --output-dir ./test_output/$(date +%s)
 
     # List available scenarios
