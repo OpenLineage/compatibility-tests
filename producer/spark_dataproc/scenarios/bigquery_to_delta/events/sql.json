@@ -5,7 +5,8 @@
     "name": "{{ match(result, 'big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_.*') }}",
     "facets": {
       "sql": {
-        "query": "SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word"
+        "query": "SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word",
+        "dialect": "spark"
       }
     }
   }
