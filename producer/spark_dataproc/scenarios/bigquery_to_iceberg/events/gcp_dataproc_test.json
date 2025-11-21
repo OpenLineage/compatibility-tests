@@ -14,6 +14,7 @@
         "appName": "BigQuery to Iceberg with BigQueryMetastoreCatalog",
         "clusterName": "{{ match(result, 'dataproc-producer-test-.+') }}",
         "appId": "{{ match(result, 'application_.+') }}",
+        "jobType": "dataproc_job",
         "projectId": "gcp-open-lineage-testing"
       }
     }
