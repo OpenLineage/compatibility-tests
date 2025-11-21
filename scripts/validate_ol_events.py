@@ -16,8 +16,10 @@ from compare_events import diff
 from jsonschema import RefResolver
 
 class OLSyntaxValidator:
-    def __init__(self, schema_validators):
+    def __init__(self, schema_validators, unchecked_facets=None, openlineage_version=None):
         self.schema_validators = schema_validators
+        self.unchecked_facets = unchecked_facets or {}
+        self.openlineage_version = openlineage_version
 
     @staticmethod
     def is_custom_facet(facet, schema_type):
@@ -36,7 +38,7 @@ class OLSyntaxValidator:
         return {tag: cls.get_validator(spec_path, tag) for tag in tags}
 
     @classmethod
-    def get_validator(cls, spec_path, tag):
+    def get_validator(cls, spec_path, tag, unchecked_facets=None):
         file_paths = listdir(join(spec_path, tag))
         facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('Facet.json')]
         spec_schema = next(load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
@@ -51,9 +53,14 @@ class OLSyntaxValidator:
             schema_validators[name] = Draft202012Validator(schema, resolver=resolver)
 
         schema_validators['core'] = Draft202012Validator(spec_schema)
-        return cls(schema_validators)
+        return cls(schema_validators, unchecked_facets, tag)
 
     def validate_entity(self, instance, schema_type, name):
+        # Check if this facet should be skipped for the current version
+        if self.should_skip_facet(schema_type):
+            print(f"Skipping validation for facet '{schema_type}' in version {self.openlineage_version} (unchecked_facets)")
+            return []
+
         try:
             schema_validator = self.schema_validators.get(schema_type)
             if schema_validator is not None:
@@ -69,6 +76,17 @@ class OLSyntaxValidator:
                 return [f"$.{schema_type} facet type {schema_type} not recognized"]
         except Exception:
             print(f"when validating {schema_type}, for instance of {name} following exception occurred \n {traceback.format_exc()}")
+
+    def should_skip_facet(self, facet_name):
+        if not self.unchecked_facets or not self.openlineage_version:
+            return False
+
+        if facet_name in self.unchecked_facets:
+            excluded_versions = self.unchecked_facets[facet_name]
+            if self.openlineage_version in excluded_versions:
+                return True
+
+        return False
 
     def validate(self, event, name):
         validation_result = []
@@ -243,6 +261,8 @@ def main():
             if isdir(scenario_path):
                 config = get_config(producer_dir, component, scenario_name)
                 validator = validators.get(config.get('openlineage_version'))
+                if 'unchecked_facets' in config:
+                    validator.unchecked_facets = config['unchecked_facets']
                 print(f"for scenario {scenario_name} validation version is {config.get('openlineage_version')}")
                 result_events = {file: load_json(path) for file in listdir(scenario_path) if
                                  isfile(path := join(scenario_path, file))}
@@ -250,9 +270,10 @@ def main():
                 scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
         report = Report({component: Component(component, 'producer', scenarios, "", "")})
     else:
-        validator = OLSyntaxValidator.get_validator(spec_path=spec_dirs, tag=openlineage_version)
         for scenario_name in listdir(base_dir):
             config = get_config(producer_dir, component, scenario_name)
+            unchecked_facets = config.get('unchecked_facets')
+            validator = OLSyntaxValidator.get_validator(spec_path=spec_dirs, tag=openlineage_version, unchecked_facets=unchecked_facets)
             scenario_path = get_path(base_dir, component, scenario_name)
             expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version)
             result_events = {file: load_json(path) for file in listdir(scenario_path) if
