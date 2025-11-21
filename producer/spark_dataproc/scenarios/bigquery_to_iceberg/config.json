@@ -211,6 +211,18 @@
       "openlineage_versions": {
         "min": "1.33.0"
       }
+    },
+    {
+      "name": "catalog_test",
+      "path": "events/catalog_test.json",
+      "tags": {
+        "facets": [
+          "catalog"
+        ]
+      },
+      "openlineage_versions": {
+        "min": "1.38.0"
+      }
     }
   ]
 }

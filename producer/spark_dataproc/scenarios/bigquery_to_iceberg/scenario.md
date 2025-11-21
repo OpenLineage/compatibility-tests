@@ -23,3 +23,4 @@ Facets present in the events:
 - ParentRunFacet
 - SQLJobFacet
 - SchemaDatasetFacet
+- CatalogDatasetFacet
