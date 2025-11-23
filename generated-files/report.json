@@ -16210,7 +16210,7 @@
       },
       {
         "name": "hive",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:START",
@@ -16225,12 +16225,10 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:RUNNING",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -16254,22 +16252,18 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:START",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -16293,13 +16287,10 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t2:COMPLETE",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -16336,6 +16327,138 @@
               "$.outputs[0].facets.catalog: 'name' is a required property"
             ],
             "tags": {}
+          },
+          {
+            "name": "run_event_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test_3.5.1",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       },
@@ -17158,7 +17281,7 @@
     "scenarios": [
       {
         "name": "hive",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:simple_test:START",
@@ -17170,12 +17293,10 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:RUNNING",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17188,13 +17309,10 @@
           },
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17207,44 +17325,34 @@
           },
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:RUNNING",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:START",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17262,6 +17370,138 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       }
@@ -17275,7 +17515,7 @@
     "scenarios": [
       {
         "name": "hive",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:simple_test:COMPLETE",
@@ -17287,12 +17527,10 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:RUNNING",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17305,23 +17543,18 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:START",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:RUNNING",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17334,13 +17567,10 @@
           },
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17353,12 +17583,10 @@
           },
           {
             "name": "default:simple_test.execute_insert_into_hive_table.warehouse_t1:COMPLETE",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
           },
           {
@@ -17371,14 +17599,143 @@
           },
           {
             "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
-            "details": [
-              "$.inputs[0].facets.catalog: 'name' is a required property",
-              "$.outputs[0].facets.catalog: 'name' is a required property"
-            ],
+            "details": [],
             "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       }
