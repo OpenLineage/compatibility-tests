@@ -116,6 +116,8 @@ jobs:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
+      workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
   spark_dataproc:
     needs: initialize_workflow
@@ -131,6 +133,8 @@ jobs:
       ol_release: ${{ matrix.openlineage_versions }}
       spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
+      workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
   hive_dataproc:
     needs: initialize_workflow
@@ -144,6 +148,8 @@ jobs:
       ol_release: ${{ matrix.openlineage_versions }}
       component_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
+      workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 

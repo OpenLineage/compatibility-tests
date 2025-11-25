@@ -4,11 +4,19 @@ on:
   workflow_call:
     secrets:
       gcpKey:
-        required: true
+        required: false
     inputs:
       release:
         description: "release tag of OpenLineage to use"
         type: string
+      workload_identity_provider:
+        description: "GCP Workload Identity Provider (if not using credentials_json)"
+        type: string
+        required: false
+      service_account:
+        description: "GCP Service Account email (if not using credentials_json)"
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -29,6 +37,8 @@ jobs:
       id: gcp-auth
       uses: 'google-github-actions/auth@v2'
       with:
+        workload_identity_provider: '${{ inputs.workload_identity_provider }}'
+        service_account: '${{ inputs.service_account }}'
         credentials_json: '${{ secrets.gcpKey }}'
     - name: Install dependencies
       run: |
@@ -50,4 +60,3 @@ jobs:
         name: dataplex-report
         path: dataplex-report.json
         retention-days: 1
-
