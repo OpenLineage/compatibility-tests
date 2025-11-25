@@ -1,0 +1,15 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_.*') }}",
+    "facets": {
+      "gcp_lineage": {
+        "origin": {
+          "sourceType": "DATAPROC",
+          "name": "{{ match(result, 'projects/gcp-open-lineage-testing/regions/us-west1/clusters/dataproc-producer-test-.*') }}"
+        }
+      }
+    }
+  }
+}

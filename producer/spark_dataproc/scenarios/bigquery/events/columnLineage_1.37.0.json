@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }}"
+  },
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "{{ match(result, '.spark-bigquery-application_.*') }}",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "word": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "word_count": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word_count",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "AGGREGATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "bigquery",
+              "name": "bigquery-public-data.samples.shakespeare",
+              "field": "word",
+              "transformations": [
+                {
+                  "type": "INDIRECT",
+                  "subtype": "GROUP_BY",
+                  "description": "",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_.*_wordcount_output') }}"
+  },
+  "run": {
+    "facets": {
+      "processing_engine": {
+        "version": "3.5.3",
+        "name": "spark",
+        "openlineageAdapterVersion": "{{ any(result) }}"
+      }
+    }
+  }
+}

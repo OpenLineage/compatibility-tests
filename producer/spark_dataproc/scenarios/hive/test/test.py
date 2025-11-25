@@ -12,3 +12,5 @@ spark.sql("INSERT INTO t1 VALUES (1,2),(3,4);")
 spark.sql("CREATE TABLE IF NOT EXISTS t2 AS SELECT * FROM t1;")
 
 time.sleep(3)
+
+spark.sql("SELECT * FROM t2;").show()

@@ -1,0 +1,29 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_.*_e2e_table') }}",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "bigquery-public-data.samples.shakespeare",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "{{ match(result, 'data/bigquery_metastore/e2e_dataset.*/e2e_table') }}",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}

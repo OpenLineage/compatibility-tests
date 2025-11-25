@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_.*') }}"
+  },
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "{{ match(result, 'data/bigquery_to_delta/e2e_delta_table_.*') }}",
+      "outputFacets": {
+        "outputStatistics": {
+          "rowCount": "{{ any(result) }}",
+          "size": "{{ any(result) }}",
+          "fileCount": "{{ any(result) }}"
+        }
+      }
+    }
+  ]
+}

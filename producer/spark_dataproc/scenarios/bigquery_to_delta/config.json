@@ -13,7 +13,7 @@
   "tests": [
     {
       "name": "run_event_test",
-      "path": "events/run_event_test.json",
+      "path": "events/run_event.json",
       "tags": {
         "facets": [
           "run_event"
@@ -22,7 +22,7 @@
     },
     {
       "name": "parent_test",
-      "path": "events/parent_test.json",
+      "path": "events/parent.json",
       "tags": {
         "facets": [
           "parent"
@@ -31,7 +31,7 @@
     },
     {
       "name": "spark_properties_test",
-      "path": "events/spark_properties_test.json",
+      "path": "events/spark_properties.json",
       "tags": {
         "facets": [
           "spark_properties"
@@ -40,7 +40,7 @@
     },
     {
       "name": "processing_engine_test",
-      "path": "events/processing_engine_test.json",
+      "path": "events/processing_engine.json",
       "tags": {
         "facets": [
           "processing_engine"
@@ -49,7 +49,7 @@
     },
     {
       "name": "gcp_dataproc_test",
-      "path": "events/gcp_dataproc_test.json",
+      "path": "events/gcp_dataproc.json",
       "tags": {
         "facets": [
           "gcp_dataproc"
@@ -61,7 +61,7 @@
     },
     {
       "name": "jobType_test",
-      "path": "events/jobType_test.json",
+      "path": "events/jobType.json",
       "tags": {
         "facets": [
           "jobType"
@@ -70,7 +70,7 @@
     },
     {
       "name": "gcp_lineage_test",
-      "path": "events/gcp_lineage_test.json",
+      "path": "events/gcp_lineage.json",
       "tags": {
         "facets": [
           "gcp_lineage"
@@ -79,7 +79,7 @@
     },
     {
       "name": "dataSource_test",
-      "path": "events/dataSource_test.json",
+      "path": "events/dataSource.json",
       "tags": {
         "facets": [
           "dataSource"
@@ -88,7 +88,7 @@
     },
     {
       "name": "schema_test",
-      "path": "events/schema_test.json",
+      "path": "events/schema.json",
       "tags": {
         "facets": [
           "schema"
@@ -102,7 +102,10 @@
     },
     {
       "name": "columnLineage_test",
-      "path": "events/columnLineage_test.json",
+      "path": "events/columnLineage.json",
+      "openlineage_versions": {
+        "max": "1.36.0"
+      },
       "tags": {
         "facets": [
           "columnLineage"
@@ -117,8 +120,27 @@
       }
     },
     {
+      "name": "columnLineage_test_1.37.0",
+      "path": "events/columnLineage_1.37.0.json",
+      "openlineage_versions": {
+        "min": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+       "lineage_level": {
+          "bigquery": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      }
+    },
+    {
       "name": "storage_test",
-      "path": "events/storage_test.json",
+      "path": "events/storage.json",
       "tags": {
         "facets": [
           "storage"
