@@ -69,7 +69,6 @@ jobs:
         with:
           workload_identity_provider: '${{ inputs.workload_identity_provider }}'
           service_account: '${{ inputs.service_account }}'
-          credentials_json: '${{ secrets.gcpKey }}'
 
       - name: Get OL artifacts
         id: get-ol-artifacts
