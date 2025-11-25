@@ -10,6 +10,7 @@ inputs:
     required: true
   credentials:
     description: "GCP credentials"
+    required: false
 outputs:
   uploaded-file:
     value: ${{ steps.upload-artifact.outputs.uploaded_file }}
@@ -29,7 +30,7 @@ runs:
       id: upload-artifact
       shell: bash
       run: |
-        python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }} --credentials ${{ inputs.credentials }}
+        python scripts/upload_file_to_gcs.py ${{ inputs.local-file-path }} ${{ inputs.gcs-path }}
         exit_code=$?
 
         if [ $exit_code -ne 0 ]; then

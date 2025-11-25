@@ -205,7 +205,6 @@ jobs:
           --region us-west1 \
           --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
           --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
           --metadata "$metadata" \
           --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }},${{ steps.upload-cloud-sql-initialization-actions.outputs.uploaded-file }}"
 
@@ -248,7 +247,6 @@ jobs:
               --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
               --spark-properties "$properties" \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
-              --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
               --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
               then
                 echo "Error: Spark job failed for scenario: $scenario"
@@ -269,7 +267,6 @@ jobs:
             --project-id gcp-open-lineage-testing \
             --region us-west1 \
             --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
-            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
           else
             echo "Cluster does not exist"
           fi
