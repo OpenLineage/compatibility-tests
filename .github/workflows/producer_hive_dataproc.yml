@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       gcpKey:
-        required: true
+        required: false
     inputs:
       component_release:
         description: "release of hive dataproc to use"
@@ -15,6 +15,14 @@ on:
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
+      workload_identity_provider:
+        description: "GCP Workload Identity Provider (if not using credentials_json)"
+        type: string
+        required: false
+      service_account:
+        description: "GCP Service Account email (if not using credentials_json)"
+        type: string
+        required: false
 
 jobs:
   run-hive-tests:
@@ -42,12 +50,30 @@ jobs:
           esac
 
 
-      - name: GCP authorization
-        id: gcp-auth
-        if: ${{ steps.init.outputs.scenarios }}
+      - name: GCP authorization (Workload Identity)
+        id: gcp-auth-wif
+        if: ${{ steps.init.outputs.scenarios && inputs.workload_identity_provider != '' }}
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: '${{ inputs.workload_identity_provider }}'
+          service_account: '${{ inputs.service_account }}'
+
+      - name: GCP authorization (JSON Key)
+        id: gcp-auth-json
+        if: ${{ steps.init.outputs.scenarios && inputs.workload_identity_provider == '' }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.gcpKey }}'
+
+      - name: Set credentials file path
+        id: gcp-auth
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          if [ -n "${{ steps.gcp-auth-wif.outputs.credentials_file_path }}" ]; then
+            echo "credentials_file_path=${{ steps.gcp-auth-wif.outputs.credentials_file_path }}" >> $GITHUB_OUTPUT
+          else
+            echo "credentials_file_path=${{ steps.gcp-auth-json.outputs.credentials_file_path }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Get OL artifacts
         id: get-ol-artifacts

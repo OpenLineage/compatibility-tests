@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       gcpKey:
-        required: true
+        required: false
       postgresqlUser:
         required: true
       postgresqlPassword:
@@ -19,6 +19,14 @@ on:
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
+      workload_identity_provider:
+        description: "GCP Workload Identity Provider (if not using credentials_json)"
+        type: string
+        required: false
+      service_account:
+        description: "GCP Service Account email (if not using credentials_json)"
+        type: string
+        required: false
 
 jobs:
   run-spark-tests:
@@ -55,11 +63,11 @@ jobs:
 
 
       - name: GCP authorization
-        id: gcp-auth
-        if: ${{ steps.init.outputs.scenarios }}
+        id: gcp-auth-wif
         uses: 'google-github-actions/auth@v2'
         with:
-          credentials_json: '${{ secrets.gcpKey }}'
+          workload_identity_provider: '${{ inputs.workload_identity_provider }}'
+          project_id: 'gcp-open-lineage-testing'
 
       - name: Get OL artifacts
         id: get-ol-artifacts
@@ -186,7 +194,6 @@ jobs:
           --region us-west1 \
           --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
           --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
           --metadata "$metadata" \
           --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }},${{ steps.upload-cloud-sql-initialization-actions.outputs.uploaded-file }}"
 
@@ -229,7 +236,6 @@ jobs:
               --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
               --spark-properties "$properties" \
               --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
-              --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
               --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
               then
                 echo "Error: Spark job failed for scenario: $scenario"
@@ -250,7 +256,6 @@ jobs:
             --project-id gcp-open-lineage-testing \
             --region us-west1 \
             --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
-            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
           else
             echo "Cluster does not exist"
           fi
