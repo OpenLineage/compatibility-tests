@@ -97,10 +97,10 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_dataplex == 'true' }}
     uses: ./.github/workflows/consumer_dataplex.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
       release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
+      workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
   spark-dataproc:
     needs: initialize_workflow
@@ -109,13 +109,14 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
     secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
       postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
       postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
       ol_release: ${{ matrix.openlineage_versions }}
       spark_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
+      workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
   hive-dataproc:
     needs: initialize_workflow
@@ -123,12 +124,12 @@ jobs:
     uses: ./.github/workflows/producer_hive_dataproc.yml
     strategy:
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.hive_matrix) }}
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
       ol_release: ${{ matrix.openlineage_versions }}
       component_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
+      workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 

@@ -112,8 +112,6 @@ jobs:
       - scenarios
     if: ${{ !failure() && needs.initialize_workflow.outputs.run_dataplex == 'true' }}
     uses: ./.github/workflows/consumer_dataplex.yml
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
       release: ${{ needs.initialize_workflow.outputs.ol_release }}
       workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -126,7 +124,6 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
     secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
       postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
       postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
@@ -142,8 +139,6 @@ jobs:
     uses: ./.github/workflows/producer_hive_dataproc.yml
     strategy:
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.hive_matrix) }}
-    secrets:
-      gcpKey: ${{ secrets.GCP_SA_KEY }}
     with:
       ol_release: ${{ matrix.openlineage_versions }}
       component_release: ${{ matrix.component_version }}
