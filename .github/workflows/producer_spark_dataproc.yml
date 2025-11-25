@@ -62,23 +62,12 @@ jobs:
           esac
 
 
-      - name: GCP authorization (Workload Identity)
+      - name: GCP authorization
         id: gcp-auth-wif
-        if: ${{ steps.init.outputs.scenarios && inputs.workload_identity_provider != '' }}
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: '${{ inputs.workload_identity_provider }}'
           project_id: 'gcp-open-lineage-testing'
-
-      - name: Set credentials file path
-        id: gcp-auth
-        if: ${{ steps.init.outputs.scenarios }}
-        run: |
-          if [ -n "${{ steps.gcp-auth-wif.outputs.credentials_file_path }}" ]; then
-            echo "credentials_file_path=${{ steps.gcp-auth-wif.outputs.credentials_file_path }}" >> $GITHUB_OUTPUT
-          else
-            echo "credentials_file_path=${{ steps.gcp-auth-json.outputs.credentials_file_path }}" >> $GITHUB_OUTPUT
-          fi
 
       - name: Get OL artifacts
         id: get-ol-artifacts
