@@ -1,0 +1,39 @@
+name: Test post step for action
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run post action
+        uses: ./.github/actions/pre_post_action
+        with:
+          pre-command: |
+            echo "Initialize before action ..."
+          command: |
+            echo "Executing action ..."
+            ls -la
+          post-command: |
+            echo "Cleaning up after action"
+
+      - name: Run post action that fails
+        uses: ./.github/actions/pre_post_action
+        with:
+          command: |
+            not existing bash command
+          post-command: |
+            echo "Cleaning up after action that fails"
+
+      - name: Run post action that fails on pre
+        if: ${{ always() }}
+        uses: ./.github/actions/pre_post_action
+        with:
+          pre-command: |
+            not existing bash command
+          command: |
+            echo "Executing action than fails on pre..."
+          post-command: |
+            echo "Cleaning up after action with pre fail"
