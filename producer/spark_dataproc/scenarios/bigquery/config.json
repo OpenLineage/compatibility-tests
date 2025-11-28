@@ -13,7 +13,22 @@
   "tests": [
     {
       "name": "run_event_test",
-      "path": "events/run_event_test.json",
+      "path": "events/run_event.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "run_event"
+        ]
+      }
+    },
+    {
+      "name": "run_event_test_1.38.0",
+      "path": "events/run_event_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "run_event"
@@ -22,7 +37,22 @@
     },
     {
       "name": "parent_test",
-      "path": "events/parent_test.json",
+      "path": "events/parent.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "parent"
+        ]
+      }
+    },
+    {
+      "name": "parent_test_1.38.0",
+      "path": "events/parent_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "parent"
@@ -31,7 +61,22 @@
     },
     {
       "name": "spark_properties_test",
-      "path": "events/spark_properties_test.json",
+      "path": "events/spark_properties.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "spark_properties"
+        ]
+      }
+    },
+    {
+      "name": "spark_properties_test_1.38.0",
+      "path": "events/spark_properties_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "spark_properties"
@@ -40,7 +85,22 @@
     },
     {
       "name": "processing_engine_test",
-      "path": "events/processing_engine_test.json",
+      "path": "events/processing_engine.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "processing_engine"
+        ]
+      }
+    },
+    {
+      "name": "processing_engine_test_1.38.0",
+      "path": "events/processing_engine_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "processing_engine"
@@ -49,9 +109,27 @@
     },
     {
       "name": "gcp_dataproc_spark_test",
-      "path": "events/gcp_dataproc_spark_test.json",
+      "path": "events/gcp_dataproc_spark.json",
       "component_versions": {
         "max": "1.23.0"
+      },
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "gcp_dataproc_spark"
+        ]
+      }
+    },
+    {
+      "name": "gcp_dataproc_spark_test_1.38.0",
+      "path": "events/gcp_dataproc_spark_1.38.0.json",
+      "component_versions": {
+        "max": "1.23.0"
+      },
+      "openlineage_versions": {
+        "min": "1.38.0"
       },
       "tags": {
         "facets": [
@@ -61,9 +139,27 @@
     },
     {
       "name": "gcp_dataproc_test",
-      "path": "events/gcp_dataproc_test.json",
+      "path": "events/gcp_dataproc.json",
       "component_versions": {
         "min": "1.24.0"
+      },
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "gcp_dataproc"
+        ]
+      }
+    },
+    {
+      "name": "gcp_dataproc_test_1.38.0",
+      "path": "events/gcp_dataproc_1.38.0.json",
+      "component_versions": {
+        "min": "1.24.0"
+      },
+      "openlineage_versions": {
+        "min": "1.38.0"
       },
       "tags": {
         "facets": [
@@ -73,7 +169,22 @@
     },
     {
       "name": "jobType_test",
-      "path": "events/jobType_test.json",
+      "path": "events/jobType.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "jobType"
+        ]
+      }
+    },
+    {
+      "name": "jobType_test_1.38.0",
+      "path": "events/jobType_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "jobType"
@@ -82,7 +193,22 @@
     },
     {
       "name": "gcp_lineage_test",
-      "path": "events/gcp_lineage_test.json",
+      "path": "events/gcp_lineage.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "gcp_lineage"
+        ]
+      }
+    },
+    {
+      "name": "gcp_lineage_test_1.38.0",
+      "path": "events/gcp_lineage_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "gcp_lineage"
@@ -91,7 +217,22 @@
     },
     {
       "name": "dataSource_test",
-      "path": "events/dataSource_test.json",
+      "path": "events/dataSource.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "dataSource"
+        ]
+      }
+    },
+    {
+      "name": "dataSource_test_1.38.0",
+      "path": "events/dataSource_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "dataSource"
@@ -100,7 +241,27 @@
     },
     {
       "name": "schema_test",
-      "path": "events/schema_test.json",
+      "path": "events/schema.json",
+      "openlineage_versions": {
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "schema"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "schema_test_1.38.0",
+      "path": "events/schema_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "schema"
@@ -114,7 +275,49 @@
     },
     {
       "name": "columnLineage_test",
-      "path": "events/columnLineage_test.json",
+      "path": "events/columnLineage.json",
+      "openlineage_versions": {
+        "max": "1.36.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "columnLineage_test_1.37.0",
+      "path": "events/columnLineage_1.37.0.json",
+      "openlineage_versions": {
+        "min": "1.37.0",
+        "max": "1.37.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "bigquery": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "columnLineage_test_1.38.0",
+      "path": "events/columnLineage_1.38.0.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
       "tags": {
         "facets": [
           "columnLineage"

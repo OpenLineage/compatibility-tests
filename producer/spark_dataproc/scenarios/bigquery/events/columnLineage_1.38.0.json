@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_.*_wordcount_output') }}"
+  },
+  "outputs": [
+    {
+      "namespace": "bigquery",
+      "name": "{{ match(result, 'gcp-open-lineage-testing.e2e_dataset.*wordcount_output') }}",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "word": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "word_count": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word_count",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "AGGREGATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "bigquery",
+              "name": "bigquery-public-data.samples.shakespeare",
+              "field": "word",
+              "transformations": [
+                {
+                  "type": "INDIRECT",
+                  "subtype": "GROUP_BY",
+                  "description": "",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

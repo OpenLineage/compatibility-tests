@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_.*_e2e_table') }}"
+  },
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "{{ match(result, 'data/bigquery_metastore/e2e_dataset.*/e2e_table') }}",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "word": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "word_count": {
+              "inputFields": [
+                {
+                  "namespace": "bigquery",
+                  "name": "bigquery-public-data.samples.shakespeare",
+                  "field": "word_count",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "AGGREGATION",
+                      "description": "",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "bigquery",
+              "name": "bigquery-public-data.samples.shakespeare",
+              "field": "word",
+              "transformations": [
+                {
+                  "type": "INDIRECT",
+                  "subtype": "GROUP_BY",
+                  "description": "",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

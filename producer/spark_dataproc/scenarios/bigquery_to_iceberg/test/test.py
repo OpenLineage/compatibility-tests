@@ -16,7 +16,11 @@ spark = (
 
 spark.catalog.setCurrentCatalog("gcp_iceberg_catalog")
 
-spark.sql(f"CREATE NAMESPACE IF NOT EXISTS e2e_dataset")
+# Get the scenario suffix from spark config to avoid concurrent write conflicts
+scenario_suffix = spark.conf.get("spark.scenario.suffix", "default")
+dataset_name = f"e2e_dataset_{scenario_suffix.replace('-', '_').replace('.', '_')}"
+
+spark.sql(f"CREATE NAMESPACE IF NOT EXISTS {dataset_name}")
 
 words = spark.read.format('bigquery') \
   .option('table', 'bigquery-public-data:samples.shakespeare') \
@@ -27,5 +31,5 @@ words.createOrReplaceTempView('words')
 word_count = spark.sql(
     'SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word')
 
-# Write as Delta format to GCS
-word_count.write.format("iceberg").mode("overwrite").saveAsTable("e2e_dataset.e2e_table")
+# Write as Iceberg format to GCS with dynamic dataset name
+word_count.write.format("iceberg").mode("overwrite").saveAsTable(f"{dataset_name}.e2e_table")

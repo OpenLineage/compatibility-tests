@@ -1,0 +1,60 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_.*_wordcount_output') }}"
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "bigquery-public-data.samples.shakespeare",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "word",
+              "type": "string",
+              "description": "A single unique word (where whitespace is the delimiter) extracted from a corpus."
+            },
+            {
+              "name": "word_count",
+              "type": "long",
+              "description": "The number of times this word appears in this corpus."
+            },
+            {
+              "name": "corpus",
+              "type": "string",
+              "description": "The work from which this word was extracted."
+            },
+            {
+              "name": "corpus_date",
+              "type": "long",
+              "description": "The year in which this corpus was published."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "bigquery",
+      "name": "{{ match(result, 'gcp-open-lineage-testing.e2e_dataset.*\\.wordcount_output') }}",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "word",
+              "type": "string",
+              "description": "A single unique word (where whitespace is the delimiter) extracted from a corpus."
+            },
+            {
+              "name": "word_count",
+              "type": "long"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

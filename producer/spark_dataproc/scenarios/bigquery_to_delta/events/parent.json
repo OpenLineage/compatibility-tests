@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_.*') }}"
+  },
+  "run": {
+    "facets": {
+      "parent": {
+        "run": {
+          "runId": "{{ is_uuid(result) }}"
+        },
+        "job": {
+          "namespace": "default",
+          "name": "big_query_to_delta_on_gcs"
+        }
+      }
+    }
+  }
+}

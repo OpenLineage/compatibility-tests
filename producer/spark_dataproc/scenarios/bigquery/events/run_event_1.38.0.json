@@ -1,0 +1,29 @@
+{
+  "eventTime": "{{ is_datetime(result) }}",
+  "eventType": "COMPLETE",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {}
+  },
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_.*_wordcount_output') }}",
+    "facets": {}
+  },
+  "inputs": [
+    {
+      "namespace": "bigquery",
+      "name": "bigquery-public-data.samples.shakespeare",
+      "facets": {},
+      "inputFacets": {}
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "bigquery",
+      "name": "{{ match(result, 'gcp-open-lineage-testing.e2e_dataset.*\\.wordcount_output') }}",
+      "facets": {},
+      "outputFacets": {}
+    }
+  ]
+}

@@ -8,6 +8,12 @@ spark = (
         .getOrCreate()
     )
 
+# Get the scenario suffix from spark config to avoid concurrent write conflicts
+scenario_suffix = spark.conf.get("spark.scenario.suffix", "default")
+table_suffix = scenario_suffix.replace('-', '_').replace('.', '_')
+table_name = f"e2e_delta_table_{table_suffix}"
+table_location = f"gs://open-lineage-e2e/data/bigquery_to_delta/{table_name}"
+
 words = spark.read.format('bigquery') \
   .option('table', 'bigquery-public-data:samples.shakespeare') \
   .load()
@@ -17,12 +23,12 @@ words.createOrReplaceTempView('words')
 word_count = spark.sql(
     'SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word')
 
-spark.sql("""CREATE TABLE IF NOT EXISTS e2e_delta_table (
+spark.sql(f"""CREATE TABLE IF NOT EXISTS {table_name} (
     word string,
     word_count long)
 USING delta
-LOCATION 'gs://open-lineage-e2e/data/bigquery_to_delta/e2e_delta_table'""")
+LOCATION '{table_location}'""")
 
 
 # Write as Delta format to GCS
-word_count.writeTo("e2e_delta_table").append()
+word_count.writeTo(table_name).append()

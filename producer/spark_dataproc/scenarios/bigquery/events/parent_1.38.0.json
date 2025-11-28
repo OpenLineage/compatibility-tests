@@ -1,0 +1,29 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_.*_wordcount_output') }}"
+  },
+  "run": {
+    "facets": {
+      "parent": {
+        "run": {
+          "runId": "{{ is_uuid(result) }}"
+        },
+        "job": {
+          "namespace": "default",
+          "name": "writing_to_big_query"
+        },
+        "root": {
+          "run": {
+            "runId": "{{ is_uuid(result) }}"
+          },
+          "job": {
+            "namespace": "default",
+            "name": "Writing to BigQuery"
+          }
+        }
+      }
+    }
+  }
+}

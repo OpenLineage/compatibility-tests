@@ -11,6 +11,28 @@
     {
       "name": "columnLineage_test",
       "path": "events/columnLineage.json",
+      "openlineage_versions": {
+        "max": "1.33.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+       "lineage_level": {
+          "cloudsql": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      }
+    },
+    {
+      "name": "columnLineage_test_1.34.0",
+      "path": "events/columnLineage_1.34.0.json",
+      "openlineage_versions": {
+        "min": "1.34.0"
+      },
       "tags": {
         "facets": [
           "columnLineage"
