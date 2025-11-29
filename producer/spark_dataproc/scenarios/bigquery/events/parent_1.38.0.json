@@ -2,7 +2,7 @@
   "eventType": "COMPLETE",
   "job": {
     "namespace": "default",
-    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_.*_wordcount_output') }}"
+    "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output_.*') }}"
   },
   "run": {
     "facets": {
