@@ -236,6 +236,30 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -683,6 +707,30 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -1099,6 +1147,38 @@
                 "storage"
               ]
             }
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_351_1300:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_351_1300:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1300:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1300:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -1502,6 +1582,38 @@
           },
           {
             "name": "default:big_query_to_delta_on_gcs.union:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table_351_1300:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_351_1300:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table_351_1300:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_351_1300:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -2994,6 +3106,30 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -3410,6 +3546,38 @@
                 "storage"
               ]
             }
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_351_1320:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1320:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_351_1320:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1320:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -3813,6 +3981,38 @@
           },
           {
             "name": "default:big_query_to_delta_on_gcs.union:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table_351_1320:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table_351_1320:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_351_1320:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_351_1320:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -4884,6 +5084,30 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -5121,6 +5345,30 @@
           },
           {
             "name": "default:simple_test.execute_create_table_command.warehouse_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
@@ -15990,7 +16238,7 @@
     "scenarios": [
       {
         "name": "cloudsql",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:spark_cloud_sql_example:START",
@@ -16204,6 +16452,25 @@
               "facets": [
                 "spark_properties"
               ]
+            }
+          },
+          {
+            "name": "columnLineage_test_1.34.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "cloudsql": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
             }
           }
         ]
@@ -16447,12 +16714,36 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
       {
         "name": "bigquery_to_delta",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table:COMPLETE",
@@ -16664,12 +16955,63 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table_351_1401:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.create_table.default_e2e_delta_table_351_1401:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_351_1401:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_delta_on_gcs.append_data_exec_v1.spark_catalog_default_e2e_delta_table_351_1401:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "columnLineage_test_1.37.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       },
       {
         "name": "bigquery_to_iceberg",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table:START",
@@ -16721,12 +17063,10 @@
           },
           {
             "name": "run_event_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'run_event_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -16807,12 +17147,10 @@
           },
           {
             "name": "dataSource_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'dataSource_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "dataSource"
@@ -16821,12 +17159,10 @@
           },
           {
             "name": "schema_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'schema_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "schema"
@@ -16863,23 +17199,72 @@
           },
           {
             "name": "storage_test_1.32.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'storage_test_1.32.0' In .outputs.[0].name: Expected value data/bigquery_metastore/e2e_dataset/e2e_table does not equal result data/bigquery_metastore/e2e_dataset.db/e2e_table"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "storage"
               ]
+            }
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_351_1401:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1401:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1401:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_351_1401:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "columnLineage_test_1.37.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
             }
           }
         ]
       },
       {
         "name": "bigquery",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:writing_to_big_query:START",
@@ -17052,6 +17437,154 @@
             "details": [
               "'columnLineage_test' event with .eventType: COMPLETE, .job.name: {{ match(result, 'writing_to_big_query.adaptive_spark_plan._spark-bigquery-application_.*') }} and .job.namespace: default not found in result events"
             ],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "default:writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output_351_1401:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output_351_1401:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test_1.38.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
             "tags": {
               "facets": [
                 "columnLineage"
@@ -17498,6 +18031,30 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -17732,6 +18289,30 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
