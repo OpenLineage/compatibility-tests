@@ -198,70 +198,59 @@ jobs:
 
       - name: Run producer jobs and create OL events
         if: ${{ steps.init.outputs.scenarios }}
-        id: run-producer
-        continue-on-error: true
-        run: |          
-          set -e
-          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
-          
-          properties=''
-          properties+='spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener'
-          properties+=',spark.sql.warehouse.dir=/tmp/warehouse'
-          properties+=',spark.openlineage.transport.type=gcs'
-          properties+=',spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }}'
-          properties+=',spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}'
-          properties+=',spark.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
-
-          for scenario in "${scenarios[@]}"
-          do
-              echo "Getting script for scenario $scenario"
-              run_script=$(find "producer/spark_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
-              
-              echo "Running spark job for scenario: $scenario"
-
-              if ! python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
+        uses: ./.github/actions/run_with_post_script
+        with:
+          command: |
+            set -e
+            IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
+            
+            properties=''
+            properties+='spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener'
+            properties+=',spark.sql.warehouse.dir=/tmp/warehouse'
+            properties+=',spark.openlineage.transport.type=gcs'
+            properties+=',spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }}'
+            properties+=',spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}'
+            properties+=',spark.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
+  
+            for scenario in "${scenarios[@]}"
+            do
+                echo "Getting script for scenario $scenario"
+                run_script=$(find "producer/spark_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
+                
+                echo "Running spark job for scenario: $scenario"
+  
+                if ! python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
+                --project-id gcp-open-lineage-testing \
+                --region us-west1 \
+                --scenario $scenario \
+                --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
+                --gcs-bucket open-lineage-e2e \
+                --python-job "$run_script" \
+                --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
+                --spark-properties "$properties" \
+                --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
+                --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
+                --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
+                then
+                  echo "Error: Spark job failed for scenario: $scenario"
+                  exit 1
+                fi
+  
+                echo "Finished running spark job for scenario: $scenario"
+            done
+  
+            echo "Finished running all scenarios"
+          post-command: |
+            if gcloud dataproc clusters list --region us-west1 | grep -q "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}"
+            then
+              python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
               --project-id gcp-open-lineage-testing \
               --region us-west1 \
-              --scenario $scenario \
               --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
-              --gcs-bucket open-lineage-e2e \
-              --python-job "$run_script" \
-              --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
-              --spark-properties "$properties" \
-              --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
-              --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
-              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
-              then
-                echo "Error: Spark job failed for scenario: $scenario"
-                exit 1
-              fi
-
-              echo "Finished running spark job for scenario: $scenario"
-          done
-
-          echo "Finished running all scenarios"
-
-      - name: Terminate producer cluster
-        if: ${{ always() && steps.init.outputs.scenarios }}
-        run: |
-          if gcloud dataproc clusters list --region us-west1 | grep -q "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}"
-          then
-            python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-            --project-id gcp-open-lineage-testing \
-            --region us-west1 \
-            --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
-            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
-          else
-            echo "Cluster does not exist"
-          fi
-
-      - name: Fail if spark jobs failed
-        if: ${{ steps.init.outputs.scenarios && steps.run-producer.outcome  == 'failure' }}
-        run: |
-          echo "step 'Run producer jobs and create OL events' has ended with failure but to terminate the cluster we needed to continue on error but fail the job after cluster termination."
-          echo "This will become redundant if starting the cluster is extracted to custom action with post actions defined."
-          echo "For now composite actions do not support post actions."
-          exit 1
+              --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
+            else
+              echo "Cluster does not exist"
+            fi
 
       - name: Validation
         if: ${{ steps.init.outputs.scenarios }}

@@ -1,0 +1,15 @@
+{
+  "name": "my-js-action",
+  "version": "1.0.0",
+  "main": "bundle/index.js",
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --platform=node --outfile=bundle/index.js"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.0",
+    "@actions/exec": "^1.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0"
+  }
+}
