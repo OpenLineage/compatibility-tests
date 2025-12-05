@@ -5,7 +5,8 @@
     "name": "{{ match(result, 'writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output_.*') }}",
     "facets": {
       "sql": {
-        "query": "SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word"
+        "query": "SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word",
+        "dialect": "spark"
       }
     }
   }
