@@ -4194,7 +4194,7 @@
       },
       {
         "name": "airflow",
-        "status": "SUCCESS",
+        "status": "FAILURE",
         "tests": [
           {
             "name": "line_01.json",
@@ -4590,10 +4590,13 @@
           },
           {
             "name": "link",
-            "status": "SUCCESS",
+            "status": "FAILURE",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [],
+            "details": [
+              "event 2024-11-26T13:05:34.626595Z, no matching entity",
+              "event 2024-11-26T13:10:45.874270Z, no matching entity"
+            ],
             "tags": {
               "facets": [
                 "run_event"
