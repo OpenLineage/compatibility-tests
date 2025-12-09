@@ -4031,7 +4031,7 @@
     "scenarios": [
       {
         "name": "simple_run_event",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "simple_run_event.json",
@@ -4081,12 +4081,10 @@
           },
           {
             "name": "link",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [
-              "event 2023-04-04T13:21:16.098Z, no matching entity"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -4097,7 +4095,7 @@
       },
       {
         "name": "spark_dataproc_simple_producer_test",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "1.json",
@@ -4182,12 +4180,10 @@
           },
           {
             "name": "link",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [
-              "event 2024-10-17T09:18:26.825Z, no matching entity"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -16750,6 +16746,14 @@
           },
           {
             "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_table_command.warehouse_t1:START",
             "status": "SUCCESS",
             "validation_type": "syntax",
             "entity_type": "openlineage",
