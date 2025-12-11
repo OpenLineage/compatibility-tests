@@ -1,0 +1,60 @@
+{
+    "component_versions": {
+      "min": "1.8.0",
+      "max": "1.8.0"
+    },
+    "openlineage_versions": {
+      "min": "1.0.0",
+      "max": "5.0.0"
+    },
+    "tests": [
+      {
+        "name": "schema_facet_test",
+        "path": "events/schema_event.json",
+        "tags": {
+          "facets": ["schema", "dataSource", "run"],
+          "max_version": "2-0-2",
+          "min_version": "1.0.0",
+          "lineage_level": {
+            "postgres": ["dataset", "column"]
+          }
+        }
+      },
+      {
+        "name": "sql_facet_test",
+        "path": "events/sql_event.json", 
+        "tags": {
+          "facets": ["sql", "dataSource"],
+          "max_version": "2-0-2",
+          "min_version": "1.0.0",
+          "lineage_level": {
+            "postgres": ["dataset"]
+          }
+        }
+      },
+      {
+        "name": "lineage_test",
+        "path": "events/lineage_event.json",
+        "tags": {
+          "facets": ["dataSource", "run"],
+          "max_version": "2-0-2", 
+          "min_version": "1.0.0",
+          "lineage_level": {
+            "postgres": ["dataset", "transformation"]
+          }
+        }
+      },
+      {
+        "name": "column_lineage_test",
+        "path": "events/column_lineage_event.json",
+        "tags": {
+          "facets": ["columnLineage", "schema", "dataSource"],
+          "max_version": "2-0-2",
+          "min_version": "1.0.0", 
+          "lineage_level": {
+            "postgres": ["column", "transformation"]
+          }
+        }
+      }
+    ]
+}

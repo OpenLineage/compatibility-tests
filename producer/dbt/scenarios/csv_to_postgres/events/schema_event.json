@@ -1,0 +1,45 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "{{ any(result) }}",
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": "{{ any(result) }}"
+  },
+  "job": {
+    "namespace": "dbt://local",
+    "name": "{{ any(result) }}",
+    "facets": {
+      "sql": {
+        "_producer": "{{ any(result) }}",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SqlJobFacet.json",
+        "query": "{{ any(result) }}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "{{ any(result) }}",
+      "facets": {
+        "schema": {
+          "_producer": "{{ any(result) }}",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+          "fields": "{{ any(result) }}"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "{{ any(result) }}",
+      "facets": {
+        "schema": {
+          "_producer": "{{ any(result) }}",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+          "fields": "{{ any(result) }}"
+        }
+      }
+    }
+  ]
+}
