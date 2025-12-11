@@ -1,0 +1,26 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_.*') }}"
+  },
+  "outputs": [
+    {
+      "namespace": "gs://open-lineage-e2e",
+      "name": "{{ match(result, 'data/bigquery_metastore/e2e_dataset.*/e2e_table.*') }}",
+      "facets": {
+        "catalog": {
+          "framework": "iceberg",
+          "type": "bigquerymetastore",
+          "name": "gcp_iceberg_catalog",
+          "warehouseUri": "gs://open-lineage-e2e/data/bigquery_metastore/",
+          "source": "spark",
+          "catalogProperties": {
+            "gcp_location": "us-west1",
+            "gcp_project_id": "gcp-open-lineage-testing"
+          }
+        }
+      }
+    }
+  ]
+}

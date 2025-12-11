@@ -5,7 +5,8 @@
     "name": "{{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_.*') }}",
     "facets": {
       "sql": {
-        "query": "SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word"
+        "query": "SELECT word, SUM(word_count) AS word_count FROM words GROUP BY word",
+        "dialect": "spark"
       }
     }
   }
