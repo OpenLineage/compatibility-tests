@@ -1,0 +1,23 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.stg_customers"
+  },
+  "outputs": [
+    {
+      "name": "dbt_test.main.stg_customers",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "customer_id",
+              "description": "Unique customer identifier"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

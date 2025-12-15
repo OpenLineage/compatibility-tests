@@ -1,7 +1,7 @@
 openlineage_compatibility_test:
-  target: dev
+  target: postgres
   outputs:
-    dev:
+    postgres:
       type: postgres
       host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
       port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | as_number }}"

@@ -1,60 +1,270 @@
 {
-    "component_versions": {
-      "min": "1.8.0",
-      "max": "1.8.0"
-    },
-    "openlineage_versions": {
-      "min": "1.0.0",
-      "max": "5.0.0"
-    },
-    "tests": [
-      {
-        "name": "schema_facet_test",
-        "path": "events/schema_event.json",
-        "tags": {
-          "facets": ["schema", "dataSource", "run"],
-          "max_version": "2-0-2",
-          "min_version": "1.0.0",
-          "lineage_level": {
-            "postgres": ["dataset", "column"]
-          }
-        }
+  "component_versions": {
+    "min": "1.8.0",
+    "max": "1.8.0"
+  },
+  "openlineage_versions": {
+    "min": "1.0.0",
+    "max": "5.0.0"
+  },
+  "tests": [
+    {
+      "name": "customers_datasource_facet_test",
+      "path": "events/customers/datasource_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
       },
-      {
-        "name": "sql_facet_test",
-        "path": "events/sql_event.json", 
-        "tags": {
-          "facets": ["sql", "dataSource"],
-          "max_version": "2-0-2",
-          "min_version": "1.0.0",
-          "lineage_level": {
-            "postgres": ["dataset"]
-          }
-        }
-      },
-      {
-        "name": "lineage_test",
-        "path": "events/lineage_event.json",
-        "tags": {
-          "facets": ["dataSource", "run"],
-          "max_version": "2-0-2", 
-          "min_version": "1.0.0",
-          "lineage_level": {
-            "postgres": ["dataset", "transformation"]
-          }
-        }
-      },
-      {
-        "name": "column_lineage_test",
-        "path": "events/column_lineage_event.json",
-        "tags": {
-          "facets": ["columnLineage", "schema", "dataSource"],
-          "max_version": "2-0-2",
-          "min_version": "1.0.0", 
-          "lineage_level": {
-            "postgres": ["column", "transformation"]
-          }
+      "tags": {
+        "facets": [
+          "dataSource"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
         }
       }
-    ]
+    },
+    {
+      "name": "customers_schema_facet_test",
+      "path": "events/customers/schema_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "schema"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "customers_column_lineage_test",
+      "path": "events/customers/column_lineage_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset",
+            "column"
+          ]
+        }
+      }
+    },
+    {
+      "name": "customers_sql_facet_test",
+      "path": "events/customers/sql_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "sql"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "orders_datasource_facet_test",
+      "path": "events/orders/datasource_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dataSource"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "orders_schema_facet_test",
+      "path": "events/orders/schema_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "schema"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "orders_column_lineage_test",
+      "path": "events/orders/column_lineage_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset",
+            "column"
+          ]
+        }
+      }
+    },
+    {
+      "name": "orders_sql_facet_test",
+      "path": "events/orders/sql_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "sql"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "analytics_datasource_facet_test",
+      "path": "events/analytics/datasource_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dataSource"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "analytics_schema_facet_test",
+      "path": "events/analytics/schema_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "schema"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "analytics_column_lineage_test",
+      "path": "events/analytics/column_lineage_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset",
+            "column"
+          ]
+        }
+      }
+    },
+    {
+      "name": "analytics_sql_facet_test",
+      "path": "events/analytics/sql_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "sql"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "dbt_node_facet_test",
+      "path": "events/dbt_node_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dbt_node"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "dbt_run_facet_test",
+      "path": "events/dbt_run_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dbt_run"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "dbt_version_facet_test",
+      "path": "events/dbt_version_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dbt_version"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    }
+  ]
 }

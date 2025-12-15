@@ -1,7 +1,5 @@
 {
-  "openlineage_versions": [
-    "1.23.0"
-  ],
+  "openlineage_versions": [],
   "component_version": [
     "1.8.0"
   ]

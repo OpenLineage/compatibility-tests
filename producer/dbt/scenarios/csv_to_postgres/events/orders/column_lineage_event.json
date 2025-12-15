@@ -1,0 +1,85 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.stg_orders"
+  },
+  "outputs": [
+    {
+      "name": "dbt_test.main.stg_orders",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "amount": {
+              "inputFields": [
+                {
+                  "field": "amount",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "completed_amount": {
+              "inputFields": [
+                {
+                  "field": "amount",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                },
+                {
+                  "field": "status",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "customer_id": {
+              "inputFields": [
+                {
+                  "field": "customer_id",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "order_date": {
+              "inputFields": [
+                {
+                  "field": "order_date",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "order_id": {
+              "inputFields": [
+                {
+                  "field": "order_id",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "status": {
+              "inputFields": [
+                {
+                  "field": "status",
+                  "name": "dbt_test.main.raw_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

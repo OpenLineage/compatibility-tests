@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.stg_customers"
+  },
+  "outputs": [
+    {
+      "name": "dbt_test.main.stg_customers",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "customer_id": {
+              "inputFields": [
+                {
+                  "field": "customer_id",
+                  "name": "dbt_test.main.raw_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "customer_name": {
+              "inputFields": [
+                {
+                  "field": "name",
+                  "name": "dbt_test.main.raw_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "email": {
+              "inputFields": [
+                {
+                  "field": "email",
+                  "name": "dbt_test.main.raw_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "registration_date": {
+              "inputFields": [
+                {
+                  "field": "registration_date",
+                  "name": "dbt_test.main.raw_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "segment": {
+              "inputFields": [
+                {
+                  "field": "segment",
+                  "name": "dbt_test.main.raw_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "value_tier": {
+              "inputFields": [
+                {
+                  "field": "segment",
+                  "name": "dbt_test.main.raw_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

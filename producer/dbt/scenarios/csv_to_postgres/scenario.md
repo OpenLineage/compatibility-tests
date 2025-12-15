@@ -4,7 +4,7 @@
 
 This scenario validates dbt's OpenLineage integration compliance using synthetic test data in a controlled CSV → dbt → PostgreSQL pipeline with file transport.
 
-**Purpose**: Compatibility testing and validation, not production use case demonstration.
+**Purpose**: Compatibility testing and validation.
 
 ## Data Flow
 
@@ -22,10 +22,11 @@ Analytics Model (customer_analytics)
 
 The scenario validates the following OpenLineage facets:
 
+- **Datasource Facets**: Source and destination database
 - **Schema Facets**: Column definitions and data types
 - **SQL Facets**: Actual SQL transformations executed by dbt
-- **Lineage**: Dataset-level lineage relationships  
 - **Column Lineage**: Field-level transformations and dependencies
+- **DBT Lineage**: DBT related validations like version, node and execution
 
 ## Test Data Logic
 
@@ -51,6 +52,7 @@ Synthetic customer analytics scenario designed for validation testing:
 - SQL facets with actual transformation queries and dialect information
 - Column lineage facets showing field-level transformations
 - Dataset lineage tracking data flow between models
+- DBT facets with project name, profile, models and dbt version
 
 ## Validation Framework
 

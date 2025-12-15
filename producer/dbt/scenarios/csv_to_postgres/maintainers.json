@@ -4,5 +4,11 @@
     "github-name": "BearingNode",
     "email": "contact@bearingnode.com",
     "link": "https://www.bearingnode.com"
+  },
+  {
+    "type": "maintainer",
+    "github-name": "LegendPawel-Marut",
+    "email": "pawel.marut@xebia.com",
+    "link": ""
   }
 ]

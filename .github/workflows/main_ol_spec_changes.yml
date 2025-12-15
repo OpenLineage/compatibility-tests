@@ -19,6 +19,9 @@ on:
       hive_matrix:
         description: 'Overwrite matrix for hive tests'
         required: false
+      dbt_matrix:
+        description: 'Overwrite matrix for hive tests'
+        required: false
 
 
 permissions:
@@ -35,6 +38,7 @@ jobs:
       ol_release: ${{ github.event.inputs.openlineage_release || steps.get-release.outputs.openlineage_release }}
       spark_matrix: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
       hive_matrix: ${{ github.event.inputs.hive_matrix || steps.set-matrix-values.outputs.hive_dataproc_matrix }}
+      dbt_matrix: ${{ github.event.inputs.dbt_matrix || steps.set-matrix-values.outputs.dbt_matrix }}
       execution_time: ${{ steps.get-execution-time.outputs.execution_time }}
     steps:
       - name: Get execution time
@@ -108,6 +112,7 @@ jobs:
 
           echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
           echo "hive_dataproc_matrix=$(get_matrix hive_dataproc)" >> $GITHUB_OUTPUT
+          echo "dbt_matrix=$(get_matrix dbt)" >> $GITHUB_OUTPUT
 
 
   ######## COMPONENT VALIDATION ########
@@ -154,6 +159,18 @@ jobs:
       component_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'true'
 
+  dbt:
+    needs:
+      - initialize_workflow
+    if: ${{ success() && needs.initialize_workflow.outputs.changes_in_spec == 'true' }}
+    uses: ./.github/workflows/producer_dbt.yml
+    strategy:
+      matrix: ${{ fromJson(needs.initialize_workflow.outputs.dbt_matrix) }}
+    with:
+      ol_release: ${{ matrix.openlineage_versions }}
+      dbt_release: ${{ matrix.component_version }}
+      get-latest-snapshots: 'false'
+
 ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
   collect-and-compare-reports:
@@ -162,6 +179,7 @@ jobs:
       - scenarios_check
       - spark-dataproc
       - hive-dataproc
+      - dbt
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:
       fail-for-new-failures: true

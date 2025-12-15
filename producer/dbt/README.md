@@ -17,17 +17,19 @@ The test is orchestrated by the `run_dbt_tests.sh` script and follows a clear, s
 
 The end-to-end process is as follows:
 
-1.  **Test Orchestration**: The `run_dbt_tests.sh` script serves as the main entry point. It sets up the environment and initiates the Python-based test runner (`test_runner/cli.py`).
+1.  **Test Orchestration**: The `run_dbt_tests.sh` script serves as the main entry point. It sets up the environment and initiates over the scenarios folder to execute each test scenario.
 
-2.  **Scenario Execution**: The test runner executes the dbt project defined in the `runner/` directory. The specific dbt commands to be run (e.g., `dbt seed`, `dbt run`, `dbt test`) are defined in the test scenarios located under `scenarios/`.
+2.  **Scenario Execution**: The test runner executes the dbt project defined in the `runner/` directory. The specific dbt commands to be run (e.g., `dbt seed`, `dbt run`, `dbt test`) are defined in the test scenarios run script (`test/run.sh`).
 
-3.  **Event Generation and Capture**: During the execution, the `dbt-ol` wrapper intercepts the dbt commands and emits OpenLineage events. The `runner/openlineage.yml` configuration directs these events to be captured as a local file (`events/openlineage_events.jsonl`) using the `file` transport.
+3.  **Event Generation and Capture**: During the execution, the `dbt-ol` wrapper intercepts the dbt commands and emits OpenLineage events. The `test/openlineage.yml` configuration directs these events to be captured as a local file (`{directory_input_param}/events.jsonl`) using the `file` transport.
+ 
+4.  **Extract events**: OpenLineage emits events reliable to one file ('append: true' causes overwrites and events to be lost) so it is required to extract the before validation.
 
-4.  **Event Validation**: Once the dbt process is complete, the test framework performs a two-stage validation on the generated `openlineage_events.jsonl` file:
-    *   **Syntax Validation**: Each event is validated against the official OpenLineage JSON schema (e.g., version `2-0-2`) to ensure it is structurally correct.
+5.  **Event Validation**: Once the dbt process is complete, the test framework performs a two-stage validation on the generated events:
+    *   **Syntax Validation**: Each event is validated against the official OpenLineage JSON schema (e.g., version `1.40.1`) to ensure it is structurally correct.
     *   **Semantic Validation**: The content of the events is compared against expected templates. This deep comparison, powered by the `scripts/compare_events.py` utility, verifies the accuracy of job names, dataset identifiers, lineage relationships, and the presence and structure of key facets.
 
-5.  **Reporting**: Upon completion, the test runner generates a standardized JSON report (`dbt_producer_report.json`) that details the results of each validation step. This report is designed to be consumed by higher-level aggregation scripts in a CI/CD environment.
+6.  **Reporting**: Upon completion, the test runner generates a standardized JSON report (`dbt_producer_report.json`) that details the results of each validation step. This report is designed to be consumed by higher-level aggregation scripts in a CI/CD environment.
 
 ## Validation Scope
 
@@ -36,28 +38,19 @@ This test validates that the `openlineage-dbt` integration correctly generates O
 #### dbt Operations Covered:
 -   `dbt seed`: To load initial data.
 -   `dbt run`: To execute dbt models.
--   `dbt test`: To run data quality tests.
 
 #### Validation Checks:
 -   **Event Generation**: Correctly creates `START` and `COMPLETE` events for jobs and runs.
 -   **Core Facet Structure and Content**: Validates key facets, including:
     -   `jobType`
     -   `sql`
-    -   `processing_engine`
-    -   `parent` (for job/run relationships)
-    -   `dbt_run`, `dbt_version`
-    -   `schema`, `dataSource`
-    -   `documentation`
+    -   `dbt_run`
+    -   `dbt_version`
+    -   `dbt_node`
+    -   `schema`
+    -   `dataSource`
     -   `columnLineage`
-    -   `dataQualityAssertions` (for dbt tests)
 -   **Specification Compliance**: Events are validated against the OpenLineage specification schema (version `2-0-2`).
-
-**For detailed coverage analysis**, see **[`SPECIFICATION_COVERAGE_ANALYSIS.md`](./SPECIFICATION_COVERAGE_ANALYSIS.md)** which provides:
-- Comprehensive facet-by-facet coverage breakdown (39% overall specification coverage)
-- Detailed explanation of custom dbt facets and validation warnings
-- Analysis of what's tested vs. what's not tested and why
-- Recommendations for future coverage improvements
-- Resolution status for known validation warnings
 
 ## Test Structure
 
@@ -66,17 +59,15 @@ The test is organized into the following key directories, each with a specific r
 ```
 producer/dbt/
 ├── run_dbt_tests.sh           # Main test execution script
-├── test_runner/               # Python test framework for orchestration and validation
 ├── scenarios/                 # Defines the dbt commands and expected outcomes for each test case
-├── events/                    # Default output directory for generated OpenLineage events
+├── output/                    # Default output directory for generated OpenLineage events (generated during execution)
 ├── runner/                    # A self-contained dbt project used as the test target
-└── future/                    # Design documents for future enhancements
+└── specs/                     # Stores OpenLineage spcification get from local repository (generated during execution)
 ```
 
 -   **`runner/`**: A self-contained dbt project with models, seeds, and configuration. This is the target of the `dbt-ol` command.
 -   **`scenarios/`**: Defines the dbt commands to be executed and contains the expected event templates for validation.
--   **`test_runner/`**: A custom Python application that orchestrates the end-to-end test workflow. It uses the `click` library to provide a command-line interface, execute the dbt process, and trigger the validation of the generated OpenLineage events.
--   **`events/`**: The default output directory for the generated `openlineage_events.jsonl` file.
+-   **`output/`**: The default output directory for the generated `events.jsonl` file and extracted events.
 
 ## How to Run the Tests
 
@@ -96,16 +87,7 @@ GitHub Actions provides the canonical testing environment with:
 
 1. **Automatic Trigger on Pull Requests**: The workflow runs automatically when changes are detected in `producer/dbt/` paths.
 
-2. **Manual Trigger via Workflow Dispatch**:
-   ```bash
-   # Trigger for specific branch
-   gh workflow run main_pr.yml --ref feature/your-branch -f components="dbt"
-   
-   # Watch the run
-   gh run watch
-   ```
-
-3. **Via Pull Request**: Opening a PR that modifies dbt producer files will automatically trigger the test suite.
+2. **Via Pull Request**: Opening a PR that modifies dbt producer files will automatically trigger the test suite.
 
 The GitHub Actions workflow:
 - Provisions a PostgreSQL 15 container with health checks
@@ -126,8 +108,8 @@ If you need to debug event generation locally:
 
 1.  **Start PostgreSQL (Optional)**:
     ```bash
-    # Quick one-liner for debugging
-    docker run -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:15-alpine
+    cd producer/dbt/scenarions/csv_to_postgres/test
+    docker compose up
     ```
 
 2.  **Install Python Dependencies**:
@@ -135,42 +117,23 @@ If you need to debug event generation locally:
     # Activate virtual environment (recommended)
     python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
     
-    # Install requirements
-    pip install -r test_runner/requirements.txt
-    ```
-
-3.  **Install dbt and the PostgreSQL adapter**:
-    ```bash
-    pip install dbt-core dbt-postgres
-    ```
-
-4.  **Install the OpenLineage dbt integration**:
-    ```bash
-    pip install openlineage-dbt
-    ```
-
 3.  **Run Test Scenario**:
     ```bash
-    # Using the test runner CLI (same as GitHub Actions uses)
-    python test_runner/cli.py run-scenario \
-      --scenario csv_to_postgres \
-      --output-dir ./test_output/$(date +%s)
-
-    # List available scenarios
-    python test_runner/cli.py list-scenarios
+    ./producer/dbt/run_dbt_tests.sh  --openlineage-directory <open_lineage_directory>
     ```
 
 4.  **Inspect Generated Events**:
     ```bash
     # View events
-    cat events/openlineage_events.jsonl | jq '.'
+    cat ./producer/dbt/output/csv_to_postgres/event-{id}.json | jq '.'
     
-    # Or check test output directory
-    ls -la test_output/
+    # check report
+    cat ./producer/dbt/dbt_producer_report.json | jq '.'
     ```
 
-**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The test runner CLI (`cli.py`) is the same code used by CI/CD, ensuring consistency.
+**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The test runner (`test/run.sh`) is the same code used by CI/CD, ensuring consistency.
 
 ## Important dbt Integration Notes
 
@@ -183,46 +146,24 @@ This integration has several nuances that are important to understand when analy
 -   The availability of certain dbt-specific facets may depend on the version of `dbt-core` being used.
 -   The file transport configuration in `openlineage.yml` directly controls the location and format of the event output.
 
-### Custom dbt Facets and Validation Warnings
+## ⚠️ Known Validation Issues
 
-**The dbt integration emits custom facets that generate expected validation warnings:**
+The dbt integration emits facets for which we cannot apply syntax validation due to schema issues:
 
-The `openlineage-dbt` integration adds vendor-specific facets to OpenLineage events that are **not part of the official OpenLineage specification**:
+### Custom dbt Facets:
+1. **`dbt_version`** (Run Facet)
+    - **Purpose**: Captures the version of dbt-core being used
+    - **Schema**: `dbt-version-run-facet.json`
+    - **Example**: `{"version": "1.10.15"}`
+    - **Schema issues**:
+        - lack of the '$id' property
+        - lack of the 'properties' object
+        - wrong ref to the RunFacet definition: OpenLineage.json#/**definitions**/RunFacet instead of OpenLineage.json#/**$defs**/RunFacet
 
-1. **`dbt_version`** - Captures the dbt-core version
-2. **`dbt_run`** - Captures dbt execution metadata (invocation_id, profile_name, project_name, etc.)
-
-These facets:
-- ✅ Have valid schema definitions in the OpenLineage repository
-- ✅ Provide valuable dbt-specific context for lineage consumers
-- ⚠️ Generate validation warnings: `"facet type dbt_version not recognized"` and `"facet type dbt_run not recognized"`
-- ℹ️ Are **expected behavior** for vendor-specific OpenLineage extensions
-
-**Impact on Test Results:**
-- All dbt operations complete successfully (seed, run, test)
-- All events are generated with correct OpenLineage structure
-- Core facets (schema, dataSource, sql, columnLineage, etc.) validate successfully
-- Custom dbt facets trigger warnings during schema validation but do **not indicate test failure**
-
-These warnings are **documented and accepted** as expected behavior. 
-
-**📊 For complete technical details**, see **[`SPECIFICATION_COVERAGE_ANALYSIS.md`](./SPECIFICATION_COVERAGE_ANALYSIS.md)** which documents:
-- The exact structure and purpose of `dbt_version` and `dbt_run` facets
-- Why validation warnings occur (vendor extensions vs. official spec)
-- Impact assessment on test results
-- Current workarounds and long-term resolution options
-
-## Future Enhancements
-
-To support community discussions around forward and backward compatibility, the `future/` directory contains design documents exploring a potential approach to multi-spec and multi-implementation version testing.
-
-These documents outline a methodology for testing a single producer implementation against multiple versions of the OpenLineage specification and client libraries. We hope these ideas can serve as a useful starting point for this important conversation within the OpenLineage community.
-
-See `future/README.md` for more details.
-
-## Maintainers
-
-**Maintainer**: BearingNode Team
-**Contact**: contact@bearingnode.com
-**Website**: https://www.bearingnode.com
-# Test workflow trigger
+2. **`dbt_run`** (Run Facet)
+    - **Purpose**: Captures dbt-specific execution metadata
+    - **Schema**: `dbt-run-run-facet.json`
+    - **Fields**: `dbt_runtime`, `invocation_id`, `profile_name`, `project_name`, `project_version`
+    - **Schema issues**:
+        - wrong type definition: "type": "**str**" instead of "type": "**string**"
+        - wrong ref to the RunFacet definition: OpenLineage.json#/**definitions**/RunFacet instead of OpenLineage.json#/**$defs**/RunFacet

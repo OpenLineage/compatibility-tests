@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics",
+    "facets": {
+      "dbt_node": {
+        "alias": "customer_analytics",
+        "database": "dbt_test",
+        "original_file_path": "{{ match(result, 'models.+') }}",
+        "schema": "main",
+        "unique_id": "model.openlineage_compatibility_test.customer_analytics"
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics",
+    "facets": {
+      "sql": {
+        "dialect": "postgres",
+        "query": "select\n    c.customer_id,\n    c.customer_name,\n    c.email,\n    c.segment,\n    c.value_tier,\n    count(o.order_id) as total_orders,\n    sum(o.completed_amount) as total_revenue,\n    avg(o.completed_amount) as avg_order_value,\n    max(o.order_date) as last_order_date\nfrom \"dbt_test\".\"main\".\"stg_customers\" c\nleft join \"dbt_test\".\"main\".\"stg_orders\" o \n    on c.customer_id = o.customer_id\ngroup by \n    c.customer_id,\n    c.customer_name,\n    c.email,\n    c.segment,\n    c.value_tier"
+      }
+    }
+  }
+}
