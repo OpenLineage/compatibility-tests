@@ -1,0 +1,9 @@
+# OpenLineage dbt Producer Test Dependencies
+# Install: pip install -r requirements.txt
+
+# dbt dependencies
+dbt-core>=1.5.0
+dbt-postgres>=1.5.0
+
+# OpenLineage integration (if available)
+openlineage-dbt>=0.28.0

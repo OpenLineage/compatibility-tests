@@ -74,7 +74,6 @@ jobs:
           pip install dbt-core==${{ inputs.dbt_release }}
           pip install dbt-postgres
           pip install openlineage-dbt==${{ inputs.ol_release }}
-          pip install -r producer/dbt/test_runner/requirements.txt
 
       - name: Set producer output event dir
         if: ${{ steps.init.outputs.scenarios }}
@@ -93,19 +92,21 @@ jobs:
           for scenario in "${scenarios[@]}"
           do
               echo "Running dbt scenario: $scenario"
-
-              if ! python3 producer/dbt/test_runner/cli.py run-scenario \
-                --scenario "$scenario" \
-                --output-dir "${{ steps.set-producer-output.outputs.event_dir }}"
-              then
-                echo "Error: dbt scenario failed: $scenario"
-                exit 1
-              fi
+          
+              mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}/$scenario"
+              bash producer/dbt/scenarios/$scenario/test/run.sh "${{ steps.set-producer-output.outputs.event_dir }}/$scenario"
 
               echo "Finished running scenario: $scenario"
           done
 
           echo "Finished running all scenarios"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.init.outputs.scenarios }}
+        with:
+          name: dbt-${{inputs.dbt_release}}-ol-${{inputs.ol_release}}-events
+          path: ${{ steps.set-producer-output.outputs.event_dir }}
+          retention-days: 1
 
       - name: Validation
         if: ${{ steps.init.outputs.scenarios }}
