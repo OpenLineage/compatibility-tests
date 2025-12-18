@@ -55,17 +55,22 @@ runs:
       run: |
         cd tmp
         IFS=',' read -ra TAGS <<< "${{ inputs.release_tags }}"
+        git fetch --tags --quiet
         for TAG in "${TAGS[@]}"; do
         echo "Checking out tag: $TAG"
-            git fetch --tags --quiet
             if git checkout --quiet "$TAG"; then
                 DEST_DIR="../specs/$TAG"
-                if [ -d "spec" ]; then
-                    mkdir -p "../specs/$TAG"
-                    find spec -path './website' -prune -o -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \) -exec cp {} "../specs/$TAG/" \;
+                if [[ -d "spec" || -d "integration/common/openlineage" ]]; then
+                    mkdir -p "$DEST_DIR"
+                    if [ -d "spec" ]; then
+                      find spec -path './website' -prune -o -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \) -exec cp {} "$DEST_DIR" \;
+                    fi
+                    if [ -d "integration/common/openlineage" ]; then
+                      find integration/common/openlineage -type f -iname '*facet.json' -exec cp {} "$DEST_DIR" \;
+                    fi
                     echo "success"
                 else
-                    echo "Spec directory not found in $TAG"
+                    echo "Neither spec nor integration/common/openlineage directory found in $TAG"
                 fi
             else
                 echo "Tag $TAG not found!"

@@ -1,0 +1,6 @@
+customer_id,name,email,registration_date,segment
+1,John Doe,john.doe@example.com,2023-01-15,premium
+2,Jane Smith,jane.smith@example.com,2023-02-20,standard
+3,Bob Johnson,bob.johnson@example.com,2023-03-10,premium
+4,Alice Brown,alice.brown@example.com,2023-04-05,standard
+5,Charlie Wilson,charlie.wilson@example.com,2023-05-12,enterprise

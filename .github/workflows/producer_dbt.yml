@@ -1,0 +1,128 @@
+name: dbt Producer
+
+on:
+  workflow_call:
+    inputs:
+      dbt_release:
+        description: "release of dbt-core to use"
+        type: string
+      ol_release:
+        description: "release tag of OpenLineage to use"
+        type: string
+      get-latest-snapshots:
+        description: "Should the artifact be downloaded from maven repo or circleci"
+        type: string
+  workflow_dispatch:
+    inputs:
+      dbt_release:
+        description: "release of dbt-core to use"
+        type: string
+        default: "1.8.0"
+      ol_release:
+        description: "release tag of OpenLineage to use"
+        type: string
+        default: "1.23.0"
+      get-latest-snapshots:
+        description: "Should the artifact be downloaded from maven repo or circleci"
+        type: string
+        default: "false"
+
+jobs:
+  run-dbt-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: dbt_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser -d dbt_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize tests
+        id: init
+        run: |
+          scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/dbt/scenarios/" ${{ inputs.dbt_release }} ${{ inputs.ol_release }} )
+          if [[ "$scenarios" != "" ]]; then
+            echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
+            echo "Found scenarios: $scenarios"
+          else
+            echo "No valid scenarios found for dbt ${{ inputs.dbt_release }} and OL ${{ inputs.ol_release }}"
+          fi
+
+      - name: Set up Python 3.12
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt dependencies
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==${{ inputs.dbt_release }}
+          pip install dbt-postgres
+          pip install openlineage-dbt==${{ inputs.ol_release }}
+
+      - name: Set producer output event dir
+        if: ${{ steps.init.outputs.scenarios }}
+        id: set-producer-output
+        run: | 
+          echo "event_dir=/tmp/dbt-events-$(date +%s%3N)" >> $GITHUB_OUTPUT
+
+      - name: Run dbt scenarios and create OL events
+        if: ${{ steps.init.outputs.scenarios }}
+        id: run-producer
+        continue-on-error: true
+        run: |          
+          set -e
+          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
+          
+          for scenario in "${scenarios[@]}"
+          do
+              echo "Running dbt scenario: $scenario"
+          
+              mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}/$scenario"
+              bash producer/dbt/scenarios/$scenario/test/run.sh "${{ steps.set-producer-output.outputs.event_dir }}/$scenario"
+
+              echo "Finished running scenario: $scenario"
+          done
+
+          echo "Finished running all scenarios"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.init.outputs.scenarios }}
+        with:
+          name: dbt-${{inputs.dbt_release}}-ol-${{inputs.ol_release}}-events
+          path: ${{ steps.set-producer-output.outputs.event_dir }}
+          retention-days: 1
+
+      - name: Validation
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: ./.github/actions/run_event_validation
+        with:
+          component: 'dbt'
+          producer-dir: 'producer'
+          release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
+          ol_release: ${{ inputs.ol_release }}
+          component_release: ${{ inputs.dbt_release }}
+          event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
+          target-path: 'dbt-${{inputs.dbt_release}}-${{inputs.ol_release}}-report.json'
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.init.outputs.scenarios }}
+        with:
+          name: dbt-${{inputs.dbt_release}}-${{inputs.ol_release}}-report
+          path: dbt-${{inputs.dbt_release}}-${{inputs.ol_release}}-report.json
+          retention-days: 1
