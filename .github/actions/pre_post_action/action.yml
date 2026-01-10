@@ -1,0 +1,23 @@
+name: "Pre/Post JS Action"
+description: "A GitHub Action with pre and post run scripts"
+
+inputs:
+  command:
+    description: Main bash script executed by the step
+    required: true
+    default: echo "WARNING - main command not set"
+
+  pre-command:
+    description: Bash command to init before step execution
+    required: false
+
+  post-command:
+    description: Bash command to clean up after step execution
+    required: true
+    default: echo 'WARNING - post command not set'
+
+runs:
+  using: "node20"
+  pre: "bundle/index.js"
+  main: "bundle/index.js"
+  post: "bundle/index.js"
