@@ -1,0 +1,61 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics"
+  },
+  "inputs": [
+    {
+      "name": "dbt_test.main.stg_customers",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "description": "Unique customer identifier",
+              "name": "customer_id"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "dbt_test.main.stg_orders",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "description": "Unique order identifier",
+              "name": "order_id"
+            },
+            {
+              "description": "Foreign key to customers",
+              "name": "customer_id"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "dbt_test.main.customer_analytics",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "description": "Unique customer identifier",
+              "name": "customer_id"
+            },
+            {
+              "description": "Total completed revenue per customer",
+              "name": "total_revenue"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

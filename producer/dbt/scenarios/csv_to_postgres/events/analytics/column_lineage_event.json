@@ -1,0 +1,113 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics"
+  },
+  "outputs": [
+    {
+      "name": "dbt_test.main.customer_analytics",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "columnLineage": {
+          "fields": {
+            "avg_order_value": {
+              "inputFields": [
+                {
+                  "field": "completed_amount",
+                  "name": "dbt_test.main.stg_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "customer_id": {
+              "inputFields": [
+                {
+                  "field": "customer_id",
+                  "name": "dbt_test.main.stg_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "customer_name": {
+              "inputFields": [
+                {
+                  "field": "customer_name",
+                  "name": "dbt_test.main.stg_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "email": {
+              "inputFields": [
+                {
+                  "field": "email",
+                  "name": "dbt_test.main.stg_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "last_order_date": {
+              "inputFields": [
+                {
+                  "field": "order_date",
+                  "name": "dbt_test.main.stg_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "segment": {
+              "inputFields": [
+                {
+                  "field": "segment",
+                  "name": "dbt_test.main.stg_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "total_orders": {
+              "inputFields": [
+                {
+                  "field": "order_id",
+                  "name": "dbt_test.main.stg_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "total_revenue": {
+              "inputFields": [
+                {
+                  "field": "completed_amount",
+                  "name": "dbt_test.main.stg_orders",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            },
+            "value_tier": {
+              "inputFields": [
+                {
+                  "field": "value_tier",
+                  "name": "dbt_test.main.stg_customers",
+                  "namespace": "postgres://localhost:5432",
+                  "transformations": []
+                }
+              ]
+            }
+          }
+        },
+        "dataSource": {
+          "name": "postgres://localhost:5432",
+          "uri": "postgres://localhost:5432"
+        }
+      }
+    }
+  ]
+}

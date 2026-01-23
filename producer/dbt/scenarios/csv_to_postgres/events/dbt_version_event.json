@@ -1,0 +1,15 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics"
+  },
+  "run": {
+    "runId": "{{ is_uuid(result) }}",
+    "facets": {
+      "dbt_version": {
+        "version": "{{ any(result) }}"
+      }
+    }
+  }
+}

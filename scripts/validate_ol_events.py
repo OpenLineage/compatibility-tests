@@ -16,6 +16,7 @@ from compare_events import diff
 from jsonschema import RefResolver
 
 class OLSyntaxValidator:
+
     def __init__(self, schema_validators, unchecked_facets=None, openlineage_version=None):
         self.schema_validators = schema_validators
         self.unchecked_facets = unchecked_facets or {}
@@ -26,12 +27,18 @@ class OLSyntaxValidator:
         if facet.get('_schemaURL') is not None:
             is_custom = any(facet.get('_schemaURL').__contains__(f'defs/{facet_type}Facet') for facet_type in
                     ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
-            if is_custom:
+            is_common = any(facet.get('_schemaURL').__contains__(f'schema/{facet_type}-facet.json') for facet_type in
+                            ['dbt-version-run', 'dbt-run-run'])
+            if is_custom or is_common:
                 print(f"facet {schema_type} seems to be custom facet, validation skipped")
-            return is_custom
+                return True
         return False
 
-
+    @staticmethod
+    def is_facet(path):
+        # List of facets from the common package that can be used for syntax validation
+        common_facets = ['dbt-node-job-facet.json']
+        return 'Facet.json' in path or path in common_facets
 
     @classmethod
     def get_validators(cls, spec_path, tags):
@@ -40,17 +47,20 @@ class OLSyntaxValidator:
     @classmethod
     def get_validator(cls, spec_path, tag, unchecked_facets=None):
         file_paths = listdir(join(spec_path, tag))
-        facet_schemas = [load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('Facet.json')]
+        facet_schemas = { path: load_json(join(spec_path, tag, path)) for path in file_paths if cls.is_facet(path) }
         spec_schema = next(load_json(join(spec_path, tag, path)) for path in file_paths if path.__contains__('OpenLineage.json'))
         schema_validators = {}
-        for schema in facet_schemas:
-            name = next(iter(schema['properties']))
-            store = {
-                spec_schema['$id']: spec_schema,
-                schema['$id']: schema,
-            }
-            resolver = RefResolver(base_uri="", referrer=spec_schema, store=store)
-            schema_validators[name] = Draft202012Validator(schema, resolver=resolver)
+        for path, schema in facet_schemas.items():
+            try:
+                name = next(iter(schema['properties']))
+                store = {
+                    spec_schema['$id']: spec_schema,
+                    schema['$id']: schema,
+                }
+                resolver = RefResolver(base_uri="", referrer=spec_schema, store=store)
+                schema_validators[name] = Draft202012Validator(schema, resolver=resolver)
+            except KeyError as e:
+                print(f"WARNING: Cannot create schema validator for '{path}' due to missing key:", e)
 
         schema_validators['core'] = Draft202012Validator(spec_schema)
         return cls(schema_validators, unchecked_facets, tag)

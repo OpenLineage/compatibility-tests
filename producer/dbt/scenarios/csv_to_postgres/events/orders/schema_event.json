@@ -1,0 +1,27 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.stg_orders"
+  },
+  "outputs": [
+    {
+      "name": "dbt_test.main.stg_orders",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "description": "Unique order identifier",
+              "name": "order_id"
+            },
+            {
+              "description": "Foreign key to customers",
+              "name": "customer_id"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

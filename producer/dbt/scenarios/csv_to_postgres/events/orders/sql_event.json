@@ -1,0 +1,13 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.stg_orders",
+    "facets": {
+      "sql": {
+        "dialect": "postgres",
+        "query": "select\n    order_id,\n    customer_id,\n    order_date,\n    amount,\n    status,\n    case \n        when status = 'completed' then amount\n        else 0\n    end as completed_amount\nfrom \"dbt_test\".\"main\".\"raw_orders\"\nwhere status != 'cancelled'"
+      }
+    }
+  }
+}

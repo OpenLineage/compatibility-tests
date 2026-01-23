@@ -1,0 +1,41 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics"
+  },
+  "inputs": [
+    {
+      "name": "dbt_test.main.stg_customers",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "dataSource": {
+          "name": "postgres://localhost:5432",
+          "uri": "postgres://localhost:5432"
+        }
+      }
+    },
+    {
+      "name": "dbt_test.main.stg_orders",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "dataSource": {
+          "name": "postgres://localhost:5432",
+          "uri": "postgres://localhost:5432"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "dbt_test.main.customer_analytics",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "dataSource": {
+          "name": "postgres://localhost:5432",
+          "uri": "postgres://localhost:5432"
+        }
+      }
+    }
+  ]
+}
