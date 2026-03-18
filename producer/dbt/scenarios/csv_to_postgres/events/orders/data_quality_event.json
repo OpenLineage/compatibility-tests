@@ -1,0 +1,34 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.stg_orders.test"
+  },
+  "inputs": [
+    {
+      "name": "dbt_test.main.stg_orders",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "dataQualityAssertions": {
+          "assertions": [
+            {
+              "assertion": "not_null",
+              "column": "customer_id",
+              "success": true
+            },
+            {
+              "assertion": "not_null",
+              "column": "order_id",
+              "success": true
+            },
+            {
+              "assertion": "unique",
+              "column": "order_id",
+              "success": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
