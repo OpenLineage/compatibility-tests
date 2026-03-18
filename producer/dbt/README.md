@@ -13,23 +13,21 @@ It is important to note that this is a **compatibility validation framework** us
 
 ## Test Architecture and Workflow
 
-The test is orchestrated by the `run_dbt_tests.sh` script and follows a clear, sequential workflow designed for reliability and ease of use. This structure ensures that each component of the integration is validated systematically.
+The test is orchestrated by the scenario's `test/run.sh` script and follows a clear, sequential workflow designed for reliability and ease of use. This structure ensures that each component of the integration is validated systematically.
 
 The end-to-end process is as follows:
 
-1.  **Test Orchestration**: The `run_dbt_tests.sh` script serves as the main entry point. It sets up the environment and initiates over the scenarios folder to execute each test scenario.
+1.  **Scenario Execution**: The `test/run.sh` script executes the dbt project defined in the `runner/` directory using `dbt-ol seed`, `dbt-ol run`, and `dbt-ol test`.
 
-2.  **Scenario Execution**: The test runner executes the dbt project defined in the `runner/` directory. The specific dbt commands to be run (e.g., `dbt seed`, `dbt run`, `dbt test`) are defined in the test scenarios run script (`test/run.sh`).
-
-3.  **Event Generation and Capture**: During the execution, the `dbt-ol` wrapper intercepts the dbt commands and emits OpenLineage events. The `test/openlineage.yml` configuration directs these events to be captured as a local file (`{directory_input_param}/events.jsonl`) using the `file` transport.
+2.  **Event Generation and Capture**: During the execution, the `dbt-ol` wrapper intercepts the dbt commands and emits OpenLineage events. The `test/run.sh` script writes an `openlineage.yml` configuration that directs these events to be captured as a local file (`{output_dir}/events.jsonl`) using the `file` transport.
  
-4.  **Extract events**: OpenLineage emits events reliable to one file ('append: true' causes overwrites and events to be lost) so it is required to extract the before validation.
+3.  **Extract events**: OpenLineage emits all events to one file, so `run.sh` splits them into individual numbered files (`event-1.json`, `event-2.json`, …) before deleting the combined `.jsonl`.
 
-5.  **Event Validation**: Once the dbt process is complete, the test framework performs a two-stage validation on the generated events:
-    *   **Syntax Validation**: Each event is validated against the official OpenLineage JSON schema (e.g., version `1.40.1`) to ensure it is structurally correct.
-    *   **Semantic Validation**: The content of the events is compared against expected templates. This deep comparison, powered by the `scripts/compare_events.py` utility, verifies the accuracy of job names, dataset identifiers, lineage relationships, and the presence and structure of key facets.
+4.  **Event Validation**: Once the dbt process is complete, the shared framework (`scripts/validate_ol_events.py`) performs a two-stage validation on the generated events:
+    *   **Syntax Validation**: Each event is validated against the official OpenLineage JSON schema to ensure it is structurally correct.
+    *   **Semantic Validation**: The content of the events is compared against expected templates in `scenarios/csv_to_postgres/events/`. This comparison, powered by the `scripts/compare_events.py` utility, verifies the accuracy of job names, dataset identifiers, lineage relationships, and the presence and structure of key facets.
 
-6.  **Reporting**: Upon completion, the test runner generates a standardized JSON report (`dbt_producer_report.json`) that details the results of each validation step. This report is designed to be consumed by higher-level aggregation scripts in a CI/CD environment.
+5.  **Reporting**: Upon completion, the framework generates a standardised JSON report that details the results of each validation step for consumption by CI/CD aggregation scripts.
 
 ## Validation Scope
 
@@ -38,6 +36,7 @@ This test validates that the `openlineage-dbt` integration correctly generates O
 #### dbt Operations Covered:
 -   `dbt seed`: To load initial data.
 -   `dbt run`: To execute dbt models.
+-   `dbt test`: To run data quality tests and capture `dataQualityAssertions` facets.
 
 #### Validation Checks:
 -   **Event Generation**: Correctly creates `START` and `COMPLETE` events for jobs and runs.
@@ -50,6 +49,7 @@ This test validates that the `openlineage-dbt` integration correctly generates O
     -   `schema`
     -   `dataSource`
     -   `columnLineage`
+    -   `dataQualityAssertions`
 -   **Specification Compliance**: Events are validated against the OpenLineage specification schema (version `2-0-2`).
 
 ## Test Structure
@@ -58,16 +58,14 @@ The test is organized into the following key directories, each with a specific r
 
 ```
 producer/dbt/
-├── run_dbt_tests.sh           # Main test execution script
-├── scenarios/                 # Defines the dbt commands and expected outcomes for each test case
-├── output/                    # Default output directory for generated OpenLineage events (generated during execution)
+├── scenarios/                 # Test scenarios; each defines expected events and a run script
 ├── runner/                    # A self-contained dbt project used as the test target
-└── specs/                     # Stores OpenLineage spcification get from local repository (generated during execution)
+├── versions.json              # Supported component and OpenLineage version ranges
+└── maintainers.json           # Maintainer contact information
 ```
 
 -   **`runner/`**: A self-contained dbt project with models, seeds, and configuration. This is the target of the `dbt-ol` command.
--   **`scenarios/`**: Defines the dbt commands to be executed and contains the expected event templates for validation.
--   **`output/`**: The default output directory for the generated `events.jsonl` file and extracted events.
+-   **`scenarios/`**: Contains one directory per scenario. Each scenario has a `config.json` defining expected event templates, an `events/` directory of expected event JSON files, and a `test/` directory with `run.sh` and `compose.yml`.
 
 ## How to Run the Tests
 
@@ -106,36 +104,33 @@ The GitHub Actions workflow:
 
 If you need to debug event generation locally:
 
-1.  **Ensure Docker is running**:
-    - The scenario runner uses `producer/dbt/scenarios/csv_to_postgres/test/compose.yml`.
-    - If PostgreSQL is not already available on `localhost:5432`, the scenario script starts the local Docker Compose service automatically and waits until it is ready.
+1.  **Ensure Docker is available**:
+    - The scenario runner will start the local Docker Compose Postgres service automatically if it is not already reachable on `localhost:5432`.
 
-2.  **Install Python Dependencies**:
+2.  **Install dbt and the OpenLineage wrapper** (use a virtual environment outside the repo):
     ```bash
-    # Activate virtual environment (recommended)
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    python -m venv ~/.venvs/dbt-compat-test
+    source ~/.venvs/dbt-compat-test/bin/activate
+    pip install dbt-core==1.8.0 dbt-postgres openlineage-dbt==1.23.0
     ```
     
-3.  **Run Test Scenario**:
-    - The example below assumes you run the command from the repository root, so relative paths such as `./producer/dbt/output` and `./dbt_producer_report.json` resolve from that location.
+3.  **Run the dbt producer test harness**:
+    - Run this from the repository root so the default output paths resolve correctly.
     ```bash
     ./producer/dbt/run_dbt_tests.sh \
-      --openlineage-directory <open_lineage_directory> \
+      --openlineage-directory /path/to/OpenLineage \
       --producer-output-events-dir ./producer/dbt/output \
-      --openlineage-release 1.45.0
+      --openlineage-release 1.45.0 \
+      --report-path ./dbt_producer_report.json
     ```
 
-4.  **Inspect Generated Events**:
+4.  **Inspect generated events**:
     ```bash
-    # View events
     cat ./producer/dbt/output/csv_to_postgres/event-{id}.json | jq '.'
-    
-    # check report
     cat ./dbt_producer_report.json | jq '.'
     ```
 
-**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. Local runs now reuse the same PostgreSQL 15 image and readiness check as CI to reduce drift between local debugging and workflow execution.
+**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The `run_dbt_tests.sh` wrapper uses the same scenario scripts and validation pipeline as CI, including the merged local test-aid improvements from #283.
 
 ## Important dbt Integration Notes
 
