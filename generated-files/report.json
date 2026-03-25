@@ -22284,6 +22284,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -23555,6 +23563,342 @@
               "facets": [
                 "spark_properties"
               ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "dbt",
+    "component_type": "producer",
+    "component_version": "1.8.0",
+    "openlineage_version": "1.45.0",
+    "scenarios": [
+      {
+        "name": "csv_to_postgres",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "dbt:dbt-run-openlineage_compatibility_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_customers:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt-run-openlineage_compatibility_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_customers:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_orders:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_orders:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.customer_analytics:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.customer_analytics:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "customers_datasource_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "customers_schema_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "customers_column_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset",
+                  "column"
+                ]
+              }
+            }
+          },
+          {
+            "name": "customers_sql_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "sql"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orders_datasource_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orders_schema_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orders_column_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset",
+                  "column"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orders_sql_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "sql"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "analytics_datasource_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "analytics_schema_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "analytics_column_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset",
+                  "column"
+                ]
+              }
+            }
+          },
+          {
+            "name": "analytics_sql_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "sql"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "dbt_node_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dbt_node"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "dbt_run_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dbt_run"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "dbt_version_facet_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dbt_version"
+              ],
+              "lineage_level": {
+                "postgres": [
+                  "dataset"
+                ]
+              }
             }
           }
         ]
