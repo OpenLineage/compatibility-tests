@@ -53,6 +53,10 @@ jobs:
         #   TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
         run: |
           git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit, skipping push"
+            exit 0
+          fi
           git commit -sm "[bot] update compatibility tables with run data"
           # git remote set-url origin https://x-access-token:${TOKEN}@github.com/tnazarew/openlineage-site.git
           git push origin main
