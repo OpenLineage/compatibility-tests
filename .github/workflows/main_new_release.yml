@@ -193,7 +193,10 @@ jobs:
     uses: ./.github/workflows/generate_compatibility_tables.yml
 
   update-site:
-    needs: generate-compatibility-tables
+    needs:
+      - update-repo-files
+      - generate-compatibility-tables
+    if: ${{ !failure() && needs.update-repo-files.outputs.changes_made == 'true' }}
     uses: ./.github/workflows/update_site.yml
     secrets:
       CI_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}
