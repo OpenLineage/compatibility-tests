@@ -102,15 +102,13 @@ The GitHub Actions workflow:
 
 ### Local Debugging (Optional)
 
-**For development debugging, you may optionally run PostgreSQL locally. The standard test environment is GitHub Actions.**
+**For development debugging, local runs should use the same PostgreSQL 15 Docker setup as CI.**
 
 If you need to debug event generation locally:
 
-1.  **Start PostgreSQL (Optional)**:
-    ```bash
-    cd producer/dbt/scenarions/csv_to_postgres/test
-    docker compose up
-    ```
+1.  **Ensure Docker is running**:
+    - The scenario runner uses `producer/dbt/scenarios/csv_to_postgres/test/compose.yml`.
+    - If PostgreSQL is not already available on `localhost:5432`, the scenario script starts the local Docker Compose service automatically and waits until it is ready.
 
 2.  **Install Python Dependencies**:
     ```bash
@@ -120,8 +118,12 @@ If you need to debug event generation locally:
     ```
     
 3.  **Run Test Scenario**:
+    - The example below assumes you run the command from the repository root, so relative paths such as `./producer/dbt/output` and `./dbt_producer_report.json` resolve from that location.
     ```bash
-    ./producer/dbt/run_dbt_tests.sh  --openlineage-directory <open_lineage_directory>
+    ./producer/dbt/run_dbt_tests.sh \
+      --openlineage-directory <open_lineage_directory> \
+      --producer-output-events-dir ./producer/dbt/output \
+      --openlineage-release 1.45.0
     ```
 
 4.  **Inspect Generated Events**:
@@ -130,10 +132,10 @@ If you need to debug event generation locally:
     cat ./producer/dbt/output/csv_to_postgres/event-{id}.json | jq '.'
     
     # check report
-    cat ./producer/dbt/dbt_producer_report.json | jq '.'
+    cat ./dbt_producer_report.json | jq '.'
     ```
 
-**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The test runner (`test/run.sh`) is the same code used by CI/CD, ensuring consistency.
+**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. Local runs now reuse the same PostgreSQL 15 image and readiness check as CI to reduce drift between local debugging and workflow execution.
 
 ## Important dbt Integration Notes
 
