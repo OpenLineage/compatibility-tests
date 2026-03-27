@@ -10,7 +10,7 @@ on:
       workflow-type:
         type: string
         required: true
-        description: "type of workflow calling, allowed values: release, spec_change"
+        description: "type of workflow calling, allowed values: release, spec_change, pr"
       execution-time:
         type: string
         required: true
@@ -33,11 +33,23 @@ jobs:
         id: check-report-empty
         run: |
           result=$(jq '. == []' reports/retention-failures-report.json)
-          echo "report-empty=${result}" >> $GITHUB_OUTPUT
+          echo "report_empty=${result}" >> $GITHUB_OUTPUT
+
+
+      - name: Generate PR summary
+        id: generate-pr-summary
+        if: ${{ inputs.workflow-type == 'pr' && steps.check-report-empty.outputs.report_empty == 'false'}}
+        run: |
+          python scripts/generate_issue.py \
+          --failure_path=reports/retention-failures-report.json \
+          --issue_path=generated-files/summary.md \
+          --skip-maintainers
+
+          cat generated-files/summary.md >> $GITHUB_STEP_SUMMARY
 
       - name: Run task for Collect Reports
-        id: collect-and-merge-reports
-        if: ${{ steps.check-report-empty.outputs.report-empty == 'false'}}
+        id: generate-issue-report
+        if: ${{ inputs.workflow-type != 'pr' && steps.check-report-empty.outputs.report_empty == 'false'}}
         run: |
           python scripts/generate_issue.py \
           --failure_path=reports/retention-failures-report.json \
@@ -45,7 +57,7 @@ jobs:
 
       - name: Create Issue From File
         uses: peter-evans/create-issue-from-file@v5
-        if: ${{ steps.check-report-empty.outputs.report-empty == 'false'}}
+        if: ${{ inputs.workflow-type != 'pr' && steps.check-report-empty.outputs.report_empty == 'false'}}
         with:
           title: new failures in report from run ${{ github.run_id }}
           content-filepath: generated-files/issue.md
