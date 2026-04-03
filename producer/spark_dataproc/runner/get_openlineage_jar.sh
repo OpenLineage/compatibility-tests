@@ -11,6 +11,7 @@ readonly SPARK_SPANNER_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attr
 readonly SPARK_BIGTABLE_CONNECTOR_URL=$(/usr/share/google/get_metadata_value attributes/SPARK_BIGTABLE_CONNECTOR_URL || echo "")
 readonly SKIP_ICEBERG_AND_DELTA=$(/usr/share/google/get_metadata_value attributes/SKIP_ICEBERG_AND_DELTA || echo "")
 
+
 if [[ -n "${OPENLINEAGE_SPARK_URL}" ]]; then
     bq_url="${SPARK_BQ_CONNECTOR_URL}"
     ol_url="${OPENLINEAGE_SPARK_URL}"
