@@ -12,17 +12,17 @@
         "dataQualityAssertions": {
           "assertions": [
             {
-              "assertion": "not_null",
-              "column": "customer_id",
-              "success": true
-            },
-            {
-              "assertion": "not_null",
+              "assertion": "not_null_customer_analytics_total_revenue",
               "column": "total_revenue",
               "success": true
             },
             {
-              "assertion": "unique",
+              "assertion": "not_null_customer_analytics_customer_id",
+              "column": "customer_id",
+              "success": true
+            },
+            {
+              "assertion": "unique_customer_analytics_customer_id",
               "column": "customer_id",
               "success": true
             }
