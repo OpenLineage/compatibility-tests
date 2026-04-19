@@ -123,6 +123,7 @@ If you need to debug event generation locally:
       --openlineage-release 1.45.0 \
       --report-path ./dbt_producer_report.json
     ```
+        - The harness installs dbt runner dependencies into your active venv and creates a separate temporary validation venv for `scripts/requirements.txt`, so the shared validation stack does not downgrade dbt packages mid-run.
 
 4.  **Inspect generated events**:
     ```bash
@@ -130,7 +131,7 @@ If you need to debug event generation locally:
     cat ./dbt_producer_report.json | jq '.'
     ```
 
-**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The `run_dbt_tests.sh` wrapper uses the same scenario scripts and validation pipeline as CI, including the merged local test-aid improvements from #283.
+**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The `run_dbt_tests.sh` wrapper uses the same scenario scripts and validation pipeline as CI, including the merged local test-aid improvements from #283, while isolating validation-only dependencies from the dbt runtime environment.
 
 ## Important dbt Integration Notes
 
