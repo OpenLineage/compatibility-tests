@@ -9,6 +9,8 @@ This framework is designed as a reference for the community to:
 -   Provide a consistent testing environment for `openlineage-dbt` across different versions.
 -   Serve as a foundation for more advanced testing scenarios, such as multi-spec or multi-implementation validation.
 
+For formal coverage expectations and audit gaps, see [producer/dbt/coverage_matrix.md](producer/dbt/coverage_matrix.md).
+
 It is important to note that this is a **compatibility validation framework** using synthetic data. It is not intended to be a demonstration of a production data pipeline.
 
 ## Test Architecture and Workflow
