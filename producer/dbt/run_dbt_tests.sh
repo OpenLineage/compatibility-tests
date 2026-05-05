@@ -7,6 +7,8 @@ SCENARIOS_DIR="$DBT_DIR/scenarios"
 RUNNER_REQUIREMENTS="$DBT_DIR/runner/requirements.txt"
 SPECS_BASE_DIR="$DBT_DIR/specs"
 SCRIPTS_DIR="$REPO_ROOT/scripts"
+VALIDATION_VENV_DIR="${DBT_VALIDATION_VENV_DIR:-}"
+VALIDATION_VENV_IS_TEMP=0
 
 resolve_path() {
     local input_path="$1"
@@ -20,6 +22,29 @@ resolve_path() {
         echo "$base_dir/$input_path"
     fi
 }
+
+cleanup_validation_venv() {
+    if [[ "$VALIDATION_VENV_IS_TEMP" -eq 1 && -n "$VALIDATION_VENV_DIR" && -d "$VALIDATION_VENV_DIR" ]]; then
+        rm -rf "$VALIDATION_VENV_DIR"
+    fi
+}
+
+ensure_validation_venv() {
+    if [[ -z "$VALIDATION_VENV_DIR" ]]; then
+        VALIDATION_VENV_DIR="$(mktemp -d "${TMPDIR:-/tmp}/dbt-validation-venv.XXXXXX")"
+        VALIDATION_VENV_IS_TEMP=1
+    fi
+
+    if [[ ! -x "$VALIDATION_VENV_DIR/bin/python" ]]; then
+        python -m venv "$VALIDATION_VENV_DIR"
+    fi
+
+    echo "Preparing isolated validation environment"
+    "$VALIDATION_VENV_DIR/bin/python" -m pip install --upgrade pip
+    "$VALIDATION_VENV_DIR/bin/python" -m pip install -r "$SCRIPTS_DIR/requirements.txt"
+}
+
+trap cleanup_validation_venv EXIT
 
 ################################################################################
 ############ dbt Producer Compatibility Test Execution Script ################
@@ -107,7 +132,7 @@ fi
 python -m pip install --upgrade pip
 
 if [ -f "$RUNNER_REQUIREMENTS" ]; then
-  pip install -r "$RUNNER_REQUIREMENTS"
+    python -m pip install -r "$RUNNER_REQUIREMENTS"
 fi
 
 ################################################################################
@@ -158,9 +183,9 @@ if [ -z "$(ls -A "$DEST_DIR")" ]; then
     exit 1
 fi
 
-pip install -r "$SCRIPTS_DIR/requirements.txt"
+ensure_validation_venv
 
-python "$SCRIPTS_DIR/validate_ol_events.py" \
+"$VALIDATION_VENV_DIR/bin/python" "$SCRIPTS_DIR/validate_ol_events.py" \
 --event_base_dir="$PRODUCER_OUTPUT_EVENTS_DIR" \
 --spec_base_dir="$SPECS_BASE_DIR" \
 --target="$REPORT_PATH" \
