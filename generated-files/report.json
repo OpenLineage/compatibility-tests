@@ -34771,12 +34771,10 @@
           },
           {
             "name": "run_event_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'run_event_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -34859,12 +34857,10 @@
           },
           {
             "name": "dataSource_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'dataSource_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "dataSource"
@@ -34873,12 +34869,10 @@
           },
           {
             "name": "schema_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'schema_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "schema"
@@ -34892,12 +34886,10 @@
           },
           {
             "name": "columnLineage_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'columnLineage_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "columnLineage"
