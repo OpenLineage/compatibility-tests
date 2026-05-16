@@ -38902,6 +38902,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -39152,6 +39168,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.local_table_scan:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
