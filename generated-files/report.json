@@ -41626,6 +41626,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.local_table_scan:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
