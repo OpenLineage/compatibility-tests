@@ -45931,6 +45931,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.default_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
