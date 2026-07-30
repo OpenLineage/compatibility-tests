@@ -1,0 +1,34 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "dbt",
+    "name": "dbt_test.main.openlineage_compatibility_test.customer_analytics.test"
+  },
+  "inputs": [
+    {
+      "name": "dbt_test.main.customer_analytics",
+      "namespace": "postgres://localhost:5432",
+      "facets": {
+        "dataQualityAssertions": {
+          "assertions": [
+            {
+              "assertion": "not_null_customer_analytics_total_revenue",
+              "column": "total_revenue",
+              "success": true
+            },
+            {
+              "assertion": "not_null_customer_analytics_customer_id",
+              "column": "customer_id",
+              "success": true
+            },
+            {
+              "assertion": "unique_customer_analytics_customer_id",
+              "column": "customer_id",
+              "success": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
