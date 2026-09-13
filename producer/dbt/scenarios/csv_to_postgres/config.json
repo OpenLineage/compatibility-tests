@@ -265,6 +265,57 @@
           ]
         }
       }
+    },
+    {
+      "name": "customers_data_quality_assertions_test",
+      "path": "events/customers/data_quality_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dataQualityAssertions"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "orders_data_quality_assertions_test",
+      "path": "events/orders/data_quality_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dataQualityAssertions"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
+    },
+    {
+      "name": "analytics_data_quality_assertions_test",
+      "path": "events/analytics/data_quality_event.json",
+      "openlineage_versions": {
+        "min": "1.38.0"
+      },
+      "tags": {
+        "facets": [
+          "dataQualityAssertions"
+        ],
+        "lineage_level": {
+          "postgres": [
+            "dataset"
+          ]
+        }
+      }
     }
   ]
 }
