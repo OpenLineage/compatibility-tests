@@ -27,9 +27,7 @@ class OLSyntaxValidator:
         if facet.get('_schemaURL') is not None:
             is_custom = any(facet.get('_schemaURL').__contains__(f'defs/{facet_type}Facet') for facet_type in
                     ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
-            is_common = any(facet.get('_schemaURL').__contains__(f'schema/{facet_type}-facet.json') for facet_type in
-                            ['dbt-version-run', 'dbt-run-run'])
-            if is_custom or is_common:
+            if is_custom:
                 print(f"facet {schema_type} seems to be custom facet, validation skipped")
                 return True
         return False
@@ -37,7 +35,7 @@ class OLSyntaxValidator:
     @staticmethod
     def is_facet(path):
         # List of facets from the common package that can be used for syntax validation
-        common_facets = ['dbt-node-job-facet.json']
+        common_facets = ['dbt-node-job-facet.json','dbt-version-run-facet.json','dbt-run-run-facet.json']
         return 'Facet.json' in path or path in common_facets
 
     @classmethod
