@@ -173,4 +173,5 @@ bin/
 **/specs/
 **/output/
 **/test/openlineage.yml
+**/events/*.jsonl
 dbt_producer_report.json
