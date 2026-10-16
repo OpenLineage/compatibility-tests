@@ -1,0 +1,20 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_.*') }}"
+  },
+  "run": {
+    "facets": {
+      "parent": {
+        "run": {
+          "runId": "{{ is_uuid(result) }}"
+        },
+        "job": {
+          "namespace": "default",
+          "name": "big_query_to_iceberg_with_big_query_metastore_catalog"
+        }
+      }
+    }
+  }
+}
