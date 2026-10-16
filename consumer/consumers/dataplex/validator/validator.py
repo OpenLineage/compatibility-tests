@@ -7,12 +7,13 @@ from os.path import join
 from proto import Message
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2.service_account import Credentials
-from google.cloud.datacatalog_lineage_v1 import LineageClient, SearchLinksRequest
+from google.cloud.datacatalog_lineage_v1 import LineageClient, SearchLinksRequest, EntityReference
 from google.protobuf.json_format import ParseDict
 from google.protobuf import struct_pb2
 from compare_events import diff
 from report import Report, Component, Scenario, Test
 
+LINK_INDEXING_TIMEOUT_SECONDS = 240
 
 class EntityHandler:
 
@@ -80,14 +81,25 @@ class EntityHandler:
         processes = [Message.to_dict(p) for p in self.client.list_processes(parent=self.parent)]
         runs = [Message.to_dict(r) for p in processes for r in self.client.list_runs(parent=p['name'])]
         lineage_events = [Message.to_dict(e) for r in runs for e in self.client.list_lineage_events(parent=r['name'])]
-        links = [Message.to_dict(res) for le in lineage_events for link in le['links'] for res in self.get_links(link)]
+        entities = sorted({fqn for le in lineage_events for link in le['links']
+                           for fqn in self.searchable_names(link['source']['fully_qualified_name']) +
+                           self.searchable_names(link['target']['fully_qualified_name'])})
+        links = [Message.to_dict(res) for fqn in entities for res in self.get_links_from(fqn)]
 
         values = list({link["name"]: link for link in links}.values())
         return processes, runs, lineage_events, values
 
-    def get_links(self, link):
+    @staticmethod
+    def searchable_names(fqn):
+        # Dataplex stores GCS link endpoints at bucket level, so object FQNs (gcs:bucket.`path`) are not searchable
+        if fqn.startswith('gcs:') and '.' in fqn:
+            return [fqn, fqn.split('.', 1)[0]]
+        return [fqn]
+
+    def get_links_from(self, fqn):
+        # source and target are a oneof in SearchLinksRequest, setting both silently drops one of them
         return self.client.search_links(
-            request=SearchLinksRequest(source=link["source"], target=link["target"], parent=self.parent))
+            request=SearchLinksRequest(source=EntityReference(fully_qualified_name=fqn), parent=self.parent))
 
     def clean_up(self):
         processes = [x for x in self.client.list_processes(parent=self.parent)]
@@ -150,7 +162,7 @@ class Validator:
                 matched = [r for r in result if exp['start_time'] == r['start_time']]
                 if len(matched) > 0:
                     d = [diff(exp, match, "") for match in matched]
-                    diffs = [] if any(e for e in d if len(e) > 0) else next(e for e in d)
+                    diffs = [] if any(len(e) == 0 for e in d) else d[0]
                 else:
                     diffs = [f"event {exp['start_time']}, no matching entity"]
                 details.extend(diffs)
@@ -198,13 +210,22 @@ def process_scenario(validator, handler, scenario_name, dump):
     if scenario.status == "SUCCESS":
         if dump:
             print(f"Dumping api state of {scenario_name}")
+            # links are indexed asynchronously, give them time to show up in the dump
+            time.sleep(LINK_INDEXING_TIMEOUT_SECONDS / 2)
             handler.dump_api_state(scenario_name)
         else:
             consumer_config = handler.read_consumer_config(scenario_name)
-            api_state = handler.get_api_state()
             validation_events = handler.load_validation_events(scenario_name, consumer_config)
             print(f"Api state validation for {scenario_name}")
-            scenario.update(validator.validate_api_state(scenario_name, api_state, validation_events))
+            # links are indexed asynchronously, usually 45-120s after the events are processed
+            deadline = time.time() + LINK_INDEXING_TIMEOUT_SECONDS
+            while True:
+                result = validator.validate_api_state(scenario_name, handler.get_api_state(), validation_events)
+                if result.status == "SUCCESS" or time.time() > deadline:
+                    break
+                print(f"Api state of {scenario_name} not complete yet, retrying")
+                time.sleep(15)
+            scenario.update(result)
 
     handler.clean_up()
     return scenario
