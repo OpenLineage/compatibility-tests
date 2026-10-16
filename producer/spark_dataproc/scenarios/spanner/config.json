@@ -22,6 +22,28 @@
             "transformation"
           ]
         }
+      },
+      "openlineage_versions": {
+        "max": "1.36.0"
+      }
+    },
+    {
+      "name": "columnLineage_test_1.37.0",
+      "path": "events/columnLineage_1.37.0.json",
+      "tags": {
+        "facets": [
+          "columnLineage"
+        ],
+        "lineage_level": {
+          "spanner": [
+            "dataset",
+            "column",
+            "transformation"
+          ]
+        }
+      },
+      "openlineage_versions": {
+        "min": "1.37.0"
       }
     },
     {
