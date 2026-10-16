@@ -86,6 +86,7 @@ EOF
 
 dbt-ol seed --project-dir="$RUNNER_DIR" --profiles-dir="$RUNNER_DIR" --target=postgres --no-version-check
 dbt-ol run --project-dir="$RUNNER_DIR" --profiles-dir="$RUNNER_DIR" --target=postgres --no-version-check
+dbt-ol test --project-dir="$RUNNER_DIR" --profiles-dir="$RUNNER_DIR" --target=postgres --no-version-check
 
 EVENTS_FILE="${PRODUCER_OUTPUT_EVENTS_DIR}/events.jsonl"
 if [[ ! -f "$EVENTS_FILE" ]]; then
