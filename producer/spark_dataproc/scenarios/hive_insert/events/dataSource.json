@@ -1,0 +1,31 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2"
+  },
+  "inputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/tmp/warehouse/hive_insert.db/t1",
+      "facets": {
+        "dataSource": {
+          "name": "{{ any(result) }}",
+          "uri": "{{ any(result) }}"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "{{ any(result) }}",
+      "name": "/tmp/warehouse/hive_insert.db/t2",
+      "facets": {
+        "dataSource": {
+          "name": "{{ any(result) }}",
+          "uri": "{{ any(result) }}"
+        }
+      }
+    }
+  ]
+}
