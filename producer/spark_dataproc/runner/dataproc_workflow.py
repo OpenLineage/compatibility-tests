@@ -211,6 +211,7 @@ async def create_cluster(
     metadata: typing.Dict[str, str],
     initialization_actions: typing.List[str],
     credentials: Credentials,
+    master_machine_type: str = "n1-standard-2",
 ) -> None:
     """
     Asynchronously creates a Dataproc cluster.
@@ -232,7 +233,7 @@ async def create_cluster(
             },
             "master_config": {
                 "num_instances": 1,
-                "machine_type_uri": "n1-standard-2",
+                "machine_type_uri": master_machine_type,
                 "disk_config": {
                     "boot_disk_type": "pd-standard",
                     "boot_disk_size_gb": 300,
@@ -607,6 +608,7 @@ async def create_cluster_command(args):
         metadata=spark_metadata,
         initialization_actions=initialization_actions,
         credentials=credentials,
+        master_machine_type=args.master_machine_type,
     )
 
 
@@ -765,6 +767,12 @@ def main():
         required=False,
         default="",
         help="Cluster initialization action scripts gcs locatizations separated by commas",
+    )
+    parser_create.add_argument(
+        "--master-machine-type",
+        required=False,
+        default="n1-standard-2",
+        help="Machine type of the master node, which runs the drivers of all jobs (default: n1-standard-2)",
     )
     parser_create.set_defaults(func=create_cluster_command)
 
