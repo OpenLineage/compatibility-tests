@@ -20,5 +20,11 @@ if __name__ == "__main__":
         .option("databaseId", database_id) \
         .option("table", table_name).load()
     aggregated_df = df.groupBy("Name").sum("Value").withColumnRenamed("sum(Value)", "totalValue")
+
+    # the cluster runs this scenario once per OpenLineage version; removing the previous output
+    # through the Hadoop FileSystem API keeps the write (and its events) unchanged
+    output = spark._jvm.org.apache.hadoop.fs.Path("output")
+    output.getFileSystem(spark._jsc.hadoopConfiguration()).delete(output, True)
+
     aggregated_df.write.csv("output")
 
