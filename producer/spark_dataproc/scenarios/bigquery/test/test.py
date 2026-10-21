@@ -24,3 +24,9 @@ word_count.write.format('bigquery') \
   .option("temporaryGcsBucket", "open-lineage-e2e") \
   .mode('overwrite') \
   .save()
+
+# Let the OpenLineage listener handle the write's end event while the SparkContext
+# is still alive. Otherwise the BigQuery lineage extension can fail on a stopped
+# context and the COMPLETE event is emitted without outputs.
+spark.sparkContext._jsc.sc().listenerBus().waitUntilEmpty(60000)
+spark.stop()
