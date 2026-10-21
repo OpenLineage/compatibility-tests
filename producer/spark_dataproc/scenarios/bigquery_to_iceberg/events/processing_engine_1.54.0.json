@@ -1,0 +1,16 @@
+{
+  "eventType": "COMPLETE",
+  "job": {
+    "namespace": "default",
+    "name": "{{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_.*') }}"
+  },
+  "run": {
+    "facets": {
+      "processing_engine": {
+        "version": "3.5.3",
+        "name": "spark",
+        "openlineageAdapterVersion": "{{ any(result) }}"
+      }
+    }
+  }
+}

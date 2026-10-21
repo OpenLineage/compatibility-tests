@@ -51,7 +51,20 @@
       "name": "parent_test_1.38.0",
       "path": "events/parent_1.38.0.json",
       "openlineage_versions": {
-        "min": "1.38.0"
+        "min": "1.38.0",
+        "max": "1.43.0"
+      },
+      "tags": {
+        "facets": [
+          "parent"
+        ]
+      }
+    },
+    {
+      "name": "parent_test_1.44.0",
+      "path": "events/parent_1.44.0.json",
+      "openlineage_versions": {
+        "min": "1.44.0"
       },
       "tags": {
         "facets": [
