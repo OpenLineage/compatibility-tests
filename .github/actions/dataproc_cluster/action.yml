@@ -1,0 +1,22 @@
+name: Dataproc cluster
+description: "Creates a Dataproc cluster with the given command and deletes it in the post step, after all other steps of the job, whatever their result"
+author: Tomasz Nazarewicz
+inputs:
+  cluster-name:
+    description: "Name of the cluster, used to delete it in the post step"
+    required: true
+  project-id:
+    description: "GCP project of the cluster"
+    required: true
+  region:
+    description: "Region of the cluster"
+    required: true
+  create-command:
+    description: "Bash command creating the cluster"
+    required: true
+
+runs:
+  using: "node24"
+  main: "index.js"
+  post: "index.js"
+  post-if: "always()"
