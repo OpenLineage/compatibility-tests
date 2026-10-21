@@ -7,9 +7,9 @@ set -euxo pipefail
 readonly VM_SPARK_JARS_DIR=/usr/lib/spark/jars
 readonly SKIP_ICEBERG_AND_DELTA=$(/usr/share/google/get_metadata_value attributes/SKIP_ICEBERG_AND_DELTA || echo "")
 # '<version>:<spark jar>:<gcs transport jar>' entries separated by semicolons, jars are in JARS_DIR
-# (see stage_openlineage_jars.sh). When set, each version is copied to OPENLINEAGE_LOCAL_DIR/<version> on the
-# master only and the jobs choose one with spark.driver.extraClassPath, otherwise the single
-# OPENLINEAGE_SPARK_URL jar is installed.
+# (see stage_openlineage_jars.sh). When set, the spark jar of each version is copied to
+# OPENLINEAGE_LOCAL_DIR/<version> on the master only and the jobs choose one with spark.driver.extraClassPath
+# (the GCS transport is passed with --jars). Otherwise the single OPENLINEAGE_SPARK_URL jar is installed.
 readonly OPENLINEAGE_JARS=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_JARS || echo "")
 readonly OPENLINEAGE_LOCAL_DIR=/opt/openlineage
 readonly JARS_DIR=gs://open-lineage-e2e/jars
@@ -41,9 +41,9 @@ if [[ -z "${OPENLINEAGE_JARS}" ]]; then
 elif [[ "${ROLE}" == "Master" ]]; then
   IFS=';' read -ra ol_entries <<< "${OPENLINEAGE_JARS}"
   for entry in "${ol_entries[@]}"; do
-    IFS=':' read -r version spark_jar gcs_jar <<< "${entry}"
+    IFS=':' read -r version spark_jar _ <<< "${entry}"
     mkdir -p "${OPENLINEAGE_LOCAL_DIR}/${version}"
-    gsutil cp "${JARS_DIR}/${spark_jar}" "${JARS_DIR}/${gcs_jar}" "${OPENLINEAGE_LOCAL_DIR}/${version}/"
+    gsutil cp "${JARS_DIR}/${spark_jar}" "${OPENLINEAGE_LOCAL_DIR}/${version}/"
   done
 fi
 gsutil cp -P "${spanner_url}" "${VM_SPARK_JARS_DIR}/"

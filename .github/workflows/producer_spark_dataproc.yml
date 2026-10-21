@@ -171,9 +171,14 @@ jobs:
       - name: Run producer jobs and create OL events
         if: ${{ steps.init.outputs.any_scenarios }}
         id: run-producer
+        env:
+          OPENLINEAGE_JARS: ${{ needs.stage-openlineage-jars.outputs.openlineage_jars }}
         run: |
           while read -r -u 3 ol_release scenarios; do
             ol_suffix=$(echo "$ol_release" | sed 's/\.//g')
+            # the spark jar goes on the driver classpath, the GCS transport through --jars: since 1.54.0 it bundles
+            # its own Woodstox, which breaks Hadoop's configuration parsing when it is on the system classpath
+            gcs_transport_jar=$(echo "$OPENLINEAGE_JARS" | tr ';' '\n' | awk -F: -v v="$ol_release" '$1 == v { print $3 }')
 
             properties=''
             properties+='spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }}'
@@ -189,6 +194,7 @@ jobs:
             --scenarios-dir producer/spark_dataproc/scenarios \
             --scenarios "$scenarios" \
             --openlineage-jars-dir "/opt/openlineage/$ol_release" \
+            --jars "gs://${GCS_BUCKET}/jars/$gcs_transport_jar" \
             --events-prefix "events/${RUN_KEY}/${{ matrix.spark_release }}/$ol_release" \
             --spark-properties "$properties" \
             --max-concurrency 3 \

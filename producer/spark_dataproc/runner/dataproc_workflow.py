@@ -428,18 +428,38 @@ async def run_scenario(
 
     async with semaphore:
         logging.info(f"Running scenario {scenario}")
+        job_client = JobControllerAsyncClient(
+            credentials=credentials,
+            client_options={"api_endpoint": f"{args.region}-dataproc.googleapis.com:443"},
+        )
         try:
-            result = await submit_pyspark_job_and_wait(
-                project_id=args.project_id,
-                region=args.region,
-                cluster_name=args.cluster_name,
-                pyspark_file_uri=uploaded_job_file,
-                properties=scenario_properties,
-                credentials=credentials,
+            # submit_job returns right away, unlike submit_job_as_operation which raises when the job
+            # fails early and loses the job, and with it the driver output
+            job = await job_client.submit_job(
+                request={
+                    "project_id": args.project_id,
+                    "region": args.region,
+                    "job": {
+                        "placement": {"cluster_name": args.cluster_name},
+                        "pyspark_job": {
+                            "main_python_file_uri": uploaded_job_file,
+                            "jar_file_uris": args.jars,
+                            "properties": scenario_properties,
+                        },
+                    },
+                }
             )
         except Exception as e:
-            logging.error(f"Scenario {scenario} could not be run: {e}")
+            logging.error(f"Scenario {scenario} could not be submitted: {e}")
             return {"scenario": scenario, "state": "SUBMISSION_FAILED", "job_id": ""}
+        logging.info(f"Submitted scenario {scenario} as job {job.reference.job_id}")
+        result = await wait_for_dataproc_job(
+            job_client=job_client,
+            project_id=args.project_id,
+            region=args.region,
+            job_id=job.reference.job_id,
+            cluster_name=args.cluster_name,
+        )
 
     if args.output_directory:
         files_to_download = list_blobs_with_prefix(
@@ -655,9 +675,10 @@ async def run_job_command(args):
 async def run_scenarios_command(args):
     """
     Command to run scenarios for a single OpenLineage version on an existing cluster.
-    OpenLineage jars are expected on the master node in --openlineage-jars-dir and are put
-    on the driver classpath, so the cluster can run scenarios for different OpenLineage
-    versions one after another. Up to --max-concurrency scenarios run at the same time.
+    The OpenLineage spark jar is expected on the master node in --openlineage-jars-dir and is put
+    on the driver classpath, so the cluster can run scenarios for different OpenLineage versions
+    one after another. --jars are added to every job. Up to --max-concurrency scenarios run at
+    the same time.
     """
     credentials = get_gcp_credentials(credentials_file=args.credentials_file)
     properties = {
@@ -807,7 +828,13 @@ def main():
     parser_scenarios.add_argument(
         "--openlineage-jars-dir",
         required=True,
-        help="Directory on the master node with the OpenLineage jars to use",
+        help="Directory on the master node with the OpenLineage spark jar to use",
+    )
+    parser_scenarios.add_argument(
+        "--jars",
+        nargs="*",
+        default=[],
+        help="GCS URIs of jars added to every job, e.g. the OpenLineage GCS transport",
     )
     parser_scenarios.add_argument(
         "--events-prefix",
