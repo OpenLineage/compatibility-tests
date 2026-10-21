@@ -10,19 +10,54 @@ on:
       postgresqlPassword:
         required: true
     inputs:
-      spark_release:
-        description: "release of spark dataproc to use"
-        type: string
-      ol_release:
-        description: "release tag of OpenLineage to use"
+      matrix:
+        description: "JSON with 'component_version' (spark releases) and 'openlineage_versions' lists, each spark release gets one cluster running all openlineage versions"
         type: string
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
 
+env:
+  RUN_KEY: ${{ github.run_id }}-${{ github.run_attempt }}
+  GCS_BUCKET: open-lineage-e2e
+
 jobs:
-  run-spark-tests:
+  stage-openlineage-jars:
     runs-on: ubuntu-latest
+    outputs:
+      openlineage_jars: ${{ steps.stage.outputs.openlineage_jars }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: GCP authorization
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # jars are kept in the shared gs://open-lineage-e2e/jars/ directory, released ones are uploaded only once
+      - name: Stage OL jars in GCS
+        id: stage
+        run: |
+          pip install requests
+          snapshots=''
+          [[ '${{ inputs.get-latest-snapshots }}' != 'true' ]] || snapshots='--snapshots'
+          openlineage_jars=$(producer/spark_dataproc/runner/stage_openlineage_jars.sh $snapshots \
+            $(echo '${{ inputs.matrix }}' | jq -r '.openlineage_versions[]'))
+          echo "openlineage_jars=$openlineage_jars" >> $GITHUB_OUTPUT
+
+  run-spark-tests:
+    needs: stage-openlineage-jars
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        spark_release: ${{ fromJson(inputs.matrix).component_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,11 +65,10 @@ jobs:
       - name: initialize tests
         id: init
         run: |
-          scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/spark_dataproc/scenarios/" ${{ inputs.spark_release }} ${{ inputs.ol_release }} )
-          [[ "$scenarios" == "" ]] || echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
-          echo "openlineage_cluster_suffix=$(echo '${{ inputs.ol_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
-          echo "component_cluster_suffix=$(echo '${{ inputs.spark_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
-          case "${{ inputs.spark_release }}" in
+          component_suffix=$(echo '${{ matrix.spark_release }}' | sed 's/\.//g')
+          echo "component_cluster_suffix=$component_suffix" >> $GITHUB_OUTPUT
+          echo "cluster_name=dataproc-producer-test-$component_suffix-${RUN_KEY}" >> $GITHUB_OUTPUT
+          case "${{ matrix.spark_release }}" in
             "3.5.1")
               echo "spark_short=3.5" >> $GITHUB_OUTPUT
               echo "dataproc_version=2.2-ubuntu22" >> $GITHUB_OUTPUT
@@ -48,136 +82,74 @@ jobs:
               echo "dataproc_version=2.0-ubuntu18" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo "spark version ${{ inputs.spark_release }} not supported"
+              echo "spark version ${{ matrix.spark_release }} not supported"
               exit 1
               ;;
           esac
 
+          # one line per openlineage version: '<ol_release> <scenarios separated by ;>'
+          : > /tmp/ol_scenarios
+          for ol_release in $(echo '${{ inputs.matrix }}' | jq -r '.openlineage_versions[]'); do
+            scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/spark_dataproc/scenarios/" ${{ matrix.spark_release }} $ol_release)
+            [[ "$scenarios" == "" ]] || echo "$ol_release $scenarios" >> /tmp/ol_scenarios
+          done
+          cat /tmp/ol_scenarios
+          [[ ! -s /tmp/ol_scenarios ]] || echo "any_scenarios=true" >> $GITHUB_OUTPUT
 
       - name: GCP authorization
         id: gcp-auth
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.any_scenarios }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
-      - name: Get OL artifacts
-        id: get-ol-artifacts
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/get_openlineage_artifacts
-        with:
-          version: ${{ inputs.ol_release }}
-          get-latest-snapshots: ${{ inputs.get-latest-snapshots }}
-          skip-flink: 'true'
-          skip-s3: 'true'
-          skip-gcp-lineage: 'true'
-          skip-sql: 'true'
-          skip-hive: 'true'
+      - name: Stage Spark BigQuery connector in GCS
+        id: stage-spark-bq-connector
+        if: ${{ steps.init.outputs.any_scenarios }}
+        run: |
+          jar="spark-${{ steps.init.outputs.spark_short }}-bigquery-0.42.0.jar"
+          if ! gcloud storage ls "gs://${GCS_BUCKET}/jars/$jar" > /dev/null 2>&1; then
+            curl -fsSL -o "/tmp/$jar" "https://repo1.maven.org/maven2/com/google/cloud/spark/spark-${{ steps.init.outputs.spark_short }}-bigquery/0.42.0/$jar"
+            gcloud storage cp "/tmp/$jar" "gs://${GCS_BUCKET}/jars/$jar"
+          fi
+          echo "url=gs://${GCS_BUCKET}/jars/$jar" >> $GITHUB_OUTPUT
 
-#       This should be somehow automated and return the newest version
-      - name: Download Big Query Spark Maven Artifact
-        id: download-spark-bq-connector
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: clausnz/github-action-download-maven-artifact@master
-        with:
-          url: 'https://repo1.maven.org'
-          repository: 'maven2'
-          groupId: 'com.google.cloud.spark'
-          artifactId: 'spark-${{ steps.init.outputs.spark_short }}-bigquery'
-          version: '0.42.0'
-          extension: 'jar'
-
-#      - name: Download Spark BigTable Maven Artifact
-#        id: download-spark-bigtable-connector
-#        if: ${{ steps.init.outputs.scenarios }}
-#        uses: clausnz/github-action-download-maven-artifact@master
-#        with:
-#          url: 'https://repo1.maven.org'
-#          repository: 'maven2'
-#          groupId: 'com.google.cloud.spark.bigtable'
-#          artifactId: 'spark-bigtable_2.12'
-#          version: '0.4.0'
-#          extension: 'jar'
-
-      - name: Upload openlineage spark integration to GCS
-        id: upload-spark-integration
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.get-ol-artifacts.outputs.spark }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      - name: Upload openlineage GCS transport to GCS
-        id: upload-gcs-transport
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.get-ol-artifacts.outputs.gcs }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      - name: Upload Spark BigQuery connector to GCS
-        id: upload-spark-bq-connector
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.download-spark-bq-connector.outputs.file }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-#      - name: Upload Spark BigTable connector to GCS
-#        id: upload-spark-bigtable-connector
-#        if: ${{ steps.init.outputs.scenarios }}
-#        uses: ./.github/actions/upload_artifacts
-#        with:
-#          local-file-path: ${{ steps.download-spark-bigtable-connector.outputs.file }}
-#          gcs-path: "gs://open-lineage-e2e/jars"
-#          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
+      # uploaded per run, so runs from other branches can't swap the scripts while the cluster starts,
+      # they are removed once the cluster is created
       - name: Upload initialization actions to GCS
         id: upload-initialization-actions
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: producer/spark_dataproc/runner/get_openlineage_jar.sh
-          gcs-path: "gs://open-lineage-e2e/scripts"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      - name: Upload CloudSQL init actions to GCS
-        id: upload-cloud-sql-initialization-actions
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: producer/spark_dataproc/runner/cloud_sql_proxy.sh
-          gcs-path: "gs://open-lineage-e2e/scripts"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
+        if: ${{ steps.init.outputs.any_scenarios }}
+        run: |
+          scripts_dir="gs://${GCS_BUCKET}/scripts/${RUN_KEY}/${{ matrix.spark_release }}"
+          gcloud storage cp producer/spark_dataproc/runner/get_openlineage_jar.sh producer/spark_dataproc/runner/cloud_sql_proxy.sh "$scripts_dir/"
+          echo "scripts_dir=$scripts_dir" >> $GITHUB_OUTPUT
+          echo "init_actions=$scripts_dir/get_openlineage_jar.sh,$scripts_dir/cloud_sql_proxy.sh" >> $GITHUB_OUTPUT
 
       - name: Set up Python 3.11
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.any_scenarios }}
         uses: actions/setup-python@v5
         with:
           cache: "pip"
           python-version: "3.11"
 
       - name: Install dependencies
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.any_scenarios }}
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
-          if [ -f producer/spark_dataproc/runner/requirements.txt ]; then pip install -r producer/spark_dataproc/runner/requirements.txt; fi
+          pip install -r producer/spark_dataproc/runner/requirements.txt
 
       - name: Start producer
         id: start-producer
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.any_scenarios }}
         run: |
           metadata=''
-          metadata+='SPARK_BQ_CONNECTOR_URL=${{steps.upload-spark-bq-connector.outputs.uploaded-file}}'
-          metadata+=',OPENLINEAGE_SPARK_URL=${{ steps.upload-spark-integration.outputs.uploaded-file }}'
+          metadata+='SPARK_BQ_CONNECTOR_URL=${{ steps.stage-spark-bq-connector.outputs.url }}'
+          metadata+=',OPENLINEAGE_JARS=${{ needs.stage-openlineage-jars.outputs.openlineage_jars }}'
           metadata+=',SPARK_SPANNER_CONNECTOR_URL=gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar'
           metadata+=',SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.5.0-SNAPSHOT.jar'
           metadata+=',enable-cloud-sql-hive-metastore=false'
           metadata+=',additional-cloud-sql-instances=gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307'
-          if [[ ${{ inputs.spark_release }} != "3.5.1" ]]; then
+          if [[ ${{ matrix.spark_release }} != "3.5.1" ]]; then
             metadata+=',SKIP_ICEBERG_AND_DELTA=true'
           fi
 
@@ -185,98 +157,179 @@ jobs:
           --project-id gcp-open-lineage-testing \
           --region us-west1 \
           --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
-          --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
+          --cluster-name "${{ steps.init.outputs.cluster_name }}" \
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
           --metadata "$metadata" \
-          --initialization-actions="${{ steps.upload-initialization-actions.outputs.uploaded-file }},${{ steps.upload-cloud-sql-initialization-actions.outputs.uploaded-file }}"
+          --initialization-actions="${{ steps.upload-initialization-actions.outputs.init_actions }}"
 
-      - name: Set producer output event dir
-        if: ${{ steps.init.outputs.scenarios }}
-        id: set-producer-output
-        run: | 
-          echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
+      - name: Remove initialization actions from GCS
+        if: ${{ always() && steps.upload-initialization-actions.outputs.scripts_dir }}
+        run: gcloud storage rm -r "${{ steps.upload-initialization-actions.outputs.scripts_dir }}" || true
 
+      # openlineage versions run one after another, scenarios of a single version run in parallel;
+      # failed scenarios don't fail the job, they show up in validation together with their driver logs
       - name: Run producer jobs and create OL events
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.init.outputs.any_scenarios }}
         id: run-producer
-        continue-on-error: true
-        run: |          
-          set -e
-          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
-          
-          properties=''
-          properties+='spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener'
-          properties+=',spark.sql.warehouse.dir=/tmp/warehouse'
-          properties+=',spark.openlineage.transport.type=gcs'
-          properties+=',spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }}'
-          properties+=',spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}'
-          properties+=',spark.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
+        env:
+          OPENLINEAGE_JARS: ${{ needs.stage-openlineage-jars.outputs.openlineage_jars }}
+        run: |
+          while read -r -u 3 ol_release scenarios; do
+            ol_suffix=$(echo "$ol_release" | sed 's/\.//g')
+            # the spark jar goes on the driver classpath, the GCS transport through --jars: since 1.54.0 it bundles
+            # its own Woodstox, which breaks Hadoop's configuration parsing when it is on the system classpath
+            gcs_transport_jar=$(echo "$OPENLINEAGE_JARS" | tr ';' '\n' | awk -F: -v v="$ol_release" '$1 == v { print $3 }')
 
-          for scenario in "${scenarios[@]}"
-          do
-              echo "Getting script for scenario $scenario"
-              run_script=$(find "producer/spark_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.py" | head -n 1)
-              
-              echo "Running spark job for scenario: $scenario"
+            properties=''
+            properties+='spark.driver.POSTGRESQL_USER=${{ secrets.postgresqlUser }}'
+            properties+=',spark.driver.POSTGRESQL_PASSWORD=${{ secrets.postgresqlPassword }}'
+            properties+=",spark.scenario.suffix=${{ steps.init.outputs.component_cluster_suffix }}-$ol_suffix"
 
-              if ! python producer/spark_dataproc/runner/dataproc_workflow.py run-job \
-              --project-id gcp-open-lineage-testing \
-              --region us-west1 \
-              --scenario $scenario \
-              --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
-              --gcs-bucket open-lineage-e2e \
-              --python-job "$run_script" \
-              --jars "${{ steps.upload-gcs-transport.outputs.uploaded-file }}" \
-              --spark-properties "$properties" \
-              --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
-              --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
-              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }}
-              then
-                echo "Error: Spark job failed for scenario: $scenario"
-                exit 1
-              fi
+            echo "Running scenarios for OpenLineage $ol_release: $scenarios"
+            python producer/spark_dataproc/runner/dataproc_workflow.py run-scenarios \
+            --project-id gcp-open-lineage-testing \
+            --region us-west1 \
+            --cluster-name "${{ steps.init.outputs.cluster_name }}" \
+            --gcs-bucket "${GCS_BUCKET}" \
+            --scenarios-dir producer/spark_dataproc/scenarios \
+            --scenarios "$scenarios" \
+            --openlineage-jars-dir "/opt/openlineage/$ol_release" \
+            --jars "gs://${GCS_BUCKET}/jars/$gcs_transport_jar" \
+            --events-prefix "events/${RUN_KEY}/${{ matrix.spark_release }}/$ol_release" \
+            --spark-properties "$properties" \
+            --max-concurrency 3 \
+            --logs-directory "/tmp/driver-logs/$ol_release" \
+            --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
+            || echo "::warning::Some scenarios failed for OpenLineage $ol_release"
 
-              echo "Finished running spark job for scenario: $scenario"
-          done
+            # check-spark-jobs fails the workflow for every scenario not in DONE state, so a runner crash
+            # that left no status.json must still be recorded
+            if [[ ! -f "/tmp/driver-logs/$ol_release/status.json" ]]; then
+              mkdir -p "/tmp/driver-logs/$ol_release"
+              jq -n --arg s "$scenarios" '$s | split(";") | map({scenario: ., state: "RUNNER_FAILED", job_id: ""})' \
+              > "/tmp/driver-logs/$ol_release/status.json"
+            fi
 
-          echo "Finished running all scenarios"
+            gcloud storage cp -r "/tmp/driver-logs/$ol_release/*" "gs://${GCS_BUCKET}/logs/${RUN_KEY}/${{ matrix.spark_release }}/$ol_release/" \
+            || echo "::warning::No driver logs for OpenLineage $ol_release"
+          done 3< /tmp/ol_scenarios
 
       - name: Terminate producer cluster
-        if: ${{ always() && steps.init.outputs.scenarios }}
+        if: ${{ always() && steps.init.outputs.any_scenarios }}
         run: |
-          if gcloud dataproc clusters list --region us-west1 | grep -q "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}"
+          if gcloud dataproc clusters list --region us-west1 | grep -q "${{ steps.init.outputs.cluster_name }}"
           then
             python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
             --project-id gcp-open-lineage-testing \
             --region us-west1 \
-            --cluster-name "dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}-${{ github.run_id }}" \
+            --cluster-name "${{ steps.init.outputs.cluster_name }}" \
             --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
           else
             echo "Cluster does not exist"
           fi
 
-      - name: Fail if spark jobs failed
-        if: ${{ steps.init.outputs.scenarios && steps.run-producer.outcome  == 'failure' }}
+  validate:
+    needs: run-spark-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        spark_release: ${{ fromJson(inputs.matrix).component_version }}
+        ol_release: ${{ fromJson(inputs.matrix).openlineage_versions }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: initialize validation
+        id: init
         run: |
-          echo "step 'Run producer jobs and create OL events' has ended with failure but to terminate the cluster we needed to continue on error but fail the job after cluster termination."
-          echo "This will become redundant if starting the cluster is extracted to custom action with post actions defined."
-          echo "For now composite actions do not support post actions."
-          exit 1
+          scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/spark_dataproc/scenarios/" ${{ matrix.spark_release }} ${{ matrix.ol_release }} )
+          [[ "$scenarios" == "" ]] || echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
+          echo "event_dir=/tmp/producer-$(date +%s%3N)" >> $GITHUB_OUTPUT
+          echo "gcs_suffix=${RUN_KEY}/${{ matrix.spark_release }}/${{ matrix.ol_release }}" >> $GITHUB_OUTPUT
+
+      - name: GCP authorization
+        if: ${{ steps.init.outputs.scenarios }}
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
+      # every scenario gets a directory, so a scenario without events fails validation instead of being skipped
+      - name: Download events
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
+          for scenario in "${scenarios[@]}"; do
+            mkdir -p "${{ steps.init.outputs.event_dir }}/$scenario"
+          done
+          gcloud storage cp -r "gs://${GCS_BUCKET}/events/${{ steps.init.outputs.gcs_suffix }}/*" "${{ steps.init.outputs.event_dir }}/" \
+          || echo "::warning::No events found"
 
       - name: Validation
         if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/run_event_validation
         with:
           component: 'spark_dataproc'
-          release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || inputs.ol_release }}
-          ol_release: ${{ inputs.ol_release }}
-          component_release: ${{ inputs.spark_release }}
-          event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
-          target-path: 'spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report.json'
+          release_tags: ${{ inputs.get-latest-snapshots == 'true' && 'main' || matrix.ol_release }}
+          ol_release: ${{ matrix.ol_release }}
+          component_release: ${{ matrix.spark_release }}
+          event-directory: ${{ steps.init.outputs.event_dir }}
+          target-path: 'spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json'
 
       - uses: actions/upload-artifact@v4
         if: ${{ steps.init.outputs.scenarios }}
         with:
-          name: spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report
-          path: spark-dataproc-${{inputs.spark_release}}-${{inputs.ol_release}}-report.json
+          name: spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report
+          path: spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json
           retention-days: 1
+
+      # scenarios that failed validation or whose Dataproc job didn't finish in DONE state
+      - name: Get driver logs of failed scenarios
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          mkdir -p failure-logs
+          failed_scenarios=$( {
+            jq -r '.[].scenarios[] | select(.status == "FAILURE") | .name' 'spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json'
+            gcloud storage cat "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/status.json" 2> /dev/null \
+            | jq -r '.[] | select(.state != "DONE") | .scenario'
+          } | sort -u )
+          for scenario in $failed_scenarios; do
+            gcloud storage cp "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/$scenario.log" \
+            "failure-logs/$scenario-${{matrix.spark_release}}-${{matrix.ol_release}}-driver.log" \
+            || echo "::warning::No driver log for scenario $scenario"
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.init.outputs.scenarios }}
+        with:
+          name: spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-failure-logs
+          path: failure-logs/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # validation only sees events, so a job that failed after emitting the expected events (e.g. a dependency
+  # conflict) would pass; this fails the workflow for every Dataproc job that didn't finish in DONE state
+  check-spark-jobs:
+    needs:
+      - run-spark-tests
+      - validate
+    if: ${{ !cancelled() && needs.run-spark-tests.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: GCP authorization
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
+      - name: Fail if any Spark job didn't finish
+        run: |
+          failed=0
+          for status in $(gcloud storage ls "gs://${GCS_BUCKET}/logs/${RUN_KEY}/**/status.json" 2> /dev/null); do
+            pair=${status#gs://${GCS_BUCKET}/logs/${RUN_KEY}/}
+            pair=${pair%/status.json}
+            while IFS=$'\t' read -r scenario state job_id; do
+              echo "::error title=Spark job failed::$scenario (spark ${pair%%/*}, openlineage ${pair##*/}) ended in state $state, job '$job_id'. Driver log: artifact spark-dataproc-${pair/\//-}-failure-logs"
+              failed=1
+            done < <(gcloud storage cat "$status" | jq -r '.[] | select(.state != "DONE") | [.scenario, .state, .job_id] | @tsv')
+          done
+          exit $failed

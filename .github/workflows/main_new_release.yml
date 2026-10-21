@@ -116,15 +116,12 @@ jobs:
     needs: initialize_workflow
     if: ${{ needs.initialize_workflow.outputs.run_spark_dataproc == 'true' }}
     uses: ./.github/workflows/producer_spark_dataproc.yml
-    strategy:
-      matrix: ${{ fromJson(needs.initialize_workflow.outputs.spark_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
       postgresqlUser: ${{ secrets.POSTGRESQL_USER }}
       postgresqlPassword: ${{ secrets.POSTGRESQL_PASSWORD }}
     with:
-      ol_release: ${{ matrix.openlineage_versions }}
-      spark_release: ${{ matrix.component_version }}
+      matrix: ${{ needs.initialize_workflow.outputs.spark_matrix }}
       get-latest-snapshots: 'false'
 
   hive-dataproc:

@@ -20,5 +20,6 @@ if __name__ == "__main__":
         .option("databaseId", database_id) \
         .option("table", table_name).load()
     aggregated_df = df.groupBy("Name").sum("Value").withColumnRenamed("sum(Value)", "totalValue")
-    aggregated_df.write.csv("output")
+    # overwrite: the cluster runs this scenario once per OpenLineage version
+    aggregated_df.write.mode("overwrite").csv("output")
 

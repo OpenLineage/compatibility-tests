@@ -4,6 +4,11 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.master("local").appName("simple test").enableHiveSupport().getOrCreate()
 
+# local datasets live in a database named after the test, so scenarios running at the same time don't collide
+namespace = spark.conf.get("spark.test.namespace", "hive")
+spark.sql(f"CREATE DATABASE IF NOT EXISTS {namespace};")
+spark.sql(f"USE {namespace};")
+
 spark.sql("DROP TABLE IF EXISTS t1;")
 spark.sql("DROP TABLE IF EXISTS t2;")
 

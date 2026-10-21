@@ -2,7 +2,7 @@
   "eventType": "COMPLETE",
   "job": {
     "namespace": "default",
-    "name": "simple_test.execute_create_hive_table_as_select_command.default_t2"
+    "name": "{{ match(result, 'simple_test.execute_create_hive_table_as_select_command.hive.*_t2') }}"
   },
   "run": {
     "facets": {
