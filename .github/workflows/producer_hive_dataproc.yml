@@ -108,27 +108,32 @@ jobs:
       - name: Start producer
         id: start-producer
         if: ${{ steps.init.outputs.scenarios }}
-        run: |
-          metadata=''
-          metadata+='GCS_TRANSPORT_JAR=${{ steps.upload-gcs-transport.outputs.uploaded-file }}'
-          metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
+        uses: ./.github/actions/dataproc_cluster
+        with:
+          cluster-name: "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}"
+          project-id: gcp-open-lineage-testing
+          region: us-west1
+          create-command: |
+            metadata=''
+            metadata+='GCS_TRANSPORT_JAR=${{ steps.upload-gcs-transport.outputs.uploaded-file }}'
+            metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
           
-          properties=''
-          properties+='hive:hive.exec.post.hooks=io.openlineage.hive.hooks.HiveOpenLineageHook'
-          properties+=',hive:hive.conf.validation=false'
-          properties+=',hive:hive.server2.logging.operation.level=VERBOSE'
-          properties+=',hive:hive.root.logger=DEBUG'
-          properties+=',hive:hive.log.explain.output=true'
+            properties=''
+            properties+='hive:hive.exec.post.hooks=io.openlineage.hive.hooks.HiveOpenLineageHook'
+            properties+=',hive:hive.conf.validation=false'
+            properties+=',hive:hive.server2.logging.operation.level=VERBOSE'
+            properties+=',hive:hive.root.logger=DEBUG'
+            properties+=',hive:hive.log.explain.output=true'
           
-          python producer/hive_dataproc/runner/dataproc_workflow.py create-cluster \
-            --project-id "gcp-open-lineage-testing" \
-            --region "us-west1" \
-            --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
-            --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
-            --cluster-properties "$properties" \
-            --metadata "$metadata" \
-            --initialization-actions "${{ steps.upload-initialization-actions.outputs.uploaded-file }}" \
-            --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}"
+            python producer/hive_dataproc/runner/dataproc_workflow.py create-cluster \
+              --project-id "gcp-open-lineage-testing" \
+              --region "us-west1" \
+              --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
+              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
+              --cluster-properties "$properties" \
+              --metadata "$metadata" \
+              --initialization-actions "${{ steps.upload-initialization-actions.outputs.uploaded-file }}" \
+              --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}"
 
       - name: Set producer output event dir
         if: ${{ steps.init.outputs.scenarios }}
@@ -139,7 +144,6 @@ jobs:
       - name: Run producer jobs and create OL events
         if: ${{ steps.init.outputs.scenarios }}
         id: run-producer
-        continue-on-error: true
         run: |          
           set -e
           IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
@@ -180,28 +184,6 @@ jobs:
           done
 
           echo "Finished running all scenarios"
-
-      - name: Terminate producer cluster
-        if: ${{ always() && steps.init.outputs.scenarios }}
-        run: |
-          if gcloud dataproc clusters list --region us-west1 | grep -q "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}"
-          then
-            python producer/hive_dataproc/runner/dataproc_workflow.py terminate-cluster \
-            --project-id gcp-open-lineage-testing \
-            --region us-west1 \
-            --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
-            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
-          else
-            echo "Cluster does not exist"
-          fi
-
-      - name: Fail if hive jobs failed
-        if: ${{ steps.init.outputs.scenarios && steps.run-producer.outcome  == 'failure' }}
-        run: |
-          echo "step 'Run producer jobs and create OL events' has ended with failure but to terminate the cluster we needed to continue on error but fail the job after cluster termination."
-          echo "This will become redundant if starting the cluster is extracted to custom action with post actions defined."
-          echo "For now composite actions do not support post actions."
-          exit 1
 
       - name: Validation
         if: ${{ steps.init.outputs.scenarios }}

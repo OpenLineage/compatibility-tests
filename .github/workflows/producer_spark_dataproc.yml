@@ -141,26 +141,31 @@ jobs:
       - name: Start producer
         id: start-producer
         if: ${{ steps.init.outputs.any_scenarios }}
-        run: |
-          metadata=''
-          metadata+='SPARK_BQ_CONNECTOR_URL=${{ steps.stage-spark-bq-connector.outputs.url }}'
-          metadata+=',OPENLINEAGE_JARS=${{ needs.stage-openlineage-jars.outputs.openlineage_jars }}'
-          metadata+=',SPARK_SPANNER_CONNECTOR_URL=gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar'
-          metadata+=',SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.5.0-SNAPSHOT.jar'
-          metadata+=',enable-cloud-sql-hive-metastore=false'
-          metadata+=',additional-cloud-sql-instances=gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307'
-          if [[ ${{ matrix.spark_release }} != "3.5.1" ]]; then
-            metadata+=',SKIP_ICEBERG_AND_DELTA=true'
-          fi
+        uses: ./.github/actions/dataproc_cluster
+        with:
+          cluster-name: "${{ steps.init.outputs.cluster_name }}"
+          project-id: gcp-open-lineage-testing
+          region: us-west1
+          create-command: |
+            metadata=''
+            metadata+='SPARK_BQ_CONNECTOR_URL=${{ steps.stage-spark-bq-connector.outputs.url }}'
+            metadata+=',OPENLINEAGE_JARS=${{ needs.stage-openlineage-jars.outputs.openlineage_jars }}'
+            metadata+=',SPARK_SPANNER_CONNECTOR_URL=gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar'
+            metadata+=',SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.5.0-SNAPSHOT.jar'
+            metadata+=',enable-cloud-sql-hive-metastore=false'
+            metadata+=',additional-cloud-sql-instances=gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307'
+            if [[ ${{ matrix.spark_release }} != "3.5.1" ]]; then
+              metadata+=',SKIP_ICEBERG_AND_DELTA=true'
+            fi
 
-          python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
-          --project-id gcp-open-lineage-testing \
-          --region us-west1 \
-          --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
-          --cluster-name "${{ steps.init.outputs.cluster_name }}" \
-          --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
-          --metadata "$metadata" \
-          --initialization-actions="${{ steps.upload-initialization-actions.outputs.init_actions }}"
+            python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
+            --project-id gcp-open-lineage-testing \
+            --region us-west1 \
+            --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
+            --cluster-name "${{ steps.init.outputs.cluster_name }}" \
+            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
+            --metadata "$metadata" \
+            --initialization-actions="${{ steps.upload-initialization-actions.outputs.init_actions }}"
 
       - name: Remove initialization actions from GCS
         if: ${{ always() && steps.upload-initialization-actions.outputs.scripts_dir }}
@@ -213,20 +218,6 @@ jobs:
             gcloud storage cp -r "/tmp/driver-logs/$ol_release/*" "gs://${GCS_BUCKET}/logs/${RUN_KEY}/${{ matrix.spark_release }}/$ol_release/" \
             || echo "::warning::No driver logs for OpenLineage $ol_release"
           done 3< /tmp/ol_scenarios
-
-      - name: Terminate producer cluster
-        if: ${{ always() && steps.init.outputs.any_scenarios }}
-        run: |
-          if gcloud dataproc clusters list --region us-west1 | grep -q "${{ steps.init.outputs.cluster_name }}"
-          then
-            python producer/spark_dataproc/runner/dataproc_workflow.py terminate-cluster \
-            --project-id gcp-open-lineage-testing \
-            --region us-west1 \
-            --cluster-name "${{ steps.init.outputs.cluster_name }}" \
-            --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }}
-          else
-            echo "Cluster does not exist"
-          fi
 
   validate:
     needs: run-spark-tests
