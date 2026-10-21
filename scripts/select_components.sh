@@ -30,7 +30,14 @@ ol_version() {
 
 dbt_version() {
   current_dbt=$(jq -r '.[] | select(.name | contains("dbt")) | .latest_version ' generated-files/releases.json)
-  latest_dbt=$(pip index versions dbt-core | grep LATEST | awk '{print $2}')
+  # PyPI JSON API instead of the output of the experimental `pip index`, whose format changed
+  latest_dbt=$(curl -s https://pypi.org/pypi/dbt-core/json | jq -r '.info.version // empty')
+
+  if [[ -z "$latest_dbt" ]]; then
+    echo "::error::Could not get the latest dbt-core version from PyPI, keeping ${current_dbt}"
+    echo "dbt_release=${current_dbt}" >> $GITHUB_OUTPUT
+    return 1
+  fi
 
   if (( $(version_sum $latest_dbt) > $(version_sum $current_dbt) )); then
     update_version "dbt" "$latest_dbt"
