@@ -165,13 +165,15 @@ jobs:
             --cluster-name "${{ steps.init.outputs.cluster_name }}" \
             --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
             --metadata "$metadata" \
+            --master-machine-type n1-standard-4 \
             --initialization-actions="${{ steps.upload-initialization-actions.outputs.init_actions }}"
 
       - name: Remove initialization actions from GCS
         if: ${{ always() && steps.upload-initialization-actions.outputs.scripts_dir }}
         run: gcloud storage rm -r "${{ steps.upload-initialization-actions.outputs.scripts_dir }}" || true
 
-      # openlineage versions run one after another, scenarios of a single version run in parallel;
+      # openlineage versions run one after another, scenarios of a single version run in parallel
+      # (their drivers all run on the master, which is why it's bigger than the workers);
       # failed scenarios don't fail the job, they show up in validation together with their driver logs
       - name: Run producer jobs and create OL events
         if: ${{ steps.init.outputs.any_scenarios }}
