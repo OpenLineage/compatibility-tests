@@ -3,6 +3,7 @@ import asyncio
 import base64
 import concurrent.futures
 import hashlib
+import json
 import logging
 import os
 import time
@@ -372,7 +373,95 @@ async def wait_for_dataproc_job(
             )
             await asyncio.sleep(10)
 
-    return {"job_id": job_id, "state": state.name, "details": job.status}
+    return {
+        "job_id": job_id,
+        "state": state.name,
+        "details": job.status,
+        "driver_output_uri": job.driver_output_resource_uri,
+    }
+
+
+def download_driver_output(
+    driver_output_uri: str,
+    destination_file_name: str,
+    credentials: typing.Optional[Credentials] = None,
+) -> None:
+    """
+    Downloads the driver output of a Dataproc job. Dataproc writes it in chunks
+    (driveroutput.000000000, driveroutput.000000001, ...), they are concatenated in order.
+    """
+    bucket_name, prefix = driver_output_uri[5:].split("/", 1)
+    client = storage.Client(credentials=credentials)
+    blobs = sorted(client.list_blobs(bucket_name, prefix=prefix), key=lambda b: b.name)
+    os.makedirs(os.path.dirname(destination_file_name), exist_ok=True)
+    with open(destination_file_name, "wb") as f:
+        for blob in blobs:
+            f.write(blob.download_as_bytes())
+    logging.info(f"Downloaded driver output {driver_output_uri} to {destination_file_name}")
+
+
+async def run_scenario(
+    semaphore: asyncio.Semaphore,
+    scenario: str,
+    args,
+    properties: typing.Dict[str, str],
+    credentials: Credentials,
+) -> typing.Dict[str, str]:
+    """
+    Runs a single scenario on the cluster and downloads its events and driver output.
+    """
+    run_script = os.path.join(args.scenarios_dir, scenario, "test", "test.py")
+    events_path = f"{args.events_prefix.rstrip('/')}/{scenario}/"
+    scenario_properties = {
+        **properties,
+        "spark.openlineage.transport.bucketName": args.gcs_bucket,
+        "spark.openlineage.transport.fileNamePrefix": events_path,
+        # local datasets (Hive metastore, warehouse) are shared by the scenarios running at the same time
+        "spark.test.namespace": scenario,
+    }
+    uploaded_job_file = upload_to_gcs(
+        source_path=run_script,
+        destination_uri=f"gs://{args.gcs_bucket}/jobs/{scenario}",
+        content_type="text/x-python",
+        credentials=credentials,
+    )
+
+    async with semaphore:
+        logging.info(f"Running scenario {scenario}")
+        try:
+            result = await submit_pyspark_job_and_wait(
+                project_id=args.project_id,
+                region=args.region,
+                cluster_name=args.cluster_name,
+                pyspark_file_uri=uploaded_job_file,
+                properties=scenario_properties,
+                credentials=credentials,
+            )
+        except Exception as e:
+            logging.error(f"Scenario {scenario} could not be run: {e}")
+            return {"scenario": scenario, "state": "SUBMISSION_FAILED", "job_id": ""}
+
+    if args.output_directory:
+        files_to_download = list_blobs_with_prefix(
+            args.gcs_bucket, events_path, "json", credentials=credentials
+        )
+        output_dir = os.path.join(args.output_directory, scenario)
+        os.makedirs(output_dir, exist_ok=True)
+        download_files_in_parallel(
+            args.gcs_bucket, files_to_download, output_dir, credentials=credentials
+        )
+
+    if args.logs_directory and result["driver_output_uri"]:
+        try:
+            download_driver_output(
+                result["driver_output_uri"],
+                os.path.join(args.logs_directory, f"{scenario}.log"),
+                credentials=credentials,
+            )
+        except Exception as e:
+            logging.error(f"Failed to download driver output for {scenario}: {e}")
+
+    return {"scenario": scenario, "state": result["state"], "job_id": result["job_id"]}
 
 
 def get_test_id(dataproc_img_version: str) -> str:
@@ -563,6 +652,39 @@ async def run_job_command(args):
         )
 
 
+async def run_scenarios_command(args):
+    """
+    Command to run scenarios for a single OpenLineage version on an existing cluster.
+    OpenLineage jars are expected on the master node in --openlineage-jars-dir and are put
+    on the driver classpath, so the cluster can run scenarios for different OpenLineage
+    versions one after another. Up to --max-concurrency scenarios run at the same time.
+    """
+    credentials = get_gcp_credentials(credentials_file=args.credentials_file)
+    properties = {
+        "spark.extraListeners": "io.openlineage.spark.agent.OpenLineageSparkListener",
+        "spark.sql.warehouse.dir": "/tmp/warehouse",
+        "spark.openlineage.transport.type": "gcs",
+        "spark.driver.extraClassPath": f"{args.openlineage_jars_dir.rstrip('/')}/*",
+        **parse_spark_properties(args.spark_properties),
+    }
+    scenarios = [s for s in args.scenarios.split(";") if s]
+    semaphore = asyncio.Semaphore(args.max_concurrency)
+
+    results = await asyncio.gather(
+        *[run_scenario(semaphore, s, args, properties, credentials) for s in scenarios]
+    )
+
+    for r in results:
+        logging.info(f"Scenario {r['scenario']}: {r['state']} (job {r['job_id']})")
+    if args.logs_directory:
+        os.makedirs(args.logs_directory, exist_ok=True)
+        with open(os.path.join(args.logs_directory, "status.json"), "w") as f:
+            json.dump(results, f, indent=2)
+    failed = [r["scenario"] for r in results if r["state"] != "DONE"]
+    if failed:
+        raise SystemExit(f"Scenarios not finished successfully: {', '.join(failed)}")
+
+
 async def terminate_cluster_command(args):
     """
     Command to terminate a Dataproc cluster.
@@ -664,6 +786,60 @@ def main():
     )
     parser_run.add_argument("--scenario", required=True, help="Scenario name")
     parser_run.set_defaults(func=run_job_command)
+
+    # Run scenarios command
+    parser_scenarios = subparsers.add_parser(
+        "run-scenarios",
+        help="Run scenarios for a single OpenLineage version on an existing cluster",
+    )
+    parser_scenarios.add_argument("--project-id", required=True, help="GCP project ID")
+    parser_scenarios.add_argument("--region", required=True, help="GCP region")
+    parser_scenarios.add_argument(
+        "--cluster-name", required=True, help="Dataproc cluster name"
+    )
+    parser_scenarios.add_argument("--gcs-bucket", required=True, help="GCS bucket name")
+    parser_scenarios.add_argument(
+        "--scenarios-dir", required=True, help="Directory containing the scenarios"
+    )
+    parser_scenarios.add_argument(
+        "--scenarios", required=True, help="Scenario names separated by semicolons"
+    )
+    parser_scenarios.add_argument(
+        "--openlineage-jars-dir",
+        required=True,
+        help="Directory on the master node with the OpenLineage jars to use",
+    )
+    parser_scenarios.add_argument(
+        "--events-prefix",
+        required=True,
+        help="GCS object prefix for the events, each scenario writes to <prefix>/<scenario>/",
+    )
+    parser_scenarios.add_argument(
+        "--spark-properties",
+        required=False,
+        default="",
+        help="Spark properties as key=value pairs separated by commas",
+    )
+    parser_scenarios.add_argument(
+        "--max-concurrency",
+        type=int,
+        default=3,
+        help="Maximum number of scenarios running at the same time (default: 3)",
+    )
+    parser_scenarios.add_argument(
+        "--output-directory",
+        required=False,
+        help="Local directory to download events to, one subdirectory per scenario",
+    )
+    parser_scenarios.add_argument(
+        "--logs-directory",
+        required=False,
+        help="Local directory to download driver outputs and status.json to",
+    )
+    parser_scenarios.add_argument(
+        "--credentials-file", required=False, help="Path to GCP credentials file"
+    )
+    parser_scenarios.set_defaults(func=run_scenarios_command)
 
     # Terminate cluster command
     parser_terminate = subparsers.add_parser(

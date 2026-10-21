@@ -6,6 +6,12 @@ set -euxo pipefail
 
 readonly VM_SPARK_JARS_DIR=/usr/lib/spark/jars
 readonly SKIP_ICEBERG_AND_DELTA=$(/usr/share/google/get_metadata_value attributes/SKIP_ICEBERG_AND_DELTA || echo "")
+# GCS directory with one subdirectory per OpenLineage version, each holding the jars for that version.
+# When set, the versions are copied to OPENLINEAGE_LOCAL_DIR on the master only and the jobs choose
+# one of them with spark.driver.extraClassPath, otherwise the single OPENLINEAGE_SPARK_URL jar is installed.
+readonly OPENLINEAGE_JARS_URL=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_JARS_URL || echo "")
+readonly OPENLINEAGE_LOCAL_DIR=/opt/openlineage
+readonly ROLE=$(/usr/share/google/get_metadata_value attributes/dataproc-role)
 
 # Returns the metadata attribute value, or the given default when the attribute is not set.
 metadata_or_default() {
@@ -28,7 +34,12 @@ iceberg_bigquery_url="gs://open-lineage-e2e/jars/iceberg-bigquery-1.10.0.jar"
 
 
 gsutil cp -P "${bq_url}" "${VM_SPARK_JARS_DIR}/"
-gsutil cp -P "${ol_url}" "${VM_SPARK_JARS_DIR}/"
+if [[ -z "${OPENLINEAGE_JARS_URL}" ]]; then
+  gsutil cp -P "${ol_url}" "${VM_SPARK_JARS_DIR}/"
+elif [[ "${ROLE}" == "Master" ]]; then
+  mkdir -p "${OPENLINEAGE_LOCAL_DIR}"
+  gsutil -m cp -r "${OPENLINEAGE_JARS_URL%/}/*" "${OPENLINEAGE_LOCAL_DIR}/"
+fi
 gsutil cp -P "${spanner_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${bigtable_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${postgresql_url}" "${VM_SPARK_JARS_DIR}/"
