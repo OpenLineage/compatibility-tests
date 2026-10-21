@@ -18,10 +18,10 @@ that timestamp, so one of the events is dropped. The `hive` scenario is enabled 
 
 input entity is hive table
 
-`default.t1`
+`hive_insert.t1`
 
 output entity hive table
-`default.t2`
+`hive_insert.t2`
 
 # Facets
 Facets present in the events:
