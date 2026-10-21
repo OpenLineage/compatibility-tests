@@ -2,7 +2,7 @@
   "eventType": "COMPLETE",
   "job": {
     "namespace": "default",
-    "name": "hive_insert_test.execute_insert_into_hive_table.warehouse_t2",
+    "name": "hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2",
     "facets": {
       "gcp_lineage": {
         "origin": {

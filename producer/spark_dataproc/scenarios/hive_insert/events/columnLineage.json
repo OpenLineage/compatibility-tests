@@ -2,12 +2,12 @@
   "eventType": "COMPLETE",
   "job": {
     "namespace": "default",
-    "name": "hive_insert_test.execute_insert_into_hive_table.warehouse_t2"
+    "name": "hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2"
   },
   "outputs": [
     {
       "namespace": "{{ any(result) }}",
-      "name": "/user/hive/warehouse/t2",
+      "name": "/tmp/warehouse/hive_insert.db/t2",
       "facets": {
         "columnLineage": {
           "fields": {
@@ -15,7 +15,7 @@
               "inputFields": [
                 {
                   "namespace": "{{ any(result) }}",
-                  "name": "/user/hive/warehouse/t1",
+                  "name": "/tmp/warehouse/hive_insert.db/t1",
                   "field": "a",
                   "transformations": [
                     {
@@ -32,7 +32,7 @@
               "inputFields": [
                 {
                   "namespace": "{{ any(result) }}",
-                  "name": "/user/hive/warehouse/t1",
+                  "name": "/tmp/warehouse/hive_insert.db/t1",
                   "field": "b",
                   "transformations": [
                     {

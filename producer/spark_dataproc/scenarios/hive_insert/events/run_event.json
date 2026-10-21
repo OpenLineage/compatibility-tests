@@ -6,13 +6,13 @@
   },
   "job": {
     "namespace": "default",
-    "name": "hive_insert_test.execute_insert_into_hive_table.warehouse_t2",
+    "name": "hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2",
     "facets": {}
   },
   "inputs": [
     {
       "namespace": "{{ any(result) }}",
-      "name": "/user/hive/warehouse/t1",
+      "name": "/tmp/warehouse/hive_insert.db/t1",
       "facets": {},
       "inputFacets": {}
     }
@@ -20,7 +20,7 @@
   "outputs": [
     {
       "namespace": "{{ any(result) }}",
-      "name": "/user/hive/warehouse/t2",
+      "name": "/tmp/warehouse/hive_insert.db/t2",
       "facets": {},
       "outputFacets": {}
     }
