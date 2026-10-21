@@ -24,40 +24,32 @@ env:
 jobs:
   stage-openlineage-jars:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ol_release: ${{ fromJson(inputs.matrix).openlineage_versions }}
+    outputs:
+      openlineage_jars: ${{ steps.stage.outputs.openlineage_jars }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: GCP authorization
-        id: gcp-auth
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
-      - name: Get OL artifacts
-        id: get-ol-artifacts
-        uses: ./.github/actions/get_openlineage_artifacts
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          version: ${{ matrix.ol_release }}
-          get-latest-snapshots: ${{ inputs.get-latest-snapshots }}
-          skip-java: 'true'
-          skip-flink: 'true'
-          skip-hive: 'true'
-          skip-sql: 'true'
-          skip-extensions: 'true'
-          skip-gcp-lineage: 'true'
-          skip-s3: 'true'
+          python-version: "3.11"
 
-      # the cluster init action copies gs://.../openlineage/<run>/<ol_release>/ to /opt/openlineage/<ol_release>/ on the master
-      - name: Upload OL jars to GCS
+      # jars are kept in the shared gs://open-lineage-e2e/jars/ directory, released ones are uploaded only once
+      - name: Stage OL jars in GCS
+        id: stage
         run: |
-          gcloud storage cp \
-          "${{ steps.get-ol-artifacts.outputs.spark }}" \
-          "${{ steps.get-ol-artifacts.outputs.gcs }}" \
-          "gs://${GCS_BUCKET}/jars/openlineage/${RUN_KEY}/${{ matrix.ol_release }}/"
+          pip install requests
+          snapshots=''
+          [[ '${{ inputs.get-latest-snapshots }}' != 'true' ]] || snapshots='--snapshots'
+          openlineage_jars=$(producer/spark_dataproc/runner/stage_openlineage_jars.sh $snapshots \
+            $(echo '${{ inputs.matrix }}' | jq -r '.openlineage_versions[]'))
+          echo "openlineage_jars=$openlineage_jars" >> $GITHUB_OUTPUT
 
   run-spark-tests:
     needs: stage-openlineage-jars
@@ -111,35 +103,26 @@ jobs:
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
-#       This should be somehow automated and return the newest version
-      - name: Download Big Query Spark Maven Artifact
-        id: download-spark-bq-connector
+      - name: Stage Spark BigQuery connector in GCS
+        id: stage-spark-bq-connector
         if: ${{ steps.init.outputs.any_scenarios }}
-        uses: clausnz/github-action-download-maven-artifact@master
-        with:
-          url: 'https://repo1.maven.org'
-          repository: 'maven2'
-          groupId: 'com.google.cloud.spark'
-          artifactId: 'spark-${{ steps.init.outputs.spark_short }}-bigquery'
-          version: '0.42.0'
-          extension: 'jar'
+        run: |
+          jar="spark-${{ steps.init.outputs.spark_short }}-bigquery-0.42.0.jar"
+          if ! gcloud storage ls "gs://${GCS_BUCKET}/jars/$jar" > /dev/null 2>&1; then
+            curl -fsSL -o "/tmp/$jar" "https://repo1.maven.org/maven2/com/google/cloud/spark/spark-${{ steps.init.outputs.spark_short }}-bigquery/0.42.0/$jar"
+            gcloud storage cp "/tmp/$jar" "gs://${GCS_BUCKET}/jars/$jar"
+          fi
+          echo "url=gs://${GCS_BUCKET}/jars/$jar" >> $GITHUB_OUTPUT
 
-      - name: Upload Spark BigQuery connector to GCS
-        id: upload-spark-bq-connector
-        if: ${{ steps.init.outputs.any_scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.download-spark-bq-connector.outputs.file }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      # uploaded per run, so runs from other branches can't swap the scripts while the cluster starts
+      # uploaded per run, so runs from other branches can't swap the scripts while the cluster starts,
+      # they are removed once the cluster is created
       - name: Upload initialization actions to GCS
         id: upload-initialization-actions
         if: ${{ steps.init.outputs.any_scenarios }}
         run: |
-          scripts_dir="gs://${GCS_BUCKET}/scripts/${RUN_KEY}"
+          scripts_dir="gs://${GCS_BUCKET}/scripts/${RUN_KEY}/${{ matrix.spark_release }}"
           gcloud storage cp producer/spark_dataproc/runner/get_openlineage_jar.sh producer/spark_dataproc/runner/cloud_sql_proxy.sh "$scripts_dir/"
+          echo "scripts_dir=$scripts_dir" >> $GITHUB_OUTPUT
           echo "init_actions=$scripts_dir/get_openlineage_jar.sh,$scripts_dir/cloud_sql_proxy.sh" >> $GITHUB_OUTPUT
 
       - name: Set up Python 3.11
@@ -160,8 +143,8 @@ jobs:
         if: ${{ steps.init.outputs.any_scenarios }}
         run: |
           metadata=''
-          metadata+='SPARK_BQ_CONNECTOR_URL=${{steps.upload-spark-bq-connector.outputs.uploaded-file}}'
-          metadata+=",OPENLINEAGE_JARS_URL=gs://${GCS_BUCKET}/jars/openlineage/${RUN_KEY}/"
+          metadata+='SPARK_BQ_CONNECTOR_URL=${{ steps.stage-spark-bq-connector.outputs.url }}'
+          metadata+=',OPENLINEAGE_JARS=${{ needs.stage-openlineage-jars.outputs.openlineage_jars }}'
           metadata+=',SPARK_SPANNER_CONNECTOR_URL=gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar'
           metadata+=',SPARK_BIGTABLE_CONNECTOR_URL=gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.5.0-SNAPSHOT.jar'
           metadata+=',enable-cloud-sql-hive-metastore=false'
@@ -178,6 +161,10 @@ jobs:
           --credentials-file ${{ steps.gcp-auth.outputs.credentials_file_path }} \
           --metadata "$metadata" \
           --initialization-actions="${{ steps.upload-initialization-actions.outputs.init_actions }}"
+
+      - name: Remove initialization actions from GCS
+        if: ${{ always() && steps.upload-initialization-actions.outputs.scripts_dir }}
+        run: gcloud storage rm -r "${{ steps.upload-initialization-actions.outputs.scripts_dir }}" || true
 
       # openlineage versions run one after another, scenarios of a single version run in parallel;
       # failed scenarios don't fail the job, they show up in validation together with their driver logs

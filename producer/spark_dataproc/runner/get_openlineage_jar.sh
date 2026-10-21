@@ -6,11 +6,13 @@ set -euxo pipefail
 
 readonly VM_SPARK_JARS_DIR=/usr/lib/spark/jars
 readonly SKIP_ICEBERG_AND_DELTA=$(/usr/share/google/get_metadata_value attributes/SKIP_ICEBERG_AND_DELTA || echo "")
-# GCS directory with one subdirectory per OpenLineage version, each holding the jars for that version.
-# When set, the versions are copied to OPENLINEAGE_LOCAL_DIR on the master only and the jobs choose
-# one of them with spark.driver.extraClassPath, otherwise the single OPENLINEAGE_SPARK_URL jar is installed.
-readonly OPENLINEAGE_JARS_URL=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_JARS_URL || echo "")
+# '<version>:<spark jar>:<gcs transport jar>' entries separated by semicolons, jars are in JARS_DIR
+# (see stage_openlineage_jars.sh). When set, each version is copied to OPENLINEAGE_LOCAL_DIR/<version> on the
+# master only and the jobs choose one with spark.driver.extraClassPath, otherwise the single
+# OPENLINEAGE_SPARK_URL jar is installed.
+readonly OPENLINEAGE_JARS=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_JARS || echo "")
 readonly OPENLINEAGE_LOCAL_DIR=/opt/openlineage
+readonly JARS_DIR=gs://open-lineage-e2e/jars
 readonly ROLE=$(/usr/share/google/get_metadata_value attributes/dataproc-role)
 
 # Returns the metadata attribute value, or the given default when the attribute is not set.
@@ -34,11 +36,15 @@ iceberg_bigquery_url="gs://open-lineage-e2e/jars/iceberg-bigquery-1.10.0.jar"
 
 
 gsutil cp -P "${bq_url}" "${VM_SPARK_JARS_DIR}/"
-if [[ -z "${OPENLINEAGE_JARS_URL}" ]]; then
+if [[ -z "${OPENLINEAGE_JARS}" ]]; then
   gsutil cp -P "${ol_url}" "${VM_SPARK_JARS_DIR}/"
 elif [[ "${ROLE}" == "Master" ]]; then
-  mkdir -p "${OPENLINEAGE_LOCAL_DIR}"
-  gsutil -m cp -r "${OPENLINEAGE_JARS_URL%/}/*" "${OPENLINEAGE_LOCAL_DIR}/"
+  IFS=';' read -ra ol_entries <<< "${OPENLINEAGE_JARS}"
+  for entry in "${ol_entries[@]}"; do
+    IFS=':' read -r version spark_jar gcs_jar <<< "${entry}"
+    mkdir -p "${OPENLINEAGE_LOCAL_DIR}/${version}"
+    gsutil cp "${JARS_DIR}/${spark_jar}" "${JARS_DIR}/${gcs_jar}" "${OPENLINEAGE_LOCAL_DIR}/${version}/"
+  done
 fi
 gsutil cp -P "${spanner_url}" "${VM_SPARK_JARS_DIR}/"
 gsutil cp -P "${bigtable_url}" "${VM_SPARK_JARS_DIR}/"
