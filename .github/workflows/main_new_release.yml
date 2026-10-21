@@ -44,10 +44,12 @@ jobs:
   initialize_workflow:
     runs-on: ubuntu-latest
     outputs:
-      run_dataplex: ${{ github.event.inputs.run_dataplex || 'true' }}
-      run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || 'true' }}
-      run_hive_dataproc: ${{ github.event.inputs.run_hive_dataproc || 'true' }}
-      run_dbt: ${{ github.event.inputs.run_dbt || 'true' }}
+      run_scenarios: ${{ steps.set-matrix-values.outputs.run_scenarios }}
+      run_dataplex: ${{ github.event.inputs.run_dataplex || steps.set-matrix-values.outputs.run_dataplex }}
+      run_spark_dataproc: ${{ github.event.inputs.run_spark_dataproc || steps.set-matrix-values.outputs.run_spark_dataproc }}
+      run_hive_dataproc: ${{ github.event.inputs.run_hive_dataproc || steps.set-matrix-values.outputs.run_hive_dataproc }}
+      run_dbt: ${{ github.event.inputs.run_dbt || steps.set-matrix-values.outputs.run_dbt }}
+      any_run: ${{ steps.set-matrix-values.outputs.any_run }}
       openlineage_release: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
       spark_matrix: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
       hive_matrix: ${{ github.event.inputs.hive_matrix || steps.set-matrix-values.outputs.hive_dataproc_matrix }}
@@ -61,9 +63,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-        # there should be part about checking not only the OL version but also the producers and consumers
-        # there is no way to check for new releases of spark_dataproc or dataplex so we just run their tests everytime
-        # also normally new release of OL should trigger all producer tests but for now they are run anyway so no need to trigger
+      # needed to look up the newest Dataproc images
+      - name: GCP authorization
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # finds new releases of OpenLineage, dbt and Dataproc (new images in the image families we test)
       - name: Select components to run
         id: select-components
         run: ./scripts/select_components.sh
@@ -75,33 +81,28 @@ jobs:
           path: generated-files/updated-releases.json
           retention-days: 1
 
+      # scheduled runs test only what changed, manual runs test everything
       - name: set-matrix-values
         id: set-matrix-values
-        run: |
-          get_matrix() {
-            local component="$1"
-            local releases_file="./generated-files/updated-releases.json"
-            local versions_file="producer/$component/versions.json"
-
-            [[ -f "$releases_file" && -f "$versions_file" ]] || {
-              echo "Missing releases.json or versions.json" >&2
-              return 1
-            }
-
-            local latest_ol=$(jq -r '.[] | select(.name == "openlineage") | .latest_version' "$releases_file")
-            local latest_comp=$(jq -r --arg name "$component" '.[] | select(.name == $name) | .latest_version' "$releases_file")
-
-            jq -c --arg ol "$latest_ol" --arg comp "$latest_comp" '
-              .openlineage_versions |= (if $ol != "" and index($ol) == null then . + [$ol] else . end) |
-              .component_version |= (if $comp != "" and index($comp) == null then . + [$comp] else . end)
-            ' "$versions_file"
-          }
-
-          echo "spark_dataproc_matrix=$(get_matrix spark_dataproc)" >> $GITHUB_OUTPUT
-          echo "hive_dataproc_matrix=$(get_matrix hive_dataproc)" >> $GITHUB_OUTPUT
-          echo "dbt_matrix=$(get_matrix dbt)" >> $GITHUB_OUTPUT
+        env:
+          LATEST_OL: ${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}
+          OL_CHANGED: ${{ steps.select-components.outputs.ol_changed || 'false' }}
+          LATEST_DBT: ${{ steps.select-components.outputs.dbt_release }}
+          DBT_CHANGED: ${{ steps.select-components.outputs.dbt_changed || 'false' }}
+          DATAPROC_CHANGED_FAMILIES: ${{ steps.select-components.outputs.dataproc_changed_families || '[]' }}
+          FORCE_ALL: ${{ github.event_name == 'workflow_dispatch' }}
+        run: ./scripts/get_release_matrices.sh | tee -a $GITHUB_OUTPUT
 
   ######## COMPONENT VALIDATION ########
+
+  scenarios:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.run_scenarios == 'true' }}
+    uses: ./.github/workflows/check_scenarios.yml
+    with:
+      release: ${{ needs.initialize_workflow.outputs.openlineage_release }}
+      get-latest-snapshots: 'false'
+      fail-for-failures: false
 
   dataplex:
     needs: initialize_workflow
@@ -153,18 +154,19 @@ jobs:
   collect-and-compare-reports:
     needs:
       - initialize_workflow
+      - scenarios
       - dataplex
       - spark-dataproc
       - hive-dataproc
       - dbt
-    if: ${{ !failure() }}
+    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
 
   notify-maintainers:
     needs:
       - initialize_workflow
       - collect-and-compare-reports
-    if: ${{ !failure() }}
+    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
     uses: ./.github/workflows/notify_maintainers.yml
     with:
       workflow-type: 'release'
@@ -175,7 +177,7 @@ jobs:
     needs:
       - initialize_workflow
       - notify-maintainers
-    if: ${{ !failure() }}
+    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
     uses: ./.github/workflows/update_repo_files.yml
     secrets:
       CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
