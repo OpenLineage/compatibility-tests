@@ -262,6 +262,232 @@
             "tags": {}
           }
         ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -1645,6 +1871,248 @@
             "tags": {}
           }
         ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.drop_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.drop_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -2669,6 +3137,216 @@
               ],
               "lineage_level": {
                 "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
                   "dataset",
                   "column",
                   "transformation"
@@ -4044,6 +4722,248 @@
             "tags": {}
           }
         ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.drop_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.drop_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -5151,6 +6071,240 @@
             "tags": {}
           }
         ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.local_table_scan:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -5415,6 +6569,232 @@
             "entity_type": "openlineage",
             "details": [],
             "tags": {}
+          }
+        ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       }
@@ -53117,6 +54497,232 @@
             "tags": {}
           }
         ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -53375,6 +54981,232 @@
             "tags": {}
           }
         ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_drop_table_command:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -53467,6 +55299,86 @@
               "$.outputs[0].facets.dbt_model facet type dbt_model not recognized"
             ],
             "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.source.openlineage_compatibility_test.raw_data.raw_customers.test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.source.openlineage_compatibility_test.raw_data.raw_orders.test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_orders.test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_customers.test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.source.openlineage_compatibility_test.raw_data.raw_orders.test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_orders.test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.customer_analytics.test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.source.openlineage_compatibility_test.raw_data.raw_customers.test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.stg_customers.test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "dbt:dbt_test.main.openlineage_compatibility_test.customer_analytics.test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -53480,7 +55392,7 @@
     "scenarios": [
       {
         "name": "bigquery_to_iceberg",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:big_query_to_iceberg_with_big_query_metastore_catalog.atomic_replace_table_as_select.e2e_dataset_e2e_table_351_1540:COMPLETE",
@@ -53688,6 +55600,162 @@
             "details": [
               "'catalog_test' event with .eventType: COMPLETE, .job.name: {{ match(result, 'big_query_to_iceberg_with_big_query_metastore_catalog.append_data.gcp_iceberg_catalog_e2e_dataset_e2e_table_.*') }} and .job.namespace: default not found in result events"
             ],
+            "tags": {
+              "facets": [
+                "catalog"
+              ]
+            }
+          },
+          {
+            "name": "run_event_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "storage_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "storage"
+              ]
+            }
+          },
+          {
+            "name": "catalog_test_1.54.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
             "tags": {
               "facets": [
                 "catalog"
@@ -53964,7 +56032,7 @@
       },
       {
         "name": "spanner",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:spark_spanner_example:START",
@@ -54158,6 +56226,25 @@
               "facets": [
                 "spark_properties"
               ]
+            }
+          },
+          {
+            "name": "columnLineage_test_1.37.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "spanner": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
             }
           }
         ]
@@ -54362,7 +56449,7 @@
       },
       {
         "name": "cloudsql",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:spark_cloud_sql_example.deserialize_to_object:COMPLETE",
@@ -54577,12 +56664,31 @@
                 "spark_properties"
               ]
             }
+          },
+          {
+            "name": "columnLineage_test_1.46.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "cloudsql": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
           }
         ]
       },
       {
         "name": "bigquery",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:writing_to_big_query.execute_save_into_data_source_command.e2e_dataset_wordcount_output_351_1540:START",
@@ -54618,12 +56724,10 @@
           },
           {
             "name": "run_event_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'run_event_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -54706,12 +56810,10 @@
           },
           {
             "name": "dataSource_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'dataSource_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "dataSource"
@@ -54720,12 +56822,10 @@
           },
           {
             "name": "schema_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'schema_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "schema"
@@ -54739,18 +56839,270 @@
           },
           {
             "name": "columnLineage_test_1.38.0",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'columnLineage_test_1.38.0' In .outputs: Length does not match: expected 1 result: 0"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "columnLineage"
               ],
               "lineage_level": {
                 "bigquery": [
+                  "dataset",
+                  "column",
+                  "transformation"
+                ]
+              }
+            }
+          },
+          {
+            "name": "parent_test_1.44.0",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "hive_insert",
+        "status": "SUCCESS",
+        "tests": [
+          {
+            "name": "default:hive_insert_test:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.drop_table:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.drop_table:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "run_event_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "run_event"
+              ]
+            }
+          },
+          {
+            "name": "parent_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "parent"
+              ]
+            }
+          },
+          {
+            "name": "spark_properties_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "spark_properties"
+              ]
+            }
+          },
+          {
+            "name": "processing_engine_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "processing_engine"
+              ]
+            }
+          },
+          {
+            "name": "gcp_dataproc_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_dataproc"
+              ]
+            }
+          },
+          {
+            "name": "jobType_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "jobType"
+              ]
+            }
+          },
+          {
+            "name": "gcp_lineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "gcp_lineage"
+              ]
+            }
+          },
+          {
+            "name": "dataSource_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "dataSource"
+              ]
+            }
+          },
+          {
+            "name": "schema_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "schema"
+              ],
+              "lineage_level": {
+                "hive": [
+                  "dataset"
+                ]
+              }
+            }
+          },
+          {
+            "name": "columnLineage_test",
+            "status": "SUCCESS",
+            "validation_type": "semantics",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {
+              "facets": [
+                "columnLineage"
+              ],
+              "lineage_level": {
+                "hive": [
                   "dataset",
                   "column",
                   "transformation"
