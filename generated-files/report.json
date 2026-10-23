@@ -486,6 +486,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -6303,6 +6319,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:hive_insert_test.local_table_scan:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -6795,6 +6819,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -54721,6 +54761,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t1:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
