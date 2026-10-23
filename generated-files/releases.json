@@ -14,5 +14,21 @@
   {
     "name": "openlineage",
     "latest_version": "1.54.0"
+  },
+  {
+    "name": "dataproc-2-0-ubu18",
+    "latest_version": "dataproc-2-0-ubu18-20260610-000000-rc02"
+  },
+  {
+    "name": "dataproc-2-1-deb11",
+    "latest_version": "dataproc-2-1-deb11-20261002-210007-rc01"
+  },
+  {
+    "name": "dataproc-2-1-ubu20",
+    "latest_version": "dataproc-2-1-ubu20-20261002-210007-rc01"
+  },
+  {
+    "name": "dataproc-2-2-ubu22",
+    "latest_version": "dataproc-2-2-ubu22-20260927-132849-rc01"
   }
 ]
