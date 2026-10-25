@@ -4994,6 +4994,30 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_create_table_command.hive_insert_db_t1:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
@@ -57181,6 +57205,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       }
