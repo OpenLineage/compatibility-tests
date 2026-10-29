@@ -265,7 +265,7 @@
       },
       {
         "name": "hive_insert",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "default:hive_insert_test.execute_drop_table_command:COMPLETE",
@@ -357,12 +357,10 @@
           },
           {
             "name": "run_event_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'run_event_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -371,12 +369,10 @@
           },
           {
             "name": "parent_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'parent_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "parent"
@@ -385,12 +381,10 @@
           },
           {
             "name": "spark_properties_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'spark_properties_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "spark_properties"
@@ -399,12 +393,10 @@
           },
           {
             "name": "processing_engine_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'processing_engine_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "processing_engine"
@@ -413,12 +405,10 @@
           },
           {
             "name": "gcp_dataproc_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'gcp_dataproc_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "gcp_dataproc"
@@ -427,12 +417,10 @@
           },
           {
             "name": "jobType_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'jobType_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "jobType"
@@ -441,12 +429,10 @@
           },
           {
             "name": "gcp_lineage_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'gcp_lineage_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "gcp_lineage"
@@ -455,12 +441,10 @@
           },
           {
             "name": "dataSource_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'dataSource_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "dataSource"
@@ -469,12 +453,10 @@
           },
           {
             "name": "schema_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'schema_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "schema"
@@ -488,12 +470,10 @@
           },
           {
             "name": "columnLineage_test",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "openlineage",
-            "details": [
-              "'columnLineage_test' event with .eventType: COMPLETE, .job.name: hive_insert_test.execute_insert_into_hive_table.hive_insert_db_t2 and .job.namespace: default not found in result events"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "columnLineage"
