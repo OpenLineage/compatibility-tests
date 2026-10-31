@@ -57910,6 +57910,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.hive_t2:COMPLETE",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.execute_create_hive_table_as_select_command.hive_t2:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -58980,6 +58996,14 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.local_table_scan:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
@@ -59464,6 +59488,22 @@
                 ]
               }
             }
+          },
+          {
+            "name": "default:simple_test.collect_limit:RUNNING",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
+          },
+          {
+            "name": "default:simple_test.collect_limit:START",
+            "status": "SUCCESS",
+            "validation_type": "syntax",
+            "entity_type": "openlineage",
+            "details": [],
+            "tags": {}
           }
         ]
       },
