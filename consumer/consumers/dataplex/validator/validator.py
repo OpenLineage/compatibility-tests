@@ -14,6 +14,14 @@ from compare_events import diff
 from report import Report, Component, Scenario, Test
 
 LINK_INDEXING_TIMEOUT_SECONDS = 240
+LINK_RETRY_INTERVAL_SECONDS = 15
+MAX_LOGGED_DETAILS = 10
+
+
+def log(message):
+    # flush explicitly, stdout is block-buffered in CI and the whole log would only show up at exit
+    print(f"[{time.strftime('%H:%M:%S')}] {message}", flush=True)
+
 
 class EntityHandler:
 
@@ -35,13 +43,15 @@ class EntityHandler:
 
     def send_ol_events(self, scenario):
         events = self.load_ol_events(scenario)
+        log(f"Sending {len(events)} events")
         report = []
         for e in events:
             try:
-                response = self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
+                self.client.process_open_lineage_run_event(parent=self.parent, open_lineage=e['payload'])
                 report.append((e['name'], []))
                 time.sleep(0.5)
             except InvalidArgument as exc:
+                log(f"Event {e['name']} rejected: {exc.args[0]}")
                 report.append((e['name'], exc.args[0]))
         time.sleep(5)
         return report
@@ -87,6 +97,8 @@ class EntityHandler:
         links = [Message.to_dict(res) for fqn in entities for res in self.get_links_from(fqn)]
 
         values = list({link["name"]: link for link in links}.values())
+        log(f"Api state: {len(processes)} processes, {len(runs)} runs, {len(lineage_events)} lineage events, "
+            f"{len(values)} links")
         return processes, runs, lineage_events, values
 
     @staticmethod
@@ -103,6 +115,7 @@ class EntityHandler:
 
     def clean_up(self):
         processes = [x for x in self.client.list_processes(parent=self.parent)]
+        log(f"Cleaning up {len(processes)} processes")
         for p in processes:
             self.client.delete_process(name=p.name)
 
@@ -198,36 +211,81 @@ def get_arguments():
     return consumer_dir, scenario_dir, parent, client, release, dump, target
 
 
+def failed_tests(scenario):
+    return sorted(name for name, test in scenario.tests.items() if test.status == "FAILURE")
+
+
+def log_failures(scenario, api_state):
+    for name in failed_tests(scenario):
+        details = scenario.tests[name].details
+        log(f"  {name} failed with {len(details)} differences:")
+        for d in details[:MAX_LOGGED_DETAILS]:
+            log(f"    {d}")
+        if len(details) > MAX_LOGGED_DETAILS:
+            log(f"    ... {len(details) - MAX_LOGGED_DETAILS} more in the report")
+    if "lineage_event" in failed_tests(scenario) or "link" in failed_tests(scenario):
+        _, _, lineage_events, links = api_state
+        log("  actual lineage event links:")
+        for le in sorted(lineage_events, key=lambda e: e['start_time']):
+            for link in le['links']:
+                log(f"    {le['start_time']}: {link['source']['fully_qualified_name']} -> "
+                    f"{link['target']['fully_qualified_name']}")
+        log("  actual searched links:")
+        for link in links:
+            log(f"    {link['start_time']}: {link['source']['fully_qualified_name']} -> "
+                f"{link['target']['fully_qualified_name']}")
+
+
+def validate_with_link_retries(validator, handler, scenario_name, validation_events):
+    # links are indexed asynchronously, usually 45-120s after the events are processed,
+    # everything else is available right away, so only wait while links are the only failure
+    start = time.time()
+    attempt = 1
+    while True:
+        api_state = handler.get_api_state()
+        result = validator.validate_api_state(scenario_name, api_state, validation_events)
+        failed = failed_tests(result)
+        elapsed = int(time.time() - start)
+        if not failed:
+            log(f"Api state of {scenario_name} valid after {elapsed}s (attempt {attempt})")
+            return result
+        if failed != ["link"]:
+            log(f"Api state of {scenario_name} invalid ({', '.join(failed)}), not waiting for link indexing")
+            log_failures(result, api_state)
+            return result
+        if elapsed + LINK_RETRY_INTERVAL_SECONDS > LINK_INDEXING_TIMEOUT_SECONDS:
+            log(f"Links of {scenario_name} still invalid after {elapsed}s, giving up")
+            log_failures(result, api_state)
+            return result
+        log(f"Links of {scenario_name} not indexed yet after {elapsed}s (attempt {attempt}), "
+            f"retrying in {LINK_RETRY_INTERVAL_SECONDS}s")
+        time.sleep(LINK_RETRY_INTERVAL_SECONDS)
+        attempt += 1
+
+
 def process_scenario(validator, handler, scenario_name, dump):
-    print(f"Processing scenario {scenario_name}")
+    start = time.time()
+    log(f"=== Processing scenario {scenario_name} ===")
     handler.clean_up()
     config = handler.read_scenario_config(scenario_name)
-    print(config)
     errors = handler.send_ol_events(scenario_name)
-    print(f"Syntax validation for {scenario_name}")
     scenario = validator.validate_syntax(config, errors, scenario_name)
+    log(f"Syntax validation for {scenario_name}: {scenario.status}")
 
     if scenario.status == "SUCCESS":
         if dump:
-            print(f"Dumping api state of {scenario_name}")
             # links are indexed asynchronously, give them time to show up in the dump
+            log(f"Waiting {LINK_INDEXING_TIMEOUT_SECONDS // 2}s for link indexing before dumping {scenario_name}")
             time.sleep(LINK_INDEXING_TIMEOUT_SECONDS / 2)
             handler.dump_api_state(scenario_name)
+            log(f"Dumped api state of {scenario_name}")
         else:
             consumer_config = handler.read_consumer_config(scenario_name)
             validation_events = handler.load_validation_events(scenario_name, consumer_config)
-            print(f"Api state validation for {scenario_name}")
-            # links are indexed asynchronously, usually 45-120s after the events are processed
-            deadline = time.time() + LINK_INDEXING_TIMEOUT_SECONDS
-            while True:
-                result = validator.validate_api_state(scenario_name, handler.get_api_state(), validation_events)
-                if result.status == "SUCCESS" or time.time() > deadline:
-                    break
-                print(f"Api state of {scenario_name} not complete yet, retrying")
-                time.sleep(15)
-            scenario.update(result)
+            scenario.update(validate_with_link_retries(validator, handler, scenario_name, validation_events))
 
     handler.clean_up()
+    log(f"=== {scenario_name}: {scenario.status} in {int(time.time() - start)}s ===")
     return scenario
 
 
