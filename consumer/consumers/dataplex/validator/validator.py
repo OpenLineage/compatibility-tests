@@ -1,6 +1,8 @@
 import argparse
 import json
 import os
+import re
+import secrets
 import time
 from pathlib import Path
 from os.path import join
@@ -16,6 +18,10 @@ from report import Report, Component, Scenario, Test
 LINK_INDEXING_TIMEOUT_SECONDS = 240
 LINK_RETRY_INTERVAL_SECONDS = 15
 MAX_LOGGED_DETAILS = 10
+# processes left behind by crashed runs are removed once their token is older than this
+STALE_PROCESS_SECONDS = 3 * 60 * 60
+# process display names are "<job namespace>:<job name>", the token is appended to the namespace
+TOKEN_PATTERN = re.compile(r"-t(\d{10})-[0-9a-f]{4}:")
 
 
 def log(message):
@@ -31,6 +37,18 @@ class EntityHandler:
         self.scenario_dir = Path(scenario_dir)
         self.parent = parent
         self.release = release
+        self.token = None
+
+    def start_scenario(self):
+        # runs share one Dataplex project, a unique job namespace per scenario run keeps their processes apart
+        self.token = f"t{int(time.time())}-{secrets.token_hex(2)}"
+        log(f"Job namespaces suffixed with -{self.token}")
+
+    def is_own(self, process):
+        return f"-{self.token}:" in process.display_name
+
+    def strip_token(self, value):
+        return value.replace(f"-{self.token}:", ":")
 
     def load_ol_events(self, scenario):
         scenario_path = self.scenario_dir / scenario / "events"
@@ -39,7 +57,12 @@ class EntityHandler:
         return sorted(entity, key=lambda d: d['name'])
 
     def get_payload(self, entry):
-        return ParseDict(json.loads(entry.read_text()), struct_pb2.Struct())
+        event = json.loads(entry.read_text())
+        parent = event.get('run', {}).get('facets', {}).get('parent', {})
+        for job in [event.get('job'), parent.get('job'), parent.get('root', {}).get('job')]:
+            if job and 'namespace' in job:
+                job['namespace'] = f"{job['namespace']}-{self.token}"
+        return ParseDict(event, struct_pb2.Struct())
 
     def send_ol_events(self, scenario):
         events = self.load_ol_events(scenario)
@@ -88,7 +111,9 @@ class EntityHandler:
             json.dump(processes_state, f, indent=2)
 
     def get_api_state(self):
-        processes = [Message.to_dict(p) for p in self.client.list_processes(parent=self.parent)]
+        processes = [Message.to_dict(p) for p in self.client.list_processes(parent=self.parent) if self.is_own(p)]
+        for p in processes:
+            p['display_name'] = self.strip_token(p['display_name'])
         runs = [Message.to_dict(r) for p in processes for r in self.client.list_runs(parent=p['name'])]
         lineage_events = [Message.to_dict(e) for r in runs for e in self.client.list_lineage_events(parent=r['name'])]
         entities = sorted({fqn for le in lineage_events for link in le['links']
@@ -114,9 +139,18 @@ class EntityHandler:
             request=SearchLinksRequest(source=EntityReference(fully_qualified_name=fqn), parent=self.parent))
 
     def clean_up(self):
-        processes = [x for x in self.client.list_processes(parent=self.parent)]
+        processes = [p for p in self.client.list_processes(parent=self.parent) if self.is_own(p)]
         log(f"Cleaning up {len(processes)} processes")
         for p in processes:
+            self.client.delete_process(name=p.name)
+
+    def clean_up_stale(self):
+        # only touches processes created by this validator, other runs may be using the project right now
+        now = time.time()
+        stale = [p for p in self.client.list_processes(parent=self.parent)
+                 if (m := TOKEN_PATTERN.search(p.display_name)) and now - int(m.group(1)) > STALE_PROCESS_SECONDS]
+        log(f"Cleaning up {len(stale)} stale processes")
+        for p in stale:
             self.client.delete_process(name=p.name)
 
     def read_consumer_config(self, scenario_name):
@@ -144,25 +178,28 @@ class Validator:
         processes_expected, runs_expected, events_expected, links_expected = validation_events
         processes_state, runs_state, events_state, links = api_state
         tests = []
-        tests.extend(Validator.compare_by_name(processes_expected, processes_state, 'process'))
-        tests.extend(Validator.compare_by_name(runs_expected, runs_state, 'run'))
+        tests.extend(Validator.compare_by_display_name(processes_expected, processes_state, 'process'))
+        tests.extend(Validator.compare_by_display_name(runs_expected, runs_state, 'run'))
         tests.extend(Validator.compare_by_start_time(events_expected, events_state, 'lineage_event'))
         tests.extend(Validator.compare_by_start_time(links_expected, links, 'link'))
         return Scenario.simplified(scenario, tests)
 
     @staticmethod
-    def compare_by_name(expected, result, entity_type):
+    def compare_by_display_name(expected, result, entity_type):
+        # ids are derived from the per-run job namespace, so entities are matched by display name
+        # (process: "<namespace>:<job name>", run: OpenLineage run id), which may be a template
         results = []
         for k, v in expected.items():
             details = []
             for exp in v['body']:
-                entity_name = exp['name'].rsplit('/', 1)
-                matched = next((proc for proc in result if proc['name'] == exp['name']), None)
-                if matched is not None:
-                    res = diff(exp, matched, "")
-                    details.extend([f"{entity_type} {entity_name}, {r}" for r in res])
+                label = exp['display_name']
+                matched = [r for r in result if not diff(label, r.get('display_name'), ".display_name")]
+                if len(matched) > 0:
+                    d = [diff(exp, match, "") for match in matched]
+                    if not any(len(e) == 0 for e in d):
+                        details.extend([f"{entity_type} {label}, {r}" for r in d[0]])
                 else:
-                    details.append(f"{entity_type} {entity_name}, no matching entity")
+                    details.append(f"{entity_type} {label}, no matching entity")
             results.append(Test.simplified(entity_type, 'semantics', entity_type, details, v['tags']))
         return results
 
@@ -266,7 +303,7 @@ def validate_with_link_retries(validator, handler, scenario_name, validation_eve
 def process_scenario(validator, handler, scenario_name, dump):
     start = time.time()
     log(f"=== Processing scenario {scenario_name} ===")
-    handler.clean_up()
+    handler.start_scenario()
     config = handler.read_scenario_config(scenario_name)
     errors = handler.send_ol_events(scenario_name)
     scenario = validator.validate_syntax(config, errors, scenario_name)
@@ -294,6 +331,7 @@ def main():
     validator = Validator()
     handler = EntityHandler(client, consumer_dir, scenario_dir, parent, release)
     scenarios_names = list_scenarios(consumer_dir)
+    handler.clean_up_stale()
     scenarios = [process_scenario(validator, handler, scenario, dump) for scenario in scenarios_names]
 
     component = Component('dataplex', 'consumer', {s.name: s for s in scenarios}, "", "")

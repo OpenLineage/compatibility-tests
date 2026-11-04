@@ -1,6 +1,6 @@
 [
   {
-    "name": "projects/484892851355/locations/us/processes/406e18d61059046db82c97ccf456e36f/runs/298a251b4fefd3db558398759768534e",
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/[^/]+/runs/[^/]+') }}",
     "display_name": "run_id",
     "start_time": "2023-04-04T13:21:16.098Z",
     "end_time": "2023-04-04T13:21:16.098Z",

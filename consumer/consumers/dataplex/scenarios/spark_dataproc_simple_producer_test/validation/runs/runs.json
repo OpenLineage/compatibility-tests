@@ -1,6 +1,6 @@
 [
   {
-    "name": "projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd/runs/0d35c69fdc8ba859b16e4c77f885ccb1",
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/[^/]+/runs/[^/]+') }}",
     "display_name": "019299c5-12f5-7946-b5b2-c6abab662e20",
     "attributes": {
       "processing_engine": {
