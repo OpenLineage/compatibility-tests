@@ -1,6 +1,6 @@
 [
   {
-    "name": "projects/484892851355/locations/us/processes/4498270707ca1472c195acf9439db8dd",
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/[^/]+') }}",
     "display_name": "default:cl_i_test_application.execute_insert_into_hive_table.warehouse_t2",
     "origin": {
       "source_type": 6,

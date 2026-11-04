@@ -6,10 +6,10 @@
     "links": [
       {
         "source": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t1"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t1"
         },
         "target": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t2"
         }
       }
     ]
@@ -21,10 +21,10 @@
     "links": [
       {
         "source": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t1"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t1"
         },
         "target": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t2"
         }
       }
     ]
@@ -36,10 +36,10 @@
     "links": [
       {
         "source": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t1"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t1"
         },
         "target": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t2"
         }
       }
     ]
@@ -51,10 +51,10 @@
     "links": [
       {
         "source": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t1"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t1"
         },
         "target": {
-          "fully_qualified_name": "dbfs:dataproc-producer-test-m.user/hive/warehouse/t2"
+          "fully_qualified_name": "hdfs:dataproc-producer-test-m.user/hive/warehouse/t2"
         }
       }
     ]

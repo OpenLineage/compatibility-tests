@@ -1,6 +1,6 @@
 [
   {
-    "name": "projects/484892851355/locations/us/processes/406e18d61059046db82c97ccf456e36f",
+    "name": "{{ match(result, 'projects/484892851355/locations/us/processes/[^/]+') }}",
     "display_name": "job_namespace:job_name",
     "attributes": {}
   }
