@@ -27,6 +27,9 @@ class OLSyntaxValidator:
         if facet.get('_schemaURL') is not None:
             is_custom = any(facet.get('_schemaURL').__contains__(f'defs/{facet_type}Facet') for facet_type in
                     ['Run', 'Job', 'Dataset', 'InputDataset', 'OutputDataset'])
+            # common package facets without a loaded schema: dbt-model-dataset has no published schema,
+            # dbt-version-run and dbt-run-run schemas are only collected for OpenLineage >= 1.40 (src/ layout),
+            # newer releases validate them through is_facet
             is_common = any(facet.get('_schemaURL').__contains__(f'schema/{facet_type}-facet.json') for facet_type in
                             ['dbt-version-run', 'dbt-run-run', 'dbt-model-dataset'])
             if is_custom or is_common:
@@ -37,7 +40,7 @@ class OLSyntaxValidator:
     @staticmethod
     def is_facet(path):
         # List of facets from the common package that can be used for syntax validation
-        common_facets = ['dbt-node-job-facet.json']
+        common_facets = ['dbt-node-job-facet.json', 'dbt-version-run-facet.json', 'dbt-run-run-facet.json']
         return 'Facet.json' in path or path in common_facets
 
     @classmethod
