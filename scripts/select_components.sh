@@ -52,20 +52,19 @@ dbt_version() {
 }
 
 # Dataproc has no release numbers we could compare, but every release publishes a new image in each image family,
-# so a family whose newest image differs from the one in releases.json got a new release
+# so a family whose newest image differs from the one in releases.json got a new release.
+# DATAPROC_IMAGES holds the newest images as a JSON list of [family, image] pairs (see get_dataproc_images.sh).
 dataproc_version() {
   local changed=()
-  for family in $(jq -r '.[]' producer/spark_dataproc/dataproc_images.json producer/hive_dataproc/dataproc_images.json | sort -u); do
+  while IFS=$'\t' read -r family latest_image; do
+    [[ -z "$family" ]] && continue
     current_image=$(jq -r --arg name "$family" '.[] | select(.name == $name) | .latest_version' generated-files/releases.json)
-    latest_image=$(gcloud compute images describe-from-family "$family" --project cloud-dataproc --format="value(name)" 2> /dev/null)
 
-    if [[ -z "$latest_image" ]]; then
-      echo "::error::Could not get the newest image of Dataproc image family ${family}"
-    elif [[ "$latest_image" != "$current_image" ]]; then
+    if [[ "$latest_image" != "$current_image" ]]; then
       update_version "$family" "$latest_image"
       changed+=("$family")
     fi
-  done
+  done < <(jq -r '.[] | @tsv' <<< "${DATAPROC_IMAGES:-[]}")
 
   echo "dataproc_changed_families=$(printf '%s\n' "${changed[@]}" | jq -R . | jq -sc 'map(select(. != ""))')" >> $GITHUB_OUTPUT
   (( ${#changed[@]} > 0 ))

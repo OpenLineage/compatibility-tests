@@ -41,7 +41,27 @@ permissions:
   issues: write
 
 jobs:
+  # A separate job because the GCP key is a multi-line secret: GitHub masks each of its lines, including the bare
+  # "{" and "}", and then drops every output of the job holding it that contains one, i.e. every JSON matrix
+  find-dataproc-images:
+    runs-on: ubuntu-latest
+    outputs:
+      dataproc_images: ${{ steps.find-images.outputs.dataproc_images }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: GCP authorization
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Find the newest images of the Dataproc image families we test
+        id: find-images
+        run: ./scripts/get_dataproc_images.sh | tee -a $GITHUB_OUTPUT
+
   initialize_workflow:
+    needs: find-dataproc-images
     runs-on: ubuntu-latest
     outputs:
       run_scenarios: ${{ steps.set-matrix-values.outputs.run_scenarios }}
@@ -63,15 +83,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # needed to look up the newest Dataproc images
-      - name: GCP authorization
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
       # finds new releases of OpenLineage, dbt and Dataproc (new images in the image families we test)
       - name: Select components to run
         id: select-components
+        env:
+          DATAPROC_IMAGES: ${{ needs.find-dataproc-images.outputs.dataproc_images }}
         run: ./scripts/select_components.sh
 
       - uses: actions/upload-artifact@v4
