@@ -21,14 +21,14 @@
   },
   {
     "name": "dataproc-2-1-deb11",
-    "latest_version": "dataproc-2-1-deb11-20261002-210007-rc01"
+    "latest_version": "dataproc-2-1-deb11-20261029-070500-rc01"
   },
   {
     "name": "dataproc-2-1-ubu20",
-    "latest_version": "dataproc-2-1-ubu20-20261002-210007-rc01"
+    "latest_version": "dataproc-2-1-ubu20-20261029-070500-rc01"
   },
   {
     "name": "dataproc-2-2-ubu22",
-    "latest_version": "dataproc-2-2-ubu22-20260927-132849-rc01"
+    "latest_version": "dataproc-2-2-ubu22-20261030-231534-rc01"
   }
 ]

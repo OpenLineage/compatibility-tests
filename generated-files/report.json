@@ -5031,7 +5031,7 @@
     "scenarios": [
       {
         "name": "simple_run_event",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "simple_run_event.json",
@@ -5081,12 +5081,10 @@
           },
           {
             "name": "link",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [
-              "event 2023-04-04T13:21:16.098Z, no matching entity"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -5097,7 +5095,7 @@
       },
       {
         "name": "spark_dataproc_simple_producer_test",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "1.json",
@@ -5182,12 +5180,10 @@
           },
           {
             "name": "link",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [
-              "event 2024-10-17T09:18:26.825Z, no matching entity"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
@@ -5198,7 +5194,7 @@
       },
       {
         "name": "airflow",
-        "status": "FAILURE",
+        "status": "SUCCESS",
         "tests": [
           {
             "name": "line_01.json",
@@ -5594,23 +5590,10 @@
           },
           {
             "name": "link",
-            "status": "FAILURE",
+            "status": "SUCCESS",
             "validation_type": "semantics",
             "entity_type": "link",
-            "details": [
-              "event 2024-11-26T13:05:39.460005Z, no matching entity",
-              "event 2024-11-26T13:05:29.606867Z, no matching entity",
-              "event 2024-11-26T13:05:29.606867Z, no matching entity",
-              "event 2024-11-26T13:05:34.626595Z, no matching entity",
-              "event 2024-11-26T13:10:46.074886Z, no matching entity",
-              "event 2024-11-26T13:10:46.074886Z, no matching entity",
-              "event 2024-11-26T13:10:46.074886Z, no matching entity",
-              "event 2024-11-26T13:10:46.074886Z, no matching entity",
-              "event 2024-11-26T13:10:45.874270Z, no matching entity",
-              "event 2024-11-26T13:10:41.007315Z, no matching entity",
-              "event 2024-11-26T13:10:44.750985Z, no matching entity",
-              "event 2024-11-26T13:10:44.755944Z, no matching entity"
-            ],
+            "details": [],
             "tags": {
               "facets": [
                 "run_event"
