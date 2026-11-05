@@ -26,6 +26,10 @@ def real(selection):
     (".github/actions/dataproc_cluster/action.yml", {"spark_dataproc", "hive_dataproc"}),
     (".github/actions/get_openlineage_artifacts/action.yml", {"hive_dataproc"}),
     ("scripts/get_valid_test_scenarios.sh", {"spark_dataproc", "hive_dataproc", "dbt"}),
+    ("dev/dataproc/dataproc_workflow.py", {"spark_dataproc", "hive_dataproc"}),
+    ("dev/dataproc/install_jars.sh", {"spark_dataproc", "hive_dataproc"}),
+    ("dev/defaults.env", {"spark_dataproc", "hive_dataproc"}),
+    ("dev/lib/status.sh", {"spark_dataproc", "hive_dataproc", "dbt"}),
 ])
 def test_real_runs(path, expected_real):
     selection = select_components([path])
@@ -45,6 +49,12 @@ def test_validator_change_revalidates_dataproc_and_runs_cheap_components():
 def test_modules_imported_by_dataplex_also_run_dataplex(path):
     selection = select_components([path])
     assert real(selection) == {"dbt", "scenarios", "dataplex"}
+    assert selection["revalidate"] == ["hive_dataproc", "spark_dataproc"]
+
+
+def test_local_validation_helpers_count_as_validation_code():
+    selection = select_components(["dev/validation/validate_locally.sh"])
+    assert real(selection) == {"dbt", "scenarios"}
     assert selection["revalidate"] == ["hive_dataproc", "spark_dataproc"]
 
 

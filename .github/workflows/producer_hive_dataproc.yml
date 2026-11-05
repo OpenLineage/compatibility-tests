@@ -106,7 +106,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
-          if [ -f producer/hive_dataproc/runner/requirements.txt ]; then pip install -r producer/hive_dataproc/runner/requirements.txt; fi
+          pip install -r dev/dataproc/requirements.txt
 
 
       - name: Start producer
@@ -129,7 +129,7 @@ jobs:
             properties+=',hive:hive.root.logger=DEBUG'
             properties+=',hive:hive.log.explain.output=true'
           
-            python producer/hive_dataproc/runner/dataproc_workflow.py create-cluster \
+            python dev/dataproc/dataproc_workflow.py create-cluster \
               --project-id "gcp-open-lineage-testing" \
               --region "us-west1" \
               --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
@@ -177,7 +177,7 @@ jobs:
               properties+=",hive.openlineage.transport.bucketName=open-lineage-e2e"
               properties+=",hive.openlineage.transport.fileNamePrefix=events/$scenario/$(date +%s%3N)/"
 
-              if python producer/hive_dataproc/runner/dataproc_workflow.py run-hive-query \
+              if python dev/dataproc/dataproc_workflow.py run-hive-query \
                 --project-id gcp-open-lineage-testing \
                 --region us-west1 \
                 --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
