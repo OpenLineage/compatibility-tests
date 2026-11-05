@@ -180,3 +180,9 @@ bin/
 /*-events-*/
 /*-report.json
 /*-logs-*/
+
+# local files that must not be committed
+.DS_Store
+*.jar
+# dbt's per-machine anonymous user id
+**/.user.yml

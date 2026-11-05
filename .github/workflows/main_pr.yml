@@ -43,6 +43,10 @@ jobs:
         id: check-configs
         run: ./scripts/check_configs.sh
 
+      # warnings only: scenarios that never run and tested versions without scenarios
+      - name: check scenario coverage
+        run: python3 scripts/check_scenario_coverage.py --summary "$GITHUB_STEP_SUMMARY"
+
       # which components to run for real and which to re-validate from stored events, see scripts/get_pr_components.py
       - name: get changed files
         id: get-changed

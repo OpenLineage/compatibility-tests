@@ -15,6 +15,18 @@ check_path() {
     fi
 }
 
+# Function to check that a file exists and isn't empty
+check_nonempty() {
+    local path="$1"
+    if [[ ! -e "$path" ]]; then
+        echo "Missing: $path"
+        missing_count=$((missing_count + 1))
+    elif [[ ! -s "$path" ]]; then
+        echo "Empty: $path"
+        missing_count=$((missing_count + 1))
+    fi
+}
+
 # Function to remove trailing slashes from a directory path
 remove_trailing_slash() {
     echo "${1%/}"
@@ -44,7 +56,7 @@ for consumer_dir in "$BASE_PATH/consumer/consumers/"*/; do
 
         check_path "$scenario_dir/config.json"
         check_path "$scenario_dir/maintainers.json"
-        check_path "$scenario_dir/scenario.md"
+        check_nonempty "$scenario_dir/scenario.md"
         check_path "$scenario_dir/validation"
     done
 done
@@ -55,7 +67,7 @@ for scenario_dir in "$BASE_PATH/consumer/scenarios/"*/; do
     [[ -d "$scenario_dir" ]] || continue
 
     check_path "$scenario_dir/maintainers.json"
-    check_path "$scenario_dir/scenario.md"
+    check_nonempty "$scenario_dir/scenario.md"
 
     # Check if at least one event file is present
     if ! compgen -G "$scenario_dir/events/"*.json > /dev/null; then
@@ -84,7 +96,7 @@ for producer_dir in "$BASE_PATH/producer/"*/; do
 
         check_path "$scenario_dir/config.json"
         check_path "$scenario_dir/maintainers.json"
-        check_path "$scenario_dir/scenario.md"
+        check_nonempty "$scenario_dir/scenario.md"
 
         # Check if at least one event file is present
         if ! compgen -G "$scenario_dir/events/"*.json > /dev/null; then
@@ -98,6 +110,6 @@ done
 if [[ $missing_count -eq 0 ]]; then
     exit 0
 else
-    echo "$missing_count required paths are missing."
+    echo "$missing_count required paths are missing or empty."
     exit 1
 fi
