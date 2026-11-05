@@ -106,7 +106,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
-          if [ -f producer/hive_dataproc/runner/requirements.txt ]; then pip install -r producer/spark_dataproc/runner/requirements.txt; fi
+          if [ -f producer/hive_dataproc/runner/requirements.txt ]; then pip install -r producer/hive_dataproc/runner/requirements.txt; fi
 
 
       - name: Start producer
@@ -158,6 +158,12 @@ jobs:
           properties+=',hive.openlineage.transport.type=gcs'
           properties+=',hive.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
 
+          # one entry per scenario, [{scenario, state, job_id}] as written by the spark runner; a failed query fails
+          # its scenario in validation instead of stopping the other scenarios
+          status_file="${{ steps.set-producer-output.outputs.event_dir }}/status.json"
+          mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}"
+          echo '[]' > "$status_file"
+
           for scenario in "${scenarios[@]}"
           do
               echo "Getting script for scenario $scenario"
@@ -171,7 +177,7 @@ jobs:
               properties+=",hive.openlineage.transport.bucketName=open-lineage-e2e"
               properties+=",hive.openlineage.transport.fileNamePrefix=events/$scenario/$(date +%s%3N)/"
 
-              if ! python producer/hive_dataproc/runner/dataproc_workflow.py run-hive-query \
+              if python producer/hive_dataproc/runner/dataproc_workflow.py run-hive-query \
                 --project-id gcp-open-lineage-testing \
                 --region us-west1 \
                 --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
@@ -180,11 +186,14 @@ jobs:
                 --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
                 --properties "$properties"
               then
-                echo "Error: hive job failed for scenario: $scenario"
-                exit 1
+                state=DONE
+                echo "Finished running hive job for scenario: $scenario"
+              else
+                state=FAILED
+                echo "::warning::hive job failed for scenario $scenario"
               fi
-
-              echo "Finished running hive job for scenario: $scenario"
+              jq --arg scenario "$scenario" --arg state "$state" '. + [{scenario: $scenario, state: $state, job_id: ""}]' \
+                "$status_file" > "$status_file.tmp" && mv "$status_file.tmp" "$status_file"
           done
 
           echo "Finished running all scenarios"
@@ -198,7 +207,8 @@ jobs:
           ol_release: ${{ inputs.ol_release }}
           component_release: ${{ inputs.component_release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
-          target-path: 'hive-dataproc-${{inputs.hive_release}}-${{inputs.ol_release}}-report.json'
+          target-path: 'hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report.json'
+          run-status-file: ${{ steps.set-producer-output.outputs.event_dir }}/status.json
 
       # the events PR checks re-validate when validation code changes (revalidate_stored_events.yml)
       - name: Update baseline events
@@ -213,3 +223,4 @@ jobs:
           name: hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report
           path: hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report.json
           retention-days: 1
+          if-no-files-found: error
