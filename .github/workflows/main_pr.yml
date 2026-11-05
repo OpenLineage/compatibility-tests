@@ -100,7 +100,7 @@ jobs:
 
       - name: Run script tests
         run: |
-          pip install -r scripts/requirements.txt -r scripts/requirements-dev.txt
+          pip install -r scripts/requirements.txt -r scripts/requirements-dev.txt -r dev/dataproc/requirements.txt
           python -m pytest scripts/tests -q
 
   ######## COMPONENT VALIDATION ########
