@@ -7,7 +7,9 @@ set -euxo pipefail
 readonly VM_HADOOP_LIB_DIR=/usr/lib/hadoop/lib
 readonly VM_DATAPROC_VM_HADOOP_LIB_DIR_DIR=/usr/local/share/google/dataproc/lib
 readonly OPENLINEAGE_HIVE_URL=$(/usr/share/google/get_metadata_value attributes/OPENLINEAGE_HIVE_URL || echo "")
-readonly GCS_TRANSPORT_JAR_URL=$(/usr/share/google/get_metadata_value attributes/GCS_TRANSPORT_JAR_URL || echo "")
+# the workflow sets GCS_TRANSPORT_JAR; GCS_TRANSPORT_JAR_URL is the old name, still read as a fallback
+readonly GCS_TRANSPORT_JAR_URL=$(/usr/share/google/get_metadata_value attributes/GCS_TRANSPORT_JAR \
+  || /usr/share/google/get_metadata_value attributes/GCS_TRANSPORT_JAR_URL || echo "")
 
 if [[ -d ${VM_DATAPROC_VM_HADOOP_LIB_DIR_DIR} ]]; then
   vm_lib_dir=${VM_DATAPROC_VM_HADOOP_LIB_DIR_DIR}
