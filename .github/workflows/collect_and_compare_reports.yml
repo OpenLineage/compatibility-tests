@@ -7,6 +7,11 @@ on:
         required: false
         default: false
         description: "fail the job if new failure report is found"
+      track-pending:
+        type: boolean
+        required: false
+        default: false
+        description: "update pending_runs.json from the planned-parts artifact: planned parts without a report stay pending (release check)"
 
 jobs:
   collect-and-compare-reports:
@@ -31,6 +36,26 @@ jobs:
         with:
           path: reports/
           merge-multiple: true
+
+      # before the comparison writes its own *-report.json files into reports/
+      - name: Update pending parts
+        if: ${{ inputs.track-pending }}
+        run: |
+          python scripts/pending_runs.py update \
+            --planned reports/planned.json \
+            --reports-dir reports/ \
+            --pending generated-files/pending_runs.json \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --out reports/updated-pending-runs.json \
+            --summary "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.track-pending }}
+        with:
+          name: updated-pending-runs
+          path: reports/updated-pending-runs.json
+          retention-days: 1
+          if-no-files-found: error
 
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
