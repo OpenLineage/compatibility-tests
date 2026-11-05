@@ -26,6 +26,10 @@ inputs:
   component:
     description: "Component name to use"
     required: true
+  run-status-file:
+    description: "status.json of the producer run ([{scenario, state, job_id}]); scenarios whose job isn't DONE fail"
+    default: ""
+    required: false
 
 
 outputs:
@@ -70,4 +74,6 @@ runs:
         --component="${{ inputs.component }}" \
         --producer_dir=${{ inputs.producer-dir }} \
         --openlineage_version=${{ inputs.release_tags }} \
-        --component_version=${{ inputs.component_release }}
+        --component_version=${{ inputs.component_release }} \
+        ${{ inputs.ol_release && format('--openlineage_release={0}', inputs.ol_release) || '' }} \
+        ${{ inputs.run-status-file && format('--run_status={0}', inputs.run-status-file) || '' }}

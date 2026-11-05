@@ -213,8 +213,8 @@ jobs:
             --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
             || echo "::warning::Some scenarios failed for OpenLineage $ol_release"
 
-            # check-spark-jobs fails the workflow for every scenario not in DONE state, so a runner crash
-            # that left no status.json must still be recorded
+            # validation fails every scenario whose job isn't in DONE state; a runner crash that left no status.json
+            # is recorded as RUNNER_FAILED for every scenario, which validation treats as "the pair didn't run"
             if [[ ! -f "/tmp/driver-logs/$ol_release/status.json" ]]; then
               mkdir -p "/tmp/driver-logs/$ol_release"
               jq -n --arg s "$scenarios" '$s | split(";") | map({scenario: ., state: "RUNNER_FAILED", job_id: ""})' \
@@ -225,8 +225,13 @@ jobs:
             || echo "::warning::No driver logs for OpenLineage $ol_release"
           done 3< /tmp/ol_scenarios
 
+  # runs for every pair whose Spark jobs ran, even when the cluster of another Spark release failed;
+  # a pair that didn't run produces no report, so the release check retries it (pending_runs.json)
   validate:
-    needs: run-spark-tests
+    needs:
+      - stage-openlineage-jars
+      - run-spark-tests
+    if: ${{ !cancelled() && needs.stage-openlineage-jars.result == 'success' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -251,9 +256,28 @@ jobs:
         with:
           credentials_json: '${{ secrets.gcpKey }}'
 
+      # status.json is written by the run step for every openlineage version it ran; without it, or when the runner
+      # itself crashed for every scenario, the pair didn't run: an infra problem, not a result, so the job fails
+      # without a report (the release check retries the pair, see pending_runs.json)
+      - name: Check that the pair ran
+        id: ran
+        if: ${{ steps.init.outputs.scenarios }}
+        run: |
+          pair="spark ${{ matrix.spark_release }}, openlineage ${{ matrix.ol_release }}"
+          status_file=/tmp/status-${{ matrix.spark_release }}-${{ matrix.ol_release }}.json
+          if ! gcloud storage cp "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/status.json" "$status_file" 2> /dev/null; then
+            echo "::error title=Pair did not run::$pair has no status.json, its Spark jobs never ran"
+            exit 1
+          fi
+          if jq -e 'all(.[]; .state == "RUNNER_FAILED")' "$status_file" > /dev/null; then
+            echo "::error title=Pair did not run::$pair: the runner failed before running any scenario"
+            exit 1
+          fi
+          echo "status_file=$status_file" >> "$GITHUB_OUTPUT"
+
       # every scenario gets a directory, so a scenario without events fails validation instead of being skipped
       - name: Download events
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.ran.outputs.status_file }}
         run: |
           IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
           for scenario in "${scenarios[@]}"; do
@@ -263,7 +287,7 @@ jobs:
           || echo "::warning::No events found"
 
       - name: Validation
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.ran.outputs.status_file }}
         uses: ./.github/actions/run_event_validation
         with:
           component: 'spark_dataproc'
@@ -272,33 +296,30 @@ jobs:
           component_release: ${{ matrix.spark_release }}
           event-directory: ${{ steps.init.outputs.event_dir }}
           target-path: 'spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json'
+          run-status-file: ${{ steps.ran.outputs.status_file }}
 
       # the events PR checks re-validate when validation code changes (revalidate_stored_events.yml)
       - name: Update baseline events
-        if: ${{ inputs.update-baseline && steps.init.outputs.scenarios }}
+        if: ${{ inputs.update-baseline && steps.ran.outputs.status_file }}
         run: |
           baseline="gs://${GCS_BUCKET}/baseline-events/spark_dataproc/${{ matrix.spark_release }}/${{ matrix.ol_release }}"
           gcloud storage rsync -r --delete-unmatched-destination-objects "${{ steps.init.outputs.event_dir }}" "$baseline"
-          gcloud storage cp "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/status.json" "$baseline/status.json" \
-          || echo "::warning::No status.json for spark ${{ matrix.spark_release }}, openlineage ${{ matrix.ol_release }}"
+          gcloud storage cp "${{ steps.ran.outputs.status_file }}" "$baseline/status.json"
 
       - uses: actions/upload-artifact@v4
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.ran.outputs.status_file }}
         with:
           name: spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report
           path: spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json
           retention-days: 1
+          if-no-files-found: error
 
-      # scenarios that failed validation or whose Dataproc job didn't finish in DONE state
+      # scenarios that failed validation, including those whose Dataproc job didn't finish in DONE state
       - name: Get driver logs of failed scenarios
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.ran.outputs.status_file }}
         run: |
           mkdir -p failure-logs
-          failed_scenarios=$( {
-            jq -r '.[].scenarios[] | select(.status == "FAILURE") | .name' 'spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json'
-            gcloud storage cat "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/status.json" 2> /dev/null \
-            | jq -r '.[] | select(.state != "DONE") | .scenario'
-          } | sort -u )
+          failed_scenarios=$(jq -r '.[].scenarios[] | select(.status == "FAILURE") | .name' 'spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json')
           for scenario in $failed_scenarios; do
             gcloud storage cp "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/$scenario.log" \
             "failure-logs/$scenario-${{matrix.spark_release}}-${{matrix.ol_release}}-driver.log" \
@@ -306,36 +327,10 @@ jobs:
           done
 
       - uses: actions/upload-artifact@v4
-        if: ${{ steps.init.outputs.scenarios }}
+        if: ${{ steps.ran.outputs.status_file }}
         with:
           name: spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-failure-logs
           path: failure-logs/
           retention-days: 7
           if-no-files-found: ignore
 
-  # validation only sees events, so a job that failed after emitting the expected events (e.g. a dependency
-  # conflict) would pass; this fails the workflow for every Dataproc job that didn't finish in DONE state
-  check-spark-jobs:
-    needs:
-      - run-spark-tests
-      - validate
-    if: ${{ !cancelled() && needs.run-spark-tests.result == 'success' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: GCP authorization
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: '${{ secrets.gcpKey }}'
-
-      - name: Fail if any Spark job didn't finish
-        run: |
-          failed=0
-          for status in $(gcloud storage ls "gs://${GCS_BUCKET}/logs/${RUN_KEY}/**/status.json" 2> /dev/null); do
-            pair=${status#gs://${GCS_BUCKET}/logs/${RUN_KEY}/}
-            pair=${pair%/status.json}
-            while IFS=$'\t' read -r scenario state job_id; do
-              echo "::error title=Spark job failed::$scenario (spark ${pair%%/*}, openlineage ${pair##*/}) ended in state $state, job '$job_id'. Driver log: artifact spark-dataproc-${pair/\//-}-failure-logs"
-              failed=1
-            done < <(gcloud storage cat "$status" | jq -r '.[] | select(.state != "DONE") | [.scenario, .state, .job_id] | @tsv')
-          done
-          exit $failed
