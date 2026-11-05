@@ -1,0 +1,102 @@
+name: Re-validate stored events
+
+# Validates the events stored by the last release run (gs://<bucket>/baseline-events/<component>/<cv>/<ol>/, written by the
+# producer workflows with update-baseline) with the validation code of the calling commit. PR checks use it when validation
+# code changes, so the change is exercised against real events without starting Dataproc clusters. Produces one report
+# artifact per component, which collect_and_compare_reports.yml compares with the published report like any other.
+
+on:
+  workflow_call:
+    secrets:
+      gcpKey:
+        required: true
+    inputs:
+      components:
+        description: "JSON list of components to re-validate, e.g. [\"spark_dataproc\",\"hive_dataproc\"]"
+        type: string
+        required: true
+
+env:
+  BASELINE: gs://open-lineage-e2e/baseline-events
+
+jobs:
+  revalidate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJson(inputs.components) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: GCP authorization
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.gcpKey }}'
+
+      # layout: baseline/<cv>/<ol>/<scenario>/*.json, the pair's status.json moved next to it as baseline/<cv>/<ol>.status.json
+      - name: Download baseline events
+        id: download
+        run: |
+          mkdir -p baseline
+          if ! gcloud storage ls "${BASELINE}/${{ matrix.component }}/" > /dev/null 2>&1; then
+            echo "::warning::No baseline events for ${{ matrix.component }}, its validation isn't covered by this check"
+            echo "- ${{ matrix.component }}: **not covered**, no baseline events" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          gcloud storage cp -r "${BASELINE}/${{ matrix.component }}/*" baseline/
+          for status in baseline/*/*/status.json; do
+            [[ -f "$status" ]] && mv "$status" "${status%/status.json}.status.json"
+          done
+          pairs=$(find baseline -mindepth 2 -maxdepth 2 -type d | sed 's|^baseline/||' | sort)
+          echo "Pairs: $pairs"
+          echo "ol_versions=$(echo "$pairs" | cut -d/ -f2 | sort -u | paste -sd, -)" >> "$GITHUB_OUTPUT"
+          echo "any=true" >> "$GITHUB_OUTPUT"
+
+      - name: get OpenlineageCode
+        if: ${{ steps.download.outputs.any }}
+        uses: actions/checkout@v4
+        with:
+          repository: OpenLineage/OpenLineage
+          path: tmp
+
+      - name: Get spec for each version
+        if: ${{ steps.download.outputs.any }}
+        run: ./dev/validation/get_ol_specs.sh "${{ steps.download.outputs.ol_versions }}" specs tmp
+
+      - name: Set up Python 3.11
+        if: ${{ steps.download.outputs.any }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate
+        if: ${{ steps.download.outputs.any }}
+        run: |
+          pip install -r scripts/requirements.txt
+          mkdir -p pair-reports
+          for pair_dir in baseline/*/*/; do
+            pair=${pair_dir#baseline/}; pair=${pair%/}
+            cv=${pair%%/*}; ol=${pair##*/}
+            echo "::group::${{ matrix.component }} $cv, openlineage $ol"
+            python scripts/validate_ol_events.py \
+              --event_base_dir="$pair_dir" \
+              --spec_base_dir=specs \
+              --target="pair-reports/$cv-$ol.json" \
+              --component="${{ matrix.component }}" \
+              --producer_dir=./producer \
+              --openlineage_version="$ol" \
+              --component_version="$cv"
+            echo "::endgroup::"
+            echo "- ${{ matrix.component }} $cv / OpenLineage $ol: re-validated" >> "$GITHUB_STEP_SUMMARY"
+          done
+          jq -s 'add' pair-reports/*.json > '${{ matrix.component }}-revalidated-report.json'
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.download.outputs.any }}
+        with:
+          name: ${{ matrix.component }}-revalidated-report
+          path: ${{ matrix.component }}-revalidated-report.json
+          retention-days: 1
+          if-no-files-found: error
