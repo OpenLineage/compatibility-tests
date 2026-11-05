@@ -16,6 +16,10 @@ on:
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
+      update-baseline:
+        description: "Store each validated pair's events as the baseline the PR checks re-validate (release check only)"
+        type: boolean
+        default: false
 
 env:
   RUN_KEY: ${{ github.run_id }}-${{ github.run_attempt }}
@@ -268,6 +272,15 @@ jobs:
           component_release: ${{ matrix.spark_release }}
           event-directory: ${{ steps.init.outputs.event_dir }}
           target-path: 'spark-dataproc-${{matrix.spark_release}}-${{matrix.ol_release}}-report.json'
+
+      # the events PR checks re-validate when validation code changes (revalidate_stored_events.yml)
+      - name: Update baseline events
+        if: ${{ inputs.update-baseline && steps.init.outputs.scenarios }}
+        run: |
+          baseline="gs://${GCS_BUCKET}/baseline-events/spark_dataproc/${{ matrix.spark_release }}/${{ matrix.ol_release }}"
+          gcloud storage rsync -r --delete-unmatched-destination-objects "${{ steps.init.outputs.event_dir }}" "$baseline"
+          gcloud storage cp "gs://${GCS_BUCKET}/logs/${{ steps.init.outputs.gcs_suffix }}/status.json" "$baseline/status.json" \
+          || echo "::warning::No status.json for spark ${{ matrix.spark_release }}, openlineage ${{ matrix.ol_release }}"
 
       - uses: actions/upload-artifact@v4
         if: ${{ steps.init.outputs.scenarios }}
