@@ -79,8 +79,10 @@ jobs:
           for pair_dir in baseline/*/*/; do
             pair=${pair_dir#baseline/}; pair=${pair%/}
             cv=${pair%%/*}; ol=${pair##*/}
+            run_status=()
+            [[ -f "baseline/$pair.status.json" ]] && run_status=(--run_status="baseline/$pair.status.json")
             echo "::group::${{ matrix.component }} $cv, openlineage $ol"
-            python scripts/validate_ol_events.py \
+            python scripts/validate_ol_events.py "${run_status[@]}" \
               --event_base_dir="$pair_dir" \
               --spec_base_dir=specs \
               --target="pair-reports/$cv-$ol.json" \

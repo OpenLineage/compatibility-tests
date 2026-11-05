@@ -59,6 +59,7 @@ jobs:
           name: scenarios-report
           path: reports/scenarios-report.json
           retention-days: 1
+          if-no-files-found: error
 
       - name: fail for failures in report
         id: fail-for-failures
