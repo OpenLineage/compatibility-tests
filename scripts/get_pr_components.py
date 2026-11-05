@@ -30,6 +30,9 @@ REAL_RUN_PATHS = {
         ".github/workflows/producer_spark_dataproc.yml",
         ".github/actions/dataproc_cluster/",
         "scripts/get_valid_test_scenarios.sh",
+        "dev/dataproc/",
+        "dev/lib/",
+        "dev/defaults.env",
     ],
     "hive_dataproc": [
         "producer/hive_dataproc/",
@@ -38,11 +41,15 @@ REAL_RUN_PATHS = {
         ".github/actions/get_openlineage_artifacts/",
         ".github/actions/upload_artifacts/",
         "scripts/get_valid_test_scenarios.sh",
+        "dev/dataproc/",
+        "dev/lib/",
+        "dev/defaults.env",
     ],
     "dbt": [
         "producer/dbt/",
         ".github/workflows/producer_dbt.yml",
         "scripts/get_valid_test_scenarios.sh",
+        "dev/lib/",
     ],
 }
 
