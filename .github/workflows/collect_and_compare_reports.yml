@@ -5,6 +5,12 @@ on:
       new_failures:
         description: "'true' if the reports of this run have failures that main's report.json doesn't have"
         value: ${{ jobs.collect-and-compare-reports.outputs.new_failures }}
+    inputs:
+      track-pending:
+        type: boolean
+        required: false
+        default: false
+        description: "update pending_runs.json from the planned-parts artifact: planned parts without a report stay pending (release check)"
 
 # This job fails only when collecting itself breaks. New compatibility failures don't fail it: they are the
 # `new_failures` output, so callers can tell a broken pipeline (a failed job) from a validation result.
@@ -27,6 +33,26 @@ jobs:
         run: |
           git fetch --quiet --depth=1 origin main
           git show FETCH_HEAD:generated-files/report.json > reports/report.json
+
+      # before the comparison writes its own *-report.json files into reports/
+      - name: Update pending parts
+        if: ${{ inputs.track-pending }}
+        run: |
+          python scripts/pending_runs.py update \
+            --planned reports/planned.json \
+            --reports-dir reports/ \
+            --pending generated-files/pending_runs.json \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --out reports/updated-pending-runs.json \
+            --summary "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.track-pending }}
+        with:
+          name: updated-pending-runs
+          path: reports/updated-pending-runs.json
+          retention-days: 1
+          if-no-files-found: error
 
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
