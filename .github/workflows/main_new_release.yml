@@ -178,6 +178,7 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_hive_dataproc == 'true' }}
     uses: ./.github/workflows/producer_hive_dataproc.yml
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.hive_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
@@ -192,6 +193,7 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_dbt == 'true' }}
     uses: ./.github/workflows/producer_dbt.yml
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.dbt_matrix) }}
     with:
       ol_release: ${{ matrix.openlineage_versions }}
