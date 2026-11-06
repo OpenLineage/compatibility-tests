@@ -62,3 +62,11 @@ dev/validation/validate_locally.sh --component <producer> --component-version <v
 ```
 
 It prints a status per scenario and exits 1 if one failed. The report has the same format and name as the CI artifact.
+
+Producers with a one-command local run, described step by step in their README ("Run locally, as CI does"):
+
+| Producer | Command |
+|---|---|
+| dbt | `producer/dbt/run_dbt_tests.sh --component-version 1.8.0 --openlineage-version 1.55.0` ([playbook](dbt/README.md#run-locally-as-ci-does)) |
+
+A new producer starts from `producer/template/run_template_tests.sh` and the sections in `producer/template/README.md`.
