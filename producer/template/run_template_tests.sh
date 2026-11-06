@@ -1,83 +1,68 @@
 #!/bin/bash
 
-################################################################################
-########## THIS IS NOT RUNNABLE EXAMPLE, JUST TEMPLATE FOR SCRIPT ##############
-##############################################################
+# Template of a producer's local run script. Copy it to producer/<producer>/run_<producer>_tests.sh, set PRODUCER, and
+# fill in the steps marked TODO. Keep it plain and linear, with the same steps (and the same scripts) as the producer's CI
+# workflow, so "Run locally, as CI does" in the producer's README stays true. producer/dbt/run_dbt_tests.sh is a
+# complete example.
+#
+#   1. the environment the scenarios need (a virtualenv, a cluster, ...)
+#   2. the scenarios valid for the versions (scripts/get_valid_test_scenarios.sh), or the ones given with --scenarios
+#   3. runner/run_scenarios.sh, shared with CI: runs them, writes <events-dir>/<scenario>/*.json and status.json
+#   4. dev/validation/validate_locally.sh: validates the events, writes the report, exits 1 if a scenario failed
 
-# Help message function
+set -euo pipefail
+
+PRODUCER=template  # TODO: the producer's directory name
+PRODUCER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$PRODUCER_DIR/../.." && pwd)"
+
 usage() {
-    echo "Usage: $0 [OPTIONS]"
-    echo ""
-    echo "Options:"
-    echo "  --openlineage-directory PATH        Path to openlineage repository directory (required)"
-    echo "  --producer-output-events-dir PATH   Path to producer output events directory (default: /path/to/default/events/dir)"
-    echo "  --openlineage-release VERSION       OpenLineage release version (default: default-openlineage-release)"
-    echo "  --report-path PATH                  Path to report directory (default: /path/to/default/report)"
-    echo "  -h, --help                          Show this help message and exit"
-    echo ""
-    echo "Example:"
-    echo "  $0 --openlineage-directory /path/to/specs --producer-output-events-dir /path/to/events --openlineage-release 1.23.0 --report-path /path/to/report"
-    exit 0
+  cat >&2 <<USAGE
+Usage: $0 --component-version V --openlineage-version OL [options]
+
+  --component-version V      component version (tested versions: producer/$PRODUCER/versions.json)
+  --openlineage-version OL   OpenLineage release
+  --scenarios 's1;s2'        scenarios to run (default: every scenario valid for the versions)
+  --events-dir DIR           where events and status.json go (default: ./$PRODUCER-events-<V>-<OL>)
+  --report-dir DIR           where the report goes (default: .); named like the CI artifact
+USAGE
+  exit "${1:-1}"
 }
 
-# Required variables (no defaults)
-OPENLINEAGE_DIRECTORY=""
-
-# Variables with default values
-PRODUCER_OUTPUT_EVENTS_DIR=output
-OPENLINEAGE_RELEASE=1.23.0
-REPORT_PATH="../spark_template_report.json"
-
-# If -h or --help is passed, print usage and exit
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    usage
-fi
-
-# Parse command line arguments
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        --openlineage-directory) OPENLINEAGE_DIRECTORY="$2"; shift ;;
-        --producer-output-events-dir) PRODUCER_OUTPUT_EVENTS_DIR="$2"; shift ;;
-        --openlineage-release) OPENLINEAGE_RELEASE="$2"; shift ;;
-        --report-path) REPORT_PATH="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1"; usage ;;
-    esac
-    shift
+component_version="" ol_version="" scenarios="" events_dir="" report_dir="."
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --component-version) component_version="$2"; shift 2 ;;
+    --openlineage-version) ol_version="$2"; shift 2 ;;
+    --scenarios) scenarios="$2"; shift 2 ;;
+    --events-dir) events_dir="$2"; shift 2 ;;
+    --report-dir) report_dir="$2"; shift 2 ;;
+    -h|--help) usage 0 ;;
+    *) echo "Unknown option: $1" >&2; usage ;;
+  esac
 done
+[[ -n "$component_version" && -n "$ol_version" ]] || usage
+events_dir="${events_dir:-$PWD/$PRODUCER-events-$component_version-$ol_version}"
+mkdir -p "$report_dir"
+report="$(cd "$report_dir" && pwd)/${PRODUCER//_/-}-$component_version-$ol_version-report.json"
 
-# Check required arguments
-if [[ -z "$OPENLINEAGE_DIRECTORY" ]]; then
-    echo "Error: Missing required arguments."
-    usage
+echo "== 1. Environment"
+# TODO: install or start what the scenarios need for these versions, e.g. a cached virtualenv
+# (producer/dbt/run_dbt_tests.sh) or a Dataproc cluster deleted by a trap (dev/dataproc/create_cluster.sh).
+
+echo "== 2. Scenarios"
+if [[ -z "$scenarios" ]]; then
+  scenarios=$("$REPO_ROOT/scripts/get_valid_test_scenarios.sh" "$PRODUCER_DIR/scenarios" "$component_version" "$ol_version")
+  [[ -n "$scenarios" ]] || { echo "No scenario is valid for $PRODUCER $component_version and OpenLineage $ol_version" >&2; exit 1; }
 fi
+echo "$scenarios"
 
+echo "== 3. Run"
+# TODO: write runner/run_scenarios.sh (see producer/dbt/runner/run_scenarios.sh) and call it from the CI workflow too.
+# It records each scenario's outcome with record_status from dev/lib/status.sh.
+[[ -x "$PRODUCER_DIR/runner/run_scenarios.sh" ]] || { echo "No runner/run_scenarios.sh yet" >&2; exit 1; }
+"$PRODUCER_DIR/runner/run_scenarios.sh" --events-dir "$events_dir" --scenarios "$scenarios"
 
-
-OL_SPEC_DIRECTORIES=$OPENLINEAGE_DIRECTORY/spec/,$OPENLINEAGE_DIRECTORY/spec/facets/,$OPENLINEAGE_DIRECTORY/spec/registry/gcp/dataproc/facets,$OPENLINEAGE_DIRECTORY/spec/registry/gcp/lineage/facets
-
-# fail if scenarios are not defined in scenario directory
-[[ $(ls scenarios | wc -l) -gt 0 ]] || { echo >&2 "NO SCENARIOS DEFINED IN scenarios"; exit 1; }
-
-mkdir -p "$PRODUCER_OUTPUT_EVENTS_DIR"
-
-echo "RUNNING TEST SCENARIOS"
-
-################################################################################
-#
-# RUN PRODUCER TEST SCENARIOS
-#
-################################################################################
-
-echo "EVENT VALIDATION"
-
-pip install -r ../../scripts/requirements.txt
-
-python ../../scripts/validate_ol_events.py \
---event_base_dir="$PRODUCER_OUTPUT_EVENTS_DIR" \
---spec_dirs="$OL_SPEC_DIRECTORIES" \
---target="$REPORT_PATH" \
---component="spark_dataproc" \
---producer_dir=.
-
-echo "EVENT VALIDATION FINISHED"
-echo "REPORT CREATED IN $REPORT_PATH"
+echo "== 4. Validate"
+"$REPO_ROOT/dev/validation/validate_locally.sh" --component "$PRODUCER" --component-version "$component_version" \
+  --openlineage-version "$ol_version" --events-dir "$events_dir" --report "$report"
