@@ -1,198 +1,73 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DBT_DIR="$SCRIPT_DIR"
+# Runs the dbt scenarios for one dbt version x OpenLineage version on your machine, the way CI does
+# (.github/workflows/producer_dbt.yml), and validates the events. See "Run locally, as CI does" in README.md.
+#
+#   1. a virtualenv with dbt-core==V, dbt-postgres and openlineage-dbt==OL (cached, reused by later runs)
+#   2. the scenarios valid for the versions (scripts/get_valid_test_scenarios.sh), or the ones given with --scenarios
+#   3. runner/run_scenarios.sh: runs them, writes events and status.json (starts Postgres with Docker if needed)
+#   4. dev/validation/validate_locally.sh: validates the events, writes the report, exits 1 if a scenario failed
+
+set -euo pipefail
+
+DBT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$DBT_DIR/../.." && pwd)"
-SCENARIOS_DIR="$DBT_DIR/scenarios"
-RUNNER_REQUIREMENTS="$DBT_DIR/runner/requirements.txt"
-SPECS_BASE_DIR="$DBT_DIR/specs"
-SCRIPTS_DIR="$REPO_ROOT/scripts"
-VALIDATION_VENV_DIR="${DBT_VALIDATION_VENV_DIR:-}"
-VALIDATION_VENV_IS_TEMP=0
+CACHE_DIR="${OL_COMPAT_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/openlineage-compatibility-tests}"
 
-resolve_path() {
-    local input_path="$1"
-    local base_dir="$2"
-    if [[ "$input_path" == ~* ]]; then
-        input_path="${input_path/#\~/$HOME}"
-    fi
-    if [[ "$input_path" = /* ]]; then
-        echo "$input_path"
-    else
-        echo "$base_dir/$input_path"
-    fi
-}
-
-cleanup_validation_venv() {
-    if [[ "$VALIDATION_VENV_IS_TEMP" -eq 1 && -n "$VALIDATION_VENV_DIR" && -d "$VALIDATION_VENV_DIR" ]]; then
-        rm -rf "$VALIDATION_VENV_DIR"
-    fi
-}
-
-ensure_validation_venv() {
-    if [[ -z "$VALIDATION_VENV_DIR" ]]; then
-        VALIDATION_VENV_DIR="$(mktemp -d "${TMPDIR:-/tmp}/dbt-validation-venv.XXXXXX")"
-        VALIDATION_VENV_IS_TEMP=1
-    fi
-
-    if [[ ! -x "$VALIDATION_VENV_DIR/bin/python" ]]; then
-        python -m venv "$VALIDATION_VENV_DIR"
-    fi
-
-    echo "Preparing isolated validation environment"
-    "$VALIDATION_VENV_DIR/bin/python" -m pip install --upgrade pip
-    "$VALIDATION_VENV_DIR/bin/python" -m pip install -r "$SCRIPTS_DIR/requirements.txt"
-}
-
-trap cleanup_validation_venv EXIT
-
-################################################################################
-############ dbt Producer Compatibility Test Execution Script ################
-################################################################################
-
-# Help message function
 usage() {
-    echo "Usage: $0 [OPTIONS]"
-    echo ""
-    echo "Options:"
-    echo "  --openlineage-directory PATH        Path to openlineage repository directory (required)"
-    echo "  --producer-output-events-dir PATH   Path to producer output events directory (default: <script_dir>/output)"
-    echo "  --openlineage-release VERSION       OpenLineage release version (default: 1.40.1)"
-    echo "  --report-path PATH                  Path to report file (default: <repo_root>/dbt_producer_report.json)"
-    echo "  -h, --help                          Show this help message and exit"
-    echo ""
-    echo "Example:"
-    echo "  $0 --openlineage-directory /path/to/OpenLineage --producer-output-events-dir /tmp/dbt-output --openlineage-release 1.45.0"
-    exit 0
+  cat >&2 <<USAGE
+Usage: $0 --component-version V --openlineage-version OL [options]
+
+  --component-version V      dbt-core version, e.g. 1.8.0 (tested versions: producer/dbt/versions.json)
+  --openlineage-version OL   openlineage-dbt version, e.g. 1.55.0
+  --scenarios 's1;s2'        scenarios to run (default: every scenario valid for the versions)
+  --events-dir DIR           where events and status.json go (default: ./dbt-events-<V>-<OL>)
+  --report-dir DIR           where the report goes (default: .); named dbt-<V>-<OL>-report.json like the CI artifact
+
+Environment: PYTHON (default python3) creates the virtualenv; OL_COMPAT_CACHE moves the cache
+(default ~/.cache/openlineage-compatibility-tests).
+USAGE
+  exit "${1:-1}"
 }
 
-# Required variables (no defaults)
-OPENLINEAGE_DIRECTORY=""
-
-# Variables with default values
-PRODUCER_OUTPUT_EVENTS_DIR="$DBT_DIR/output"
-OPENLINEAGE_RELEASE=1.40.1
-REPORT_PATH="$REPO_ROOT/dbt_producer_report.json"
-
-# If -h or --help is passed, print usage and exit
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    usage
-fi
-
-# Parse command line arguments
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        --openlineage-directory) OPENLINEAGE_DIRECTORY="$2"; shift ;;
-        --producer-output-events-dir) PRODUCER_OUTPUT_EVENTS_DIR="$2"; shift ;;
-        --openlineage-release) OPENLINEAGE_RELEASE="$2"; shift ;;
-        --report-path) REPORT_PATH="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1"; usage ;;
-    esac
-    shift
+component_version="" ol_version="" scenarios="" events_dir="" report_dir="."
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --component-version) component_version="$2"; shift 2 ;;
+    --openlineage-version) ol_version="$2"; shift 2 ;;
+    --scenarios) scenarios="$2"; shift 2 ;;
+    --events-dir) events_dir="$2"; shift 2 ;;
+    --report-dir) report_dir="$2"; shift 2 ;;
+    -h|--help) usage 0 ;;
+    *) echo "Unknown option: $1" >&2; usage ;;
+  esac
 done
+[[ -n "$component_version" && -n "$ol_version" ]] || usage
+events_dir="${events_dir:-$PWD/dbt-events-$component_version-$ol_version}"
+mkdir -p "$report_dir"
+report="$(cd "$report_dir" && pwd)/dbt-$component_version-$ol_version-report.json"
 
-OPENLINEAGE_DIRECTORY="$(resolve_path "$OPENLINEAGE_DIRECTORY" "$PWD")"
-PRODUCER_OUTPUT_EVENTS_DIR="$(resolve_path "$PRODUCER_OUTPUT_EVENTS_DIR" "$PWD")"
-REPORT_PATH="$(resolve_path "$REPORT_PATH" "$PWD")"
-
-# Check required arguments
-if [[ -z "$OPENLINEAGE_DIRECTORY" ]]; then
-    echo "Error: Missing required arguments."
-    usage
+echo "== 1. dbt $component_version, openlineage-dbt $ol_version"
+venv="$CACHE_DIR/venvs/dbt-$component_version-openlineage-$ol_version"
+if [[ ! -x "$venv/bin/dbt-ol" ]]; then
+  rm -rf "$venv"
+  "${PYTHON:-python3}" -m venv "$venv"
+  "$venv/bin/python" -m pip install --quiet --upgrade pip
+  # the same packages as the "Install dbt dependencies" step in CI
+  "$venv/bin/python" -m pip install --quiet "dbt-core==$component_version" dbt-postgres "openlineage-dbt==$ol_version"
 fi
+echo "virtualenv: $venv"
 
-# fail if scenarios are not defined in scenario directory
-[[ -d "$SCENARIOS_DIR" ]] || { echo >&2 "Error: scenarios directory not found at $SCENARIOS_DIR"; exit 1; }
-[[ $(find "$SCENARIOS_DIR" | wc -l) -gt 0 ]] || { echo >&2 "NO SCENARIOS DEFINED IN $SCENARIOS_DIR"; exit 1; }
-
-mkdir -p "$PRODUCER_OUTPUT_EVENTS_DIR"
-
-echo "=============================================================================="
-echo "                    dbt PRODUCER COMPATIBILITY TEST                           "
-echo "=============================================================================="
-echo "OpenLineage Directory: $OPENLINEAGE_DIRECTORY"
-echo "Producer Output Events Dir: $PRODUCER_OUTPUT_EVENTS_DIR"
-echo "OpenLineage Release: $OPENLINEAGE_RELEASE"
-echo "Report Path: $REPORT_PATH"
-echo "=============================================================================="
-
-################################################################################
-#
-# SETUP ENVIRONMENT
-#
-################################################################################
-
-# Check if scenario directory exists
-if [[ ! -d "$SCENARIOS_DIR" ]]; then
-    echo "Error: scenarios directory not found at $SCENARIOS_DIR"
-    exit 1
+echo "== 2. Scenarios"
+if [[ -z "$scenarios" ]]; then
+  scenarios=$("$REPO_ROOT/scripts/get_valid_test_scenarios.sh" "$DBT_DIR/scenarios" "$component_version" "$ol_version")
+  [[ -n "$scenarios" ]] || { echo "No scenario is valid for dbt $component_version and OpenLineage $ol_version" >&2; exit 1; }
 fi
+echo "$scenarios"
 
-#install python dependencies
-python -m pip install --upgrade pip
+echo "== 3. Run"
+PATH="$venv/bin:$PATH" "$DBT_DIR/runner/run_scenarios.sh" --events-dir "$events_dir" --scenarios "$scenarios"
 
-if [ -f "$RUNNER_REQUIREMENTS" ]; then
-    python -m pip install -r "$RUNNER_REQUIREMENTS"
-fi
-
-################################################################################
-#
-# RUN dbt PRODUCER TESTS
-#
-################################################################################
-
-echo "Running dbt producer tests..."
-
-# Run tests for each scenario
-echo "Discovering test scenarios..."
-for scenario_dir in "$SCENARIOS_DIR"/*/; do
-    if [[ -d "$scenario_dir" && -f "${scenario_dir}config.json" ]]; then
-        SCENARIO_NAME=$(basename "$scenario_dir")
-        echo "Found scenario: $SCENARIO_NAME"
-
-        mkdir -p "$PRODUCER_OUTPUT_EVENTS_DIR/$SCENARIO_NAME"
-        "$scenario_dir"test/run.sh "$PRODUCER_OUTPUT_EVENTS_DIR/$SCENARIO_NAME"
-
-        echo "Scenario $SCENARIO_NAME completed"
-    fi
-done
-
-echo "EVENT VALIDATION FOR SPEC VERSION $OPENLINEAGE_RELEASE"
-
-# Generate JSON report
-REPORT_DIR=$(dirname "$REPORT_PATH")
-mkdir -p "$REPORT_DIR"
-
-DEST_DIR="$SPECS_BASE_DIR/$OPENLINEAGE_RELEASE"
-
-mkdir -p "$DEST_DIR"
-
-if [ -d "$OPENLINEAGE_DIRECTORY/spec" ]; then
-  while IFS= read -r spec_file; do
-    cp "$spec_file" "$DEST_DIR/"
-  done < <(find "$OPENLINEAGE_DIRECTORY/spec" -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \))
-fi
-if [ -d "$OPENLINEAGE_DIRECTORY/integration/common/src/openlineage" ]; then
-  while IFS= read -r spec_file; do
-    cp "$spec_file" "$DEST_DIR/"
-  done < <(find "$OPENLINEAGE_DIRECTORY/integration/common/src/openlineage" -type f -iname '*facet.json')
-fi
-
-if [ -z "$(ls -A "$DEST_DIR")" ]; then
-    echo "Cannot collect OpenLineage specs"
-    exit 1
-fi
-
-ensure_validation_venv
-
-"$VALIDATION_VENV_DIR/bin/python" "$SCRIPTS_DIR/validate_ol_events.py" \
---event_base_dir="$PRODUCER_OUTPUT_EVENTS_DIR" \
---spec_base_dir="$SPECS_BASE_DIR" \
---target="$REPORT_PATH" \
---component="dbt" \
---component_version="1.8.0" \
---producer_dir="$REPO_ROOT/producer" \
---openlineage_version="$OPENLINEAGE_RELEASE"
-
-echo "EVENT VALIDATION FINISHED"
-echo "REPORT CREATED IN $REPORT_PATH"
+echo "== 4. Validate"
+"$REPO_ROOT/dev/validation/validate_locally.sh" --component dbt --component-version "$component_version" \
+  --openlineage-version "$ol_version" --events-dir "$events_dir" --report "$report"
