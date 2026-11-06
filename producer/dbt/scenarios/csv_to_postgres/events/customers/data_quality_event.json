@@ -12,12 +12,14 @@
         "dataQualityAssertions": {
           "assertions": [
             {
-              "assertion": "not_null_stg_customers_customer_id",
+              "assertion": "not_null",
+              "name": "not_null_stg_customers_customer_id",
               "column": "customer_id",
               "success": true
             },
             {
-              "assertion": "unique_stg_customers_customer_id",
+              "assertion": "unique",
+              "name": "unique_stg_customers_customer_id",
               "column": "customer_id",
               "success": true
             }
