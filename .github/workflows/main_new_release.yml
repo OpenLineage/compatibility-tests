@@ -33,6 +33,10 @@ on:
       dbt_matrix:
         description: 'Overwrite matrix for hive tests'
         required: false
+      publish:
+        description: "Publish the results (issues, report, site). 'false' to test pipeline changes from a branch"
+        required: false
+        default: 'true'
 
 permissions:
   id-token: write
@@ -109,6 +113,33 @@ jobs:
           FORCE_ALL: ${{ github.event_name == 'workflow_dispatch' }}
         run: ./scripts/get_release_matrices.sh | tee -a $GITHUB_OUTPUT
 
+      # what this run tests, so the collect step can tell which parts produced no result (pending_runs.json)
+      - name: Plan the parts of this run
+        env:
+          SPARK_MATRIX: ${{ github.event.inputs.spark_matrix || steps.set-matrix-values.outputs.spark_dataproc_matrix }}
+          HIVE_MATRIX: ${{ github.event.inputs.hive_matrix || steps.set-matrix-values.outputs.hive_dataproc_matrix }}
+          DBT_MATRIX: ${{ github.event.inputs.dbt_matrix || steps.set-matrix-values.outputs.dbt_matrix }}
+          RUN_SPARK: ${{ github.event.inputs.run_spark_dataproc || steps.set-matrix-values.outputs.run_spark_dataproc }}
+          RUN_HIVE: ${{ github.event.inputs.run_hive_dataproc || steps.set-matrix-values.outputs.run_hive_dataproc }}
+          RUN_DBT: ${{ github.event.inputs.run_dbt || steps.set-matrix-values.outputs.run_dbt }}
+          RUN_SCENARIOS: ${{ steps.set-matrix-values.outputs.run_scenarios }}
+          RUN_DATAPLEX: ${{ github.event.inputs.run_dataplex || steps.set-matrix-values.outputs.run_dataplex }}
+        run: |
+          mkdir -p generated-files/planned
+          python3 scripts/pending_runs.py plan \
+            --spark-dataproc-matrix "$([[ "$RUN_SPARK" == "true" ]] && echo "$SPARK_MATRIX")" \
+            --hive-dataproc-matrix "$([[ "$RUN_HIVE" == "true" ]] && echo "$HIVE_MATRIX")" \
+            --dbt-matrix "$([[ "$RUN_DBT" == "true" ]] && echo "$DBT_MATRIX")" \
+            --run-scenarios "$RUN_SCENARIOS" \
+            --run-dataplex "$RUN_DATAPLEX" \
+            --out generated-files/planned/planned.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: planned-parts
+          path: generated-files/planned/planned.json
+          retention-days: 1
+
   ######## COMPONENT VALIDATION ########
 
   scenarios:
@@ -147,6 +178,7 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_hive_dataproc == 'true' }}
     uses: ./.github/workflows/producer_hive_dataproc.yml
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.hive_matrix) }}
     secrets:
       gcpKey: ${{ secrets.GCP_SA_KEY }}
@@ -161,6 +193,7 @@ jobs:
     if: ${{ needs.initialize_workflow.outputs.run_dbt == 'true' }}
     uses: ./.github/workflows/producer_dbt.yml
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.initialize_workflow.outputs.dbt_matrix) }}
     with:
       ol_release: ${{ matrix.openlineage_versions }}
@@ -177,14 +210,17 @@ jobs:
       - spark-dataproc
       - hive-dataproc
       - dbt
-    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
+    # a failed component doesn't stop the others from being published; it stays pending and is retried
+    if: ${{ !cancelled() && needs.initialize_workflow.result == 'success' && needs.initialize_workflow.outputs.any_run == 'true' }}
     uses: ./.github/workflows/collect_and_compare_reports.yml
+    with:
+      track-pending: true
 
   notify-maintainers:
     needs:
       - initialize_workflow
       - collect-and-compare-reports
-    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
+    if: ${{ !cancelled() && needs.collect-and-compare-reports.result == 'success' && github.event.inputs.publish != 'false' }}
     uses: ./.github/workflows/notify_maintainers.yml
     with:
       workflow-type: 'release'
@@ -194,8 +230,10 @@ jobs:
   update-repo-files:
     needs:
       - initialize_workflow
+      - collect-and-compare-reports
       - notify-maintainers
-    if: ${{ !failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
+    # a failed notification doesn't block publishing
+    if: ${{ !cancelled() && needs.collect-and-compare-reports.result == 'success' && github.event.inputs.publish != 'false' }}
     uses: ./.github/workflows/update_repo_files.yml
     secrets:
       CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
@@ -206,14 +244,14 @@ jobs:
 
   generate-compatibility-tables:
     needs: update-repo-files
-    if: ${{ !failure() && needs.update-repo-files.outputs.changes_made == 'true' }}
+    if: ${{ !cancelled() && needs.update-repo-files.result == 'success' && needs.update-repo-files.outputs.changes_made == 'true' }}
     uses: ./.github/workflows/generate_compatibility_tables.yml
 
   update-site:
     needs:
       - update-repo-files
       - generate-compatibility-tables
-    if: ${{ !failure() && needs.update-repo-files.outputs.changes_made == 'true' }}
+    if: ${{ !cancelled() && needs.update-repo-files.result == 'success' && needs.generate-compatibility-tables.result == 'success' && needs.update-repo-files.outputs.changes_made == 'true' }}
     uses: ./.github/workflows/update_site.yml
     secrets:
       CI_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}
