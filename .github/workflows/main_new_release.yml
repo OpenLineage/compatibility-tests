@@ -90,6 +90,13 @@ jobs:
           DATAPROC_IMAGES: ${{ needs.find-dataproc-images.outputs.dataproc_images }}
         run: ./scripts/select_components.sh
 
+      # warnings only: scenarios that never run and tested versions without scenarios
+      - name: Check scenario coverage
+        run: |
+          python3 scripts/check_scenario_coverage.py \
+            --latest-ol "${{ github.event.inputs.openlineage_release || steps.select-components.outputs.ol_release }}" \
+            --summary "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
         if: steps.select-components.outputs.releases_updated == 'true'
         with:
