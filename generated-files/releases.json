@@ -9,7 +9,7 @@
   },
   {
     "name": "dbt",
-    "latest_version": "1.12.6"
+    "latest_version": "1.12.7"
   },
   {
     "name": "openlineage",
