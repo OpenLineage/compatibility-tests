@@ -100,7 +100,9 @@ jobs:
 
       - name: Run script tests
         run: |
-          pip install -r scripts/requirements.txt -r scripts/requirements-dev.txt -r dev/dataproc/requirements.txt
+          pip install -r scripts/requirements.txt -r scripts/requirements-dev.txt
+          # separately: it pins other versions of shared packages (cachetools), so one resolve fails
+          pip install -r dev/dataproc/requirements.txt
           python -m pytest scripts/tests -q
 
   ######## COMPONENT VALIDATION ########
