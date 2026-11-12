@@ -15,6 +15,10 @@ on:
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
+      update-baseline:
+        description: "Store the validated events as the baseline the PR checks re-validate (release check only)"
+        type: boolean
+        default: false
 
 jobs:
   run-hive-tests:
@@ -195,6 +199,13 @@ jobs:
           component_release: ${{ inputs.component_release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
           target-path: 'hive-dataproc-${{inputs.hive_release}}-${{inputs.ol_release}}-report.json'
+
+      # the events PR checks re-validate when validation code changes (revalidate_stored_events.yml)
+      - name: Update baseline events
+        if: ${{ inputs.update-baseline && steps.init.outputs.scenarios }}
+        run: |
+          baseline="gs://open-lineage-e2e/baseline-events/hive_dataproc/${{ inputs.component_release }}/${{ inputs.ol_release }}"
+          gcloud storage rsync -r --delete-unmatched-destination-objects "${{ steps.set-producer-output.outputs.event_dir }}" "$baseline"
 
       - uses: actions/upload-artifact@v4
         if: ${{ steps.init.outputs.scenarios }}
