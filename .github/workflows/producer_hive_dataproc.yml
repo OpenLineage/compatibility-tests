@@ -119,8 +119,8 @@ jobs:
           region: us-west1
           create-command: |
             metadata=''
-            # TEMPORARY test of the OpenLineage Woodstox fix (snapshot transport without Woodstox/stax2); do not merge
-            metadata+='GCS_TRANSPORT_JAR=gs://open-lineage-e2e/jars/transports-gcs-1.56.0-SNAPSHOT-woodstox-fix.jar'
+            # TEMPORARY test of the OpenLineage Woodstox fix (snapshot transport without Woodstox/stax2, Conscrypt and native libraries); do not merge
+            metadata+='GCS_TRANSPORT_JAR=gs://open-lineage-e2e/jars/transports-gcs-1.56.0-SNAPSHOT-conscrypt-fix.jar'
             metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
           
             properties=''
