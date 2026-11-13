@@ -59,17 +59,18 @@ The test is organized into the following key directories, each with a specific r
 ```
 producer/dbt/
 ├── scenarios/                 # Test scenarios; each defines expected events and a run script
-├── runner/                    # A self-contained dbt project used as the test target
+├── runner/                    # A self-contained dbt project used as the test target, and run_scenarios.sh
+├── run_dbt_tests.sh           # Runs the scenarios locally, as CI does
 ├── versions.json              # Supported component and OpenLineage version ranges
 └── maintainers.json           # Maintainer contact information
 ```
 
--   **`runner/`**: A self-contained dbt project with models, seeds, and configuration. This is the target of the `dbt-ol` command.
+-   **`runner/`**: A self-contained dbt project with models, seeds, and configuration. This is the target of the `dbt-ol` command. `runner/run_scenarios.sh` runs the scenarios and records how each ended in `status.json`; CI and `run_dbt_tests.sh` both call it.
 -   **`scenarios/`**: Contains one directory per scenario. Each scenario has a `config.json` defining expected event templates, an `events/` directory of expected event JSON files, and a `test/` directory with `run.sh` and `compose.yml`.
 
 ## How to Run the Tests
 
-There are two primary ways to run the dbt compatibility tests: **locally for development and debugging**, or via **GitHub Actions for automated CI/CD validation**. Both approaches use the same underlying test framework but differ in their database setup and execution environment.
+The dbt tests run in GitHub Actions on every pull request that touches them and in the scheduled release check. You can run them on your machine the same way (see [Run locally, as CI does](#run-locally-as-ci-does)); both use the same scripts.
 
 ### Running Tests via GitHub Actions (Automated CI/CD)
 
@@ -90,7 +91,7 @@ GitHub Actions provides the canonical testing environment with:
 The GitHub Actions workflow:
 - Provisions a PostgreSQL 15 container with health checks
 - Installs `dbt-core`, `dbt-postgres`, and `openlineage-dbt` at specified versions
-- Executes all scenarios defined in `scenarios/`
+- Runs the scenarios valid for the versions with `runner/run_scenarios.sh`
 - Validates events against OpenLineage JSON schemas
 - Generates compatibility reports and uploads artifacts
 
@@ -98,40 +99,66 @@ The GitHub Actions workflow:
 
 ---
 
-### Local Debugging (Optional)
+### Run locally, as CI does
 
-**For development debugging, local runs should use the same PostgreSQL 15 Docker setup as CI.**
+Use this to test a new or changed scenario before you commit it. Locally, the steps and scripts are the same as in
+`.github/workflows/producer_dbt.yml`. Only the Postgres is different: CI uses a service container, locally the scenario's
+`test/run.sh` starts the same `postgres:15-alpine` with Docker Compose if nothing is listening on `localhost:5432`.
 
-If you need to debug event generation locally:
+**Prerequisites:** Python 3.11+ (CI uses 3.12), `jq`, `git` and Docker. No GCP access is needed.
 
-1.  **Ensure Docker is available**:
-    - The scenario runner will start the local Docker Compose Postgres service automatically if it is not already reachable on `localhost:5432`.
+**Pick the versions** from `producer/dbt/versions.json` (`component_version`; OpenLineage: the latest release, or the one
+you're testing). Scenarios only run for the versions in their `config.json`.
 
-2.  **Install dbt and the OpenLineage wrapper** (use a virtual environment outside the repo):
-    ```bash
-    python -m venv ~/.venvs/dbt-compat-test
-    source ~/.venvs/dbt-compat-test/bin/activate
-    pip install dbt-core==1.8.0 dbt-postgres openlineage-dbt==1.23.0
-    ```
-    
-3.  **Run the dbt producer test harness**:
-    - Run this from the repository root so the default output paths resolve correctly.
-    ```bash
-    ./producer/dbt/run_dbt_tests.sh \
-      --openlineage-directory /path/to/OpenLineage \
-      --producer-output-events-dir ./producer/dbt/output \
-      --openlineage-release 1.45.0 \
-      --report-path ./dbt_producer_report.json
-    ```
-        - The harness installs dbt runner dependencies into your active venv and creates a separate temporary validation venv for `scripts/requirements.txt`, so the shared validation stack does not downgrade dbt packages mid-run.
+#### One command
 
-4.  **Inspect generated events**:
-    ```bash
-    cat ./producer/dbt/output/csv_to_postgres/event-{id}.json | jq '.'
-    cat ./dbt_producer_report.json | jq '.'
-    ```
+From the repository root:
 
-**Note**: Local debugging is entirely optional. All official validation happens in GitHub Actions with PostgreSQL service containers. The `run_dbt_tests.sh` wrapper uses the same scenario scripts and validation pipeline as CI, including the merged local test-aid improvements from #283, while isolating validation-only dependencies from the dbt runtime environment.
+```bash
+producer/dbt/run_dbt_tests.sh --component-version 1.8.0 --openlineage-version 1.55.0
+```
+
+Options: `--scenarios 'csv_to_postgres'` runs only the given scenarios, `--events-dir` and `--report-dir` move the output
+(`--help` lists everything). The first run creates a virtualenv with `dbt-core==1.8.0`, `dbt-postgres` and
+`openlineage-dbt==1.55.0` in `~/.cache/openlineage-compatibility-tests/venvs/` and clones OpenLineage for the spec; later
+runs reuse both.
+
+#### The same steps by hand
+
+One command per CI step, so you can stop after any of them, look at the output, or re-run just one:
+
+```bash
+V=1.8.0 OL=1.55.0 EVENTS=$PWD/dbt-events-$V-$OL
+
+# "Initialize tests": the scenarios valid for the versions
+SCENARIOS=$(scripts/get_valid_test_scenarios.sh producer/dbt/scenarios $V $OL); echo "$SCENARIOS"
+
+# "Install dbt dependencies" (any virtualenv outside the repo)
+python3 -m venv ~/.venvs/dbt-$V-$OL
+~/.venvs/dbt-$V-$OL/bin/pip install dbt-core==$V dbt-postgres openlineage-dbt==$OL
+
+# "Run dbt scenarios and create OL events"
+PATH=~/.venvs/dbt-$V-$OL/bin:$PATH producer/dbt/runner/run_scenarios.sh --events-dir "$EVENTS" --scenarios "$SCENARIOS"
+
+# "Validation"
+dev/validation/validate_locally.sh --component dbt --component-version $V --openlineage-version $OL --events-dir "$EVENTS"
+```
+
+#### What you get
+
+- `dbt-events-<V>-<OL>/<scenario>/event-N.json`: the events, one file per event, in the order dbt-ol emitted them.
+- `dbt-events-<V>-<OL>/status.json`: how each scenario's run ended (`DONE` or `FAILED`). A `FAILED` scenario fails validation
+  with a "producer job" test; the dbt output above it shows why.
+- `dbt-<V>-<OL>-report.json`: the report, with the same name and format as the CI artifact. The script prints a line per
+  scenario with its status and the tests that didn't pass, and exits 1 if a scenario failed. A test that doesn't match its
+  expected event lists the differences in its `details`:
+
+  ```bash
+  jq '.[].scenarios[] | {name, status, failed: [.tests[] | select(.status == "FAILURE") | {name, details}]}' dbt-1.8.0-1.55.0-report.json
+  ```
+
+Both outputs are git-ignored when they're in the repository root. The Postgres container keeps running after the run;
+stop it with `docker compose -f producer/dbt/scenarios/csv_to_postgres/test/compose.yml down -v` (`-v` also drops the data).
 
 ## Important dbt Integration Notes
 

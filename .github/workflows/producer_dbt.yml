@@ -84,33 +84,11 @@ jobs:
       - name: Run dbt scenarios and create OL events
         if: ${{ steps.init.outputs.scenarios }}
         id: run-producer
-        continue-on-error: true
-        run: |          
-          set -e
-          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
-          
-          # one entry per scenario, [{scenario, state, job_id}]; a failed run.sh fails its scenario in validation
-          status_file="${{ steps.set-producer-output.outputs.event_dir }}/status.json"
-          mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}"
-          echo '[]' > "$status_file"
-
-          for scenario in "${scenarios[@]}"
-          do
-              echo "Running dbt scenario: $scenario"
-          
-              mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}/$scenario"
-              if bash producer/dbt/scenarios/$scenario/test/run.sh "${{ steps.set-producer-output.outputs.event_dir }}/$scenario"; then
-                state=DONE
-                echo "Finished running scenario: $scenario"
-              else
-                state=FAILED
-                echo "::warning::dbt scenario $scenario failed"
-              fi
-              jq --arg scenario "$scenario" --arg state "$state" '. + [{scenario: $scenario, state: $state, job_id: ""}]' \
-                "$status_file" > "$status_file.tmp" && mv "$status_file.tmp" "$status_file"
-          done
-
-          echo "Finished running all scenarios"
+        # a failed scenario is recorded in status.json and fails that scenario in validation
+        run: |
+          producer/dbt/runner/run_scenarios.sh \
+            --events-dir "${{ steps.set-producer-output.outputs.event_dir }}" \
+            --scenarios "${{ steps.init.outputs.scenarios }}"
 
       - uses: actions/upload-artifact@v4
         if: ${{ steps.init.outputs.scenarios }}

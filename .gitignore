@@ -176,4 +176,6 @@ bin/
 **/output/
 **/test/openlineage.yml
 **/events/*.jsonl
-dbt_producer_report.json
+# output of the local run scripts (producer/*/run_*_tests.sh) when run from the repo root
+/*-events-*/
+/*-report.json

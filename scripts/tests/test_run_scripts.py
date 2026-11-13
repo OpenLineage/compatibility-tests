@@ -11,6 +11,9 @@ SCRIPTS = [
     "dev/dataproc/gcs_upload.sh",
     "dev/validation/get_ol_specs.sh",
     "dev/validation/validate_locally.sh",
+    "producer/dbt/run_dbt_tests.sh",
+    "producer/dbt/runner/run_scenarios.sh",
+    "producer/template/run_template_tests.sh",
 ]
 
 
