@@ -721,6 +721,61 @@ async def terminate_cluster_command(args):
     )
 
 
+async def run_hive_query_command(args):
+    credentials = get_gcp_credentials(credentials_file=args.credentials_file)
+    job_client = JobControllerAsyncClient(
+        credentials=credentials,
+        client_options={"api_endpoint": f"{args.region}-dataproc.googleapis.com:443"},
+    )
+
+    job_props = {prop[0]: prop[1] for prop_str in args.properties.split(",") if len(prop := prop_str.split("=")) == 2}
+    job = {
+        "placement": {"cluster_name": args.cluster_name},
+        "hive_job": {
+            "query_list": {"queries": [args.query]},
+            "properties": job_props,
+        },
+    }
+    operation = await job_client.submit_job_as_operation(
+        request={"project_id": args.project_id, "region": args.region, "job": job}
+    )
+    job_response = await operation.result()
+    job_id = job_response.reference.job_id
+    print(f"Submitted Hive job with job_id: {job_id}")
+    # Wait for job completion
+    result = await wait_for_dataproc_job(
+        job_client=job_client,
+        project_id=args.project_id,
+        region=args.region,
+        job_id=job_id,
+        cluster_name=args.cluster_name,
+    )
+    print(f"Hive job finished: {result}")
+
+    # Download event files if output_directory is defined
+    if args.output_directory:
+        bucket = job_props.get("hive.openlineage.transport.bucketName")
+        prefix = job_props.get("hive.openlineage.transport.fileNamePrefix")
+        if bucket and prefix:
+            print(f"Downloading event files from bucket: {bucket}, prefix: {prefix}")
+            files_to_download = list_blobs_with_prefix(
+                bucket, prefix, "json", credentials=credentials
+            )
+            print(f"FILES TO DOWNLOAD: {files_to_download}")
+            if files_to_download:
+                download_files_in_parallel(
+                    bucket,
+                    files_to_download,
+                    args.output_directory,
+                    credentials=credentials,
+                )
+                print(f"Downloaded event files to {args.output_directory}")
+            else:
+                print("No event files found to download.")
+        else:
+            print("Could not determine bucket or prefix for event files. Skipping download.")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Manage Google Cloud Dataproc clusters and jobs"
@@ -889,6 +944,34 @@ def main():
         "--credentials-file", required=False, help="Path to GCP credentials file"
     )
     parser_terminate.set_defaults(func=terminate_cluster_command)
+
+    parser_hive = subparsers.add_parser(
+        "run-hive-query", help="Run a Hive query on Dataproc"
+    )
+    parser_hive.add_argument("--project-id", required=True, help="GCP project ID")
+    parser_hive.add_argument("--region", required=True, help="GCP region")
+    parser_hive.add_argument(
+        "--cluster-name", required=True, help="Dataproc cluster name"
+    )
+    parser_hive.add_argument(
+        "--query", required=True, help="Hive query string to execute"
+    )
+    parser_hive.add_argument(
+        "--credentials-file", required=False, help="Path to GCP credentials file"
+    )
+    parser_hive.add_argument(
+        "--properties",
+        required=False,
+        default="",
+        help="Hive job properties as key=value pairs separated by commas",
+    )
+    parser_hive.add_argument(
+        "--output-directory",
+        required=False,
+        default="",
+        help="Local directory to download event files to (optional)",
+    )
+    parser_hive.set_defaults(func=run_hive_query_command)
 
     args = parser.parse_args()
 

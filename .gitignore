@@ -18,6 +18,8 @@ downloads/
 eggs/
 .eggs/
 lib/
+# shared shell helpers for running producers, not a Python build directory
+!dev/lib/
 lib64/
 parts/
 sdist/
