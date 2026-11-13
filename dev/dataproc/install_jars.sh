@@ -22,6 +22,7 @@ metadata() {
 
 jars=$(metadata JARS)
 master_jars=$(metadata MASTER_JARS)
+SAME_MTIME=200001010000  # 2000-01-01 00:00 UTC, [[CC]YY]MMDDhhmm for touch -t (GNU and BSD)
 target_dir=$(metadata JARS_TARGET_DIR)
 role=$(metadata dataproc-role)
 
@@ -36,7 +37,11 @@ fi
 if [[ -n "$jars" ]]; then
   IFS=';' read -ra jar_urls <<< "$jars"
   for url in "${jar_urls[@]}"; do
-    [[ -n "$url" ]] && gsutil cp -P "$url" "$target_dir/"
+    [[ -z "$url" ]] && continue
+    gsutil cp "$url" "$target_dir/"
+    # the same mtime on every node: YARN/Tez localize these jars and refuse one whose mtime differs between nodes
+    # ("changed on src filesystem"). cp -P would take it from the object's metadata, which a manual upload may lack.
+    TZ=UTC touch -m -t "$SAME_MTIME" "$target_dir/$(basename "$url")"
   done
 fi
 
