@@ -1,6 +1,7 @@
 # Copyright 2018-2024 contributors to the OpenLineage project
 # SPDX-License-Identifier: Apache-2.0
 
+import builtins
 import json
 import logging
 import os
@@ -115,7 +116,8 @@ def diff(expected, result, prefix="", function=None) -> list:
         else:
             if function == "unordered_list":
                 for i, x in enumerate(expected):
-                    if not any(r for r in result if diff(x, r, f"{prefix}.[{i}]") is []):
+                    # builtins.any: this module defines its own any() as a jinja helper
+                    if not builtins.any(diff(x, r, f"{prefix}.[{i}]") == [] for r in result):
                         errors.append(f"In {prefix}.[{i}], no matching elements")
             else:
                 for i, x in enumerate(expected):
