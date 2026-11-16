@@ -66,6 +66,7 @@ jobs:
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
+          skip-gcs: 'true'  # see GCS_TRANSPORT_JAR below
 
       - name: Upload openlineage hive integration to GCS
         id: upload-hive-integration
@@ -73,15 +74,6 @@ jobs:
         uses: ./.github/actions/upload_artifacts
         with:
           local-file-path: ${{ steps.get-ol-artifacts.outputs.hive }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      - name: Upload openlineage GCS transport to GCS
-        id: upload-gcs-transport
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.get-ol-artifacts.outputs.gcs }}
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
@@ -119,7 +111,10 @@ jobs:
           region: us-west1
           create-command: |
             metadata=''
-            metadata+='GCS_TRANSPORT_JAR=${{ steps.upload-gcs-transport.outputs.uploaded-file }}'
+            # Temporary: released transports-gcs 1.40.0-1.55.0 break Hive on Dataproc (half-relocated Woodstox stops
+            # HiveServer2, the bundled Conscrypt native library aborts the Tez AM). This snapshot has both fixed; go back
+            # to uploading the matching transport (get-ol-artifacts' gcs output) once a release has the fix (1.56.0?).
+            metadata+='GCS_TRANSPORT_JAR=gs://open-lineage-e2e/jars/transports-gcs-1.56.0-SNAPSHOT-conscrypt-fix.jar'
             metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
           
             properties=''
