@@ -32,19 +32,10 @@ jobs:
         run: |
           scenarios=$(./scripts/get_valid_test_scenarios.sh "producer/hive_dataproc/scenarios/" ${{ inputs.component_release }} ${{ inputs.ol_release }} )
           [[ "$scenarios" == "" ]] || echo "scenarios=$scenarios" >> $GITHUB_OUTPUT
-          echo "openlineage_cluster_suffix=$(echo '${{ inputs.ol_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
-          echo "component_cluster_suffix=$(echo '${{ inputs.component_release }}' | sed 's/\.//g')" >> $GITHUB_OUTPUT
-          case "${{ inputs.component_release }}" in
-            "3.1.3")
-              echo "hive_short=3" >> $GITHUB_OUTPUT
-              echo "dataproc_version=2.1-debian11" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "hive version ${{ inputs.component_release }} not supported"
-              exit 1
-              ;;
-          esac
-
+          echo "cluster_name=hive-dataproc-producer-test-$(echo '${{ inputs.component_release }}' | sed 's/\.//g')-$(echo '${{ inputs.ol_release }}' | sed 's/\.//g')-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          # the cluster settings per Hive release are in producer/hive_dataproc/runner/cluster.json
+          jq -e --arg v '${{ inputs.component_release }}' 'has($v)' producer/hive_dataproc/runner/cluster.json > /dev/null \
+            || { echo "hive version ${{ inputs.component_release }} not supported"; exit 1; }
 
       - name: GCP authorization
         id: gcp-auth
@@ -77,15 +68,6 @@ jobs:
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
-      - name: Upload initialization actions to GCS
-        id: upload-initialization-actions
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: producer/hive_dataproc/runner/get_hive_openlineage_jars.sh
-          gcs-path: "gs://open-lineage-e2e/scripts"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
       - name: Set up Python 3.11
         if: ${{ steps.init.outputs.scenarios }}
         uses: actions/setup-python@v5
@@ -106,32 +88,15 @@ jobs:
         if: ${{ steps.init.outputs.scenarios }}
         uses: ./.github/actions/dataproc_cluster
         with:
-          cluster-name: "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}"
+          cluster-name: ${{ steps.init.outputs.cluster_name }}
           project-id: gcp-open-lineage-testing
           region: us-west1
+          # the GCS transport: runner/create_cluster.sh's default, a fixed snapshot (released 1.40.0-1.55.0 break Hive)
           create-command: |
-            metadata=''
-            # Temporary: released transports-gcs 1.40.0-1.55.0 break Hive on Dataproc (half-relocated Woodstox stops
-            # HiveServer2, the bundled Conscrypt native library aborts the Tez AM). This snapshot has both fixed; go back
-            # to uploading the matching transport (get-ol-artifacts' gcs output) once a release has the fix (1.56.0?).
-            metadata+='GCS_TRANSPORT_JAR=gs://open-lineage-e2e/jars/transports-gcs-1.56.0-SNAPSHOT-conscrypt-fix.jar'
-            metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
-          
-            properties=''
-            properties+='hive:hive.exec.post.hooks=io.openlineage.hive.hooks.HiveOpenLineageHook'
-            properties+=',hive:hive.conf.validation=false'
-            properties+=',hive:hive.server2.logging.operation.level=VERBOSE'
-            properties+=',hive:hive.root.logger=DEBUG'
-            properties+=',hive:hive.log.explain.output=true'
-          
-            python dev/dataproc/dataproc_workflow.py create-cluster \
-              --project-id "gcp-open-lineage-testing" \
-              --region "us-west1" \
-              --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
-              --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
-              --cluster-properties "$properties" \
-              --metadata "$metadata" \
-              --initialization-actions "${{ steps.upload-initialization-actions.outputs.uploaded-file }}" \
+            producer/hive_dataproc/runner/create_cluster.sh \
+              --hive-release "${{ inputs.component_release }}" \
+              --cluster-name "${{ steps.init.outputs.cluster_name }}" \
+              --hive-jar "${{ steps.upload-hive-integration.outputs.uploaded-file }}" \
               --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}"
 
       - name: Set producer output event dir
@@ -143,55 +108,12 @@ jobs:
       - name: Run producer jobs and create OL events
         if: ${{ steps.init.outputs.scenarios }}
         id: run-producer
-        run: |          
-          set -e
-          IFS=';' read -ra scenarios <<< "${{ steps.init.outputs.scenarios }}"
-          
-          properties=''
-          properties+='hive.extraListeners=io.openlineage.hive.hooks.HiveOpenLineageHook'
-          properties+=',hive.sql.warehouse.dir=/tmp/warehouse'
-          properties+=',hive.openlineage.transport.type=gcs'
-          properties+=',hive.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
-
-          # one entry per scenario, [{scenario, state, job_id}] as written by the spark runner; a failed query fails
-          # its scenario in validation instead of stopping the other scenarios
-          status_file="${{ steps.set-producer-output.outputs.event_dir }}/status.json"
-          mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}"
-          echo '[]' > "$status_file"
-
-          for scenario in "${scenarios[@]}"
-          do
-              echo "Getting script for scenario $scenario"
-              query_file=$(find "producer/hive_dataproc/scenarios/$scenario/test/" -maxdepth 1 -type f -name "*.sql" | head -n 1)
-              query=$(cat $query_file)
-
-              echo "Running hive job for scenario: $scenario"
-              
-              properties=''
-              properties+='hive.openlineage.transport.type=gcs'
-              properties+=",hive.openlineage.transport.bucketName=open-lineage-e2e"
-              properties+=",hive.openlineage.transport.fileNamePrefix=events/$scenario/$(date +%s%3N)/"
-
-              if python dev/dataproc/dataproc_workflow.py run-hive-query \
-                --project-id gcp-open-lineage-testing \
-                --region us-west1 \
-                --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
-                --query "$query" \
-                --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}" \
-                --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
-                --properties "$properties"
-              then
-                state=DONE
-                echo "Finished running hive job for scenario: $scenario"
-              else
-                state=FAILED
-                echo "::warning::hive job failed for scenario $scenario"
-              fi
-              jq --arg scenario "$scenario" --arg state "$state" '. + [{scenario: $scenario, state: $state, job_id: ""}]' \
-                "$status_file" > "$status_file.tmp" && mv "$status_file.tmp" "$status_file"
-          done
-
-          echo "Finished running all scenarios"
+        run: |
+          producer/hive_dataproc/runner/run_scenarios.sh \
+            --cluster-name "${{ steps.init.outputs.cluster_name }}" \
+            --scenarios "${{ steps.init.outputs.scenarios }}" \
+            --events-dir "${{ steps.set-producer-output.outputs.event_dir }}" \
+            --credentials-file "${{ steps.gcp-auth.outputs.credentials_file_path }}"
 
       - name: Validation
         if: ${{ steps.init.outputs.scenarios }}
