@@ -77,7 +77,10 @@ for entry in "${entries[@]}"; do
   master_jars+="${master_jars:+;}$OPENLINEAGE_DIR/$version=$jars_dir/$spark_jar"
 done
 
-metadata="JARS=$jars,JARS_TARGET_DIR=/usr/lib/spark/jars,MASTER_JARS=$master_jars"
+# SPARK_BQ_CONNECTOR_URL: Dataproc 2.1+ images replace their built-in BigQuery connector with this one; without it the
+# built-in connector stays next to ours ("Multiple sources found for bigquery"). 2.0 images have none, hence also in JARS.
+metadata="SPARK_BQ_CONNECTOR_URL=$jars_dir/$bq_jar"
+metadata+=",JARS=$jars,JARS_TARGET_DIR=/usr/lib/spark/jars,MASTER_JARS=$master_jars"
 metadata+=$(jq -r '.metadata | to_entries | map(",\(.key)=\(.value)") | join("")' "$CLUSTER_JSON")
 
 # a copy per cluster, so concurrent runs don't swap each other's init actions; only needed while the cluster starts
