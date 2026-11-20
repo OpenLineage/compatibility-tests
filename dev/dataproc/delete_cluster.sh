@@ -22,9 +22,12 @@ USAGE
   exit "${1:-1}"
 }
 
-# user name as it appears in cluster names (lowercase letters, digits and dashes)
+# shellcheck source=dev/lib/dataproc_venv.sh
+source "$DEV_DIR/lib/dataproc_venv.sh"
+
+# user name as it appears in the cluster names of local runs
 user_slug() {
-  echo "${USER:-user}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9\n' '-'
+  dataproc_user_slug
 }
 
 cluster_name="" list_mine=false credentials_file=""

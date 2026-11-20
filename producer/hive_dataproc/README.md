@@ -34,7 +34,8 @@ access to `gcp-open-lineage-testing`, or your own project and bucket (`--project
 the one you're testing). Scenarios only run for the versions in their `config.json`.
 
 **Cost and time:** a cluster (1 master, 2 workers) is created for the run and deleted at the end, also when a step
-fails or you press Ctrl-C. Creating it takes about 3 minutes, each scenario about 1 minute.
+fails or you press Ctrl-C. In CI, creating it takes about 5 minutes, the `aggregate_job` scenario about 2 minutes and
+deleting the cluster about 1 minute.
 
 ### One command
 
