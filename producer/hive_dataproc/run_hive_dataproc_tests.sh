@@ -17,6 +17,8 @@ REPO_ROOT="$(cd "$HIVE_DIR/../.." && pwd)"
 CACHE_DIR="${OL_COMPAT_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/openlineage-compatibility-tests}"
 # shellcheck source=dev/defaults.env
 source "$REPO_ROOT/dev/defaults.env"
+# shellcheck source=dev/lib/dataproc_venv.sh
+source "$REPO_ROOT/dev/lib/dataproc_venv.sh"
 
 usage() {
   cat >&2 <<USAGE
@@ -66,17 +68,7 @@ report="$(cd "$report_dir" && pwd)/hive-dataproc-$component_version-$ol_version-
 gcp=(--project "$GCP_PROJECT" --region "$GCP_REGION" --bucket "$GCS_BUCKET")
 
 echo "== 1. Dataproc client"
-venv="$CACHE_DIR/venvs/dataproc"
-requirements_hash=$(shasum "$REPO_ROOT/dev/dataproc/requirements.txt" | cut -d' ' -f1)
-if [[ ! -x "$venv/bin/python" || "$(cat "$venv/.requirements-hash" 2> /dev/null)" != "$requirements_hash" ]]; then
-  rm -rf "$venv"
-  "${PYTHON:-python3}" -m venv "$venv"
-  "$venv/bin/python" -m pip install --quiet --upgrade pip
-  "$venv/bin/python" -m pip install --quiet -r "$REPO_ROOT/dev/dataproc/requirements.txt"
-  echo "$requirements_hash" > "$venv/.requirements-hash"
-fi
-export PATH="$venv/bin:$PATH"  # the dev/ and runner/ scripts call `python`
-echo "virtualenv: $venv"
+dataproc_venv "$CACHE_DIR"
 
 echo "== 2. Scenarios"
 # the ones the user picked are also the only ones validated; by default every valid scenario is
@@ -109,8 +101,7 @@ else
   echo "$hive_jar"
 
   echo "== 4. Cluster"
-  user_slug=$(echo "${USER:-user}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9\n' '-' | cut -c1-15)
-  cluster_name="hive-${user_slug}-${component_version//./}-${ol_version//./}-$(date +%s)"
+  cluster_name="hive-$(dataproc_user_slug)-${component_version//./}-${ol_version//./}-$(date +%s)"
   if [[ "$keep_cluster" == "true" ]]; then
     echo "The cluster is kept; delete it with: dev/dataproc/delete_cluster.sh --cluster-name $cluster_name"
   else
