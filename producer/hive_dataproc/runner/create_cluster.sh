@@ -55,9 +55,10 @@ config=$(jq -e --arg v "$hive_release" '.[$v]' "$HIVE_DIR/runner/cluster.json") 
 image=$(jq -r '.image' <<< "$config")
 properties=$(jq -r '.properties | to_entries | map("\(.key)=\(.value)") | join(",")' <<< "$config")
 
-# a copy per cluster: concurrent runs don't overwrite each other's init action
-init_action=$("$REPO_ROOT/dev/dataproc/gcs_upload.sh" --force "$REPO_ROOT/dev/dataproc/install_jars.sh" \
-  "gs://$GCS_BUCKET/scripts/$cluster_name")
+# a copy per cluster: concurrent runs don't overwrite each other's init action; only needed while the cluster starts
+scripts_dir="gs://$GCS_BUCKET/scripts/$cluster_name"
+trap 'gcloud storage rm -r "$scripts_dir" > /dev/null 2>&1 || true' EXIT
+init_action=$("$REPO_ROOT/dev/dataproc/gcs_upload.sh" --force "$REPO_ROOT/dev/dataproc/install_jars.sh" "$scripts_dir")
 
 args=(--cluster-name "$cluster_name" --image-version "$image" --properties "$properties"
       --metadata "JARS=$hive_jar;$gcs_transport_jar" --init-actions "$init_action"

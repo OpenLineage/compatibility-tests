@@ -16,6 +16,9 @@ SCRIPTS = [
     "producer/hive_dataproc/run_hive_dataproc_tests.sh",
     "producer/hive_dataproc/runner/create_cluster.sh",
     "producer/hive_dataproc/runner/run_scenarios.sh",
+    "producer/spark_dataproc/run_spark_dataproc_tests.sh",
+    "producer/spark_dataproc/runner/create_cluster.sh",
+    "producer/spark_dataproc/runner/run_scenarios.sh",
     "producer/template/run_template_tests.sh",
 ]
 

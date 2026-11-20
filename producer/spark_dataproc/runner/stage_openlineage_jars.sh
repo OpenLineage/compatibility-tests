@@ -2,7 +2,7 @@
 
 # Makes sure the OpenLineage spark and GCS transport jars of the given versions are in the shared GCS jar
 # directory, and prints '<version>:<spark jar>:<gcs transport jar>' entries separated by semicolons,
-# as expected by the OPENLINEAGE_JARS cluster metadata of get_openlineage_jar.sh.
+# as expected by runner/create_cluster.sh --openlineage-jars and runner/run_scenarios.sh.
 #
 # Released jars are downloaded from Maven and uploaded only when they are missing from the directory.
 # With --snapshots the jars of the latest OpenLineage build are uploaded (replacing the previous build with
