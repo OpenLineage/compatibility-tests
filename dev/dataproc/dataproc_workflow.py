@@ -775,6 +775,11 @@ async def run_hive_query_command(args):
         else:
             print("Could not determine bucket or prefix for event files. Skipping download.")
 
+    # after the download: a failed query can still have emitted events worth looking at
+    print(f"Hive job {job_id} ended in state {result['state']}")
+    if result["state"] != "DONE":
+        raise SystemExit(f"Hive job {job_id} did not finish successfully (state {result['state']})")
+
 
 def main():
     parser = argparse.ArgumentParser(
