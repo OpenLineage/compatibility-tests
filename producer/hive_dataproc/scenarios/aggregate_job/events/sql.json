@@ -5,7 +5,7 @@
     "name": "createtable_as_select.default.monthly_transaction_summary",
     "facets": {
       "sql": {
-        "query": "CREATE TABLE monthly_transaction_summary STORED AS PARQUET AS SELECT     TRUNC(submissiondate, 'MM') AS Month,     transactiontype,     SUM(transactionamount) AS TotalAmount,     COUNT(*) AS TransactionCount FROM     transactions GROUP BY     TRUNC(submissiondate, 'MM'),     transactiontype ORDER BY     Month,     transactiontype"
+        "query": "CREATE TABLE monthly_transaction_summary\n  STORED AS PARQUET\n  AS\n  SELECT\n      TRUNC(submissiondate, 'MM') AS Month,\n      transactiontype,\n      SUM(transactionamount) AS TotalAmount,\n      COUNT(*) AS TransactionCount\n  FROM\n      transactions\n  GROUP BY\n      TRUNC(submissiondate, 'MM'),\n      transactiontype\n  ORDER BY\n      Month,\n      transactiontype"
       }
     }
   }

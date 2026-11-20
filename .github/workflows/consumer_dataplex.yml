@@ -50,4 +50,5 @@ jobs:
         name: dataplex-report
         path: dataplex-report.json
         retention-days: 1
+        if-no-files-found: error
 
