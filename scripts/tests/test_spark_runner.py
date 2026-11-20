@@ -76,6 +76,7 @@ def test_create_cluster_for_3_5_1(stubs):
     assert option(create, "--dataproc-image-version") == "2.2-ubuntu22"
     assert option(create, "--master-machine-type") == "n1-standard-4"
     assert metadata(create) == {
+        "SPARK_BQ_CONNECTOR_URL": "gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.42.0.jar",
         "JARS": ";".join([
             "gs://open-lineage-e2e/jars/spark-3.5-bigquery-0.42.0.jar",
             "gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar",
@@ -113,6 +114,7 @@ def test_create_cluster_for_3_1_3_stages_the_connector(stubs):
     assert option(create, "--dataproc-image-version") == "2.0-ubuntu18"
     jars = metadata(create)["JARS"].split(";")
     assert jars[0] == "gs://mine/jars/spark-3.1-bigquery-0.42.0.jar"
+    assert metadata(create)["SPARK_BQ_CONNECTOR_URL"] == "gs://mine/jars/spark-3.1-bigquery-0.42.0.jar"
     assert not any("iceberg" in j or "delta" in j for j in jars)
     assert metadata(create)["MASTER_JARS"].startswith("/opt/openlineage/1.32.0=gs://mine/jars/")
 
