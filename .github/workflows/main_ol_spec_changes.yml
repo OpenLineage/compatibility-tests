@@ -25,6 +25,7 @@ on:
 
 
 permissions:
+  actions: read  # pipeline-alarm reads the run's jobs
   id-token: write
   contents: write
   pull-requests: write
