@@ -81,6 +81,8 @@ echo "== 1. Dataproc client"
 dataproc_venv "$CACHE_DIR"
 
 echo "== 2. Scenarios"
+# the ones the user picked are also the only ones validated; by default every valid scenario is
+selected="$scenarios"
 if [[ -z "$scenarios" ]]; then
   scenarios=$("$REPO_ROOT/scripts/get_valid_test_scenarios.sh" "$SPARK_DIR/scenarios" "$component_version" "$ol_version")
   [[ -n "$scenarios" ]] || { echo "No scenario is valid for Spark $component_version and OpenLineage $ol_version" >&2; exit 1; }
@@ -126,4 +128,5 @@ run_key="local-$(dataproc_user_slug)-$(date +%s)"
 
 echo "== 6. Validate"
 "$REPO_ROOT/dev/validation/validate_locally.sh" --component spark_dataproc --component-version "$component_version" \
-  --openlineage-version "$ol_version" --events-dir "$events_dir" --report "$report"
+  --openlineage-version "$ol_version" --events-dir "$events_dir" --report "$report" \
+  ${selected:+--scenarios "$selected"}
