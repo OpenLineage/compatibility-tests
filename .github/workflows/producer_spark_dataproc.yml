@@ -140,7 +140,7 @@ jobs:
         if: ${{ steps.init.outputs.any_scenarios }}
         run: |
           python -m pip install --upgrade pip
-          pip install -r producer/spark_dataproc/runner/requirements.txt
+          pip install -r dev/dataproc/requirements.txt
 
       - name: Start producer
         id: start-producer
@@ -162,7 +162,7 @@ jobs:
               metadata+=',SKIP_ICEBERG_AND_DELTA=true'
             fi
 
-            python producer/spark_dataproc/runner/dataproc_workflow.py create-cluster \
+            python dev/dataproc/dataproc_workflow.py create-cluster \
             --project-id gcp-open-lineage-testing \
             --region us-west1 \
             --dataproc-image-version ${{ steps.init.outputs.dataproc_version }} \
@@ -197,7 +197,7 @@ jobs:
             properties+=",spark.scenario.suffix=${{ steps.init.outputs.component_cluster_suffix }}-$ol_suffix"
 
             echo "Running scenarios for OpenLineage $ol_release: $scenarios"
-            python producer/spark_dataproc/runner/dataproc_workflow.py run-scenarios \
+            python dev/dataproc/dataproc_workflow.py run-scenarios \
             --project-id gcp-open-lineage-testing \
             --region us-west1 \
             --cluster-name "${{ steps.init.outputs.cluster_name }}" \

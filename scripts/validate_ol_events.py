@@ -249,6 +249,9 @@ def get_arguments():
                              "that isn't a version (e.g. main for snapshots)")
     parser.add_argument('--run_status', type=str, default=None,
                         help="status.json of the producer run: [{scenario, state, job_id}], state DONE when the job finished")
+    parser.add_argument('--scenarios', type=str, default=None,
+                        help="scenarios to validate, separated by ; or , (default: all); for runs of only some "
+                             "scenarios, so the others aren't reported as producing no events")
 
     args = parser.parse_args()
 
@@ -260,8 +263,10 @@ def get_arguments():
     openlineage_version = args.openlineage_version
     spec_base_dir = args.spec_base_dir
 
+    selected = {name.strip() for name in re.split('[,;]', args.scenarios) if name.strip()} if args.scenarios else None
+
     return (event_base_dir, producer_dir, target, spec_base_dir, component, component_version, openlineage_version,
-            args.openlineage_release, args.run_status)
+            args.openlineage_release, args.run_status, selected)
 
 
 def check_versions(component_version, openlineage_version, config):
@@ -337,11 +342,13 @@ def validate_producer_scenario(base_dir, producer_dir, spec_dirs, component, com
 
 
 def validate_producer(base_dir, producer_dir, spec_dirs, component, component_version, openlineage_version,
-                      openlineage_release, run_status):
+                      openlineage_release, run_status, selected=None):
     # the scenarios come from their definitions, so a scenario without events is reported instead of vanishing
     gating_version = openlineage_release or openlineage_version
     scenario_names = set(valid_scenarios(producer_dir, component, component_version, gating_version))
     scenario_names.update(name for name in listdir(base_dir) if isdir(join(base_dir, name)))
+    if selected is not None:
+        scenario_names &= selected
     job_states = load_run_status(run_status)
 
     scenarios = {}
@@ -361,12 +368,12 @@ def validate_producer(base_dir, producer_dir, spec_dirs, component, component_ve
     return Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
 
 
-def validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, openlineage_version):
+def validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, openlineage_version, selected=None):
     validators = OLSyntaxValidator.get_validators(spec_path=spec_dirs, tags=openlineage_version.split(','))
     scenarios = {}
     for scenario_name in listdir(base_dir):
         scenario_path = get_path(base_dir, component, scenario_name)
-        if not isdir(scenario_path):
+        if not isdir(scenario_path) or (selected is not None and scenario_name not in selected):
             continue
         try:
             config = get_config(producer_dir, component, scenario_name)
@@ -384,12 +391,12 @@ def validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, op
 
 def main():
     (base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version,
-     openlineage_release, run_status) = get_arguments()
+     openlineage_release, run_status, selected) = get_arguments()
     if component == 'scenarios':
-        report = validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, openlineage_version)
+        report = validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, openlineage_version, selected)
     else:
         report = validate_producer(base_dir, producer_dir, spec_dirs, component, component_version, openlineage_version,
-                                   openlineage_release, run_status)
+                                   openlineage_release, run_status, selected)
     with open(target, 'w') as f:
         jsonc.dump(report.to_dict(), f, indent=2)
 

@@ -226,3 +226,27 @@ def test_unreadable_config_fails_only_its_scenario(env):
 
     assert by_name(scenarios["broken_config"])["validation"]["status"] == "FAILURE"
     assert scenarios["fine"]["status"] == "SUCCESS"
+
+
+def test_scenarios_limits_validation_to_the_selected_ones(env):
+    env.scenario("picked")
+    env.scenario("skipped_silent")
+    env.scenario("skipped_emitted")
+    env.emitted("picked", "e.json", run_event())
+    env.emitted("skipped_emitted", "e.json", run_event())
+
+    scenarios = env.validate("--scenarios=picked")
+
+    assert set(scenarios) == {"picked"}
+    assert scenarios["picked"]["status"] == "SUCCESS"
+
+
+def test_selected_scenario_without_events_still_fails(env):
+    env.scenario("picked")
+    env.scenario("other")
+    env.emitted("other", "e.json", run_event())
+
+    scenarios = env.validate("--scenarios=picked;other")
+
+    assert by_name(scenarios["picked"])["events"]["status"] == "FAILURE"
+    assert scenarios["other"]["status"] == "SUCCESS"
