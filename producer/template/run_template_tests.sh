@@ -51,6 +51,8 @@ echo "== 1. Environment"
 # (producer/dbt/run_dbt_tests.sh) or a Dataproc cluster deleted by a trap (dev/dataproc/create_cluster.sh).
 
 echo "== 2. Scenarios"
+# the ones the user picked are also the only ones validated; by default every valid scenario is
+selected="$scenarios"
 if [[ -z "$scenarios" ]]; then
   scenarios=$("$REPO_ROOT/scripts/get_valid_test_scenarios.sh" "$PRODUCER_DIR/scenarios" "$component_version" "$ol_version")
   [[ -n "$scenarios" ]] || { echo "No scenario is valid for $PRODUCER $component_version and OpenLineage $ol_version" >&2; exit 1; }
@@ -65,4 +67,5 @@ echo "== 3. Run"
 
 echo "== 4. Validate"
 "$REPO_ROOT/dev/validation/validate_locally.sh" --component "$PRODUCER" --component-version "$component_version" \
-  --openlineage-version "$ol_version" --events-dir "$events_dir" --report "$report"
+  --openlineage-version "$ol_version" --events-dir "$events_dir" --report "$report" \
+  ${selected:+--scenarios "$selected"}
