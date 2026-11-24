@@ -25,6 +25,7 @@ on:
 
 
 permissions:
+  actions: read  # pipeline-alarm reads the run's jobs
   id-token: write
   contents: write
   pull-requests: write
@@ -178,14 +179,12 @@ jobs:
       - hive-dataproc
       - dbt
     uses: ./.github/workflows/collect_and_compare_reports.yml
-    with:
-      fail-for-new-failures: true
 
   notify-maintainers:
     needs:
       - initialize_workflow
       - collect-and-compare-reports
-    if: ${{ failure() }}
+    if: ${{ !cancelled() && needs.collect-and-compare-reports.outputs.new_failures == 'true' }}
     uses: ./.github/workflows/notify_maintainers.yml
     with:
       workflow-type: 'spec_change'
@@ -204,3 +203,16 @@ jobs:
      workflow-type: 'spec_change'
      trigger-type: ${{ github.event.inputs.openlineage_release && 'manual' || 'scheduled' }}
      execution-time: ${{ needs.initialize_workflow.outputs.execution_time }}
+
+  pipeline-alarm:
+    needs:
+      - initialize_workflow
+      - scenarios_check
+      - spark-dataproc
+      - hive-dataproc
+      - dbt
+      - collect-and-compare-reports
+      - notify-maintainers
+      - update-repo-files
+    if: ${{ always() }}
+    uses: ./.github/workflows/pipeline_alarm.yml

@@ -1,0 +1,27 @@
+name: Pipeline alarm
+
+# The last job of the release check and the spec-change check (`if: always()`, needing every other job): keeps one
+# `ci-broken` issue per workflow open while any job of the run failed or was cancelled (scripts/ci_alarm.py run-status).
+# Runs outside main only print the plan to the job summary, so branch dispatches never open issues.
+on:
+  workflow_call:
+
+jobs:
+  alarm:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update the ci-broken issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ github.ref != 'refs/heads/main' && '--dry-run' || '' }}
+        run: |
+          # shellcheck disable=SC2086  # DRY_RUN is empty or one flag
+          python scripts/ci_alarm.py run-status --repo "${{ github.repository }}" --workflow "${{ github.workflow }}" \
+            --run-id "${{ github.run_id }}" --run-attempt "${{ github.run_attempt }}" \
+            --self-job "pipeline-alarm / alarm" $DRY_RUN | tee -a "$GITHUB_STEP_SUMMARY"

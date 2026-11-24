@@ -35,6 +35,7 @@ on:
         required: false
 
 permissions:
+  actions: read  # pipeline-alarm reads the run's jobs
   id-token: write
   contents: write
   pull-requests: write
@@ -217,3 +218,20 @@ jobs:
     uses: ./.github/workflows/update_site.yml
     secrets:
       CI_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}
+
+  pipeline-alarm:
+    needs:
+      - find-dataproc-images
+      - initialize_workflow
+      - scenarios
+      - dataplex
+      - spark-dataproc
+      - hive-dataproc
+      - dbt
+      - collect-and-compare-reports
+      - notify-maintainers
+      - update-repo-files
+      - generate-compatibility-tables
+      - update-site
+    if: ${{ always() }}
+    uses: ./.github/workflows/pipeline_alarm.yml

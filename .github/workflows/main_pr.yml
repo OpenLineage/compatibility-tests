@@ -183,14 +183,12 @@ jobs:
       - revalidate
     if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
-    with:
-      fail-for-new-failures: true
 
   notify-maintainers:
     needs:
       - initialize_workflow
       - collect-and-compare-reports
-    if: ${{ failure() && needs.initialize_workflow.outputs.any_run == 'true' }}
+    if: ${{ !cancelled() && needs.collect-and-compare-reports.outputs.new_failures == 'true' }}
     uses: ./.github/workflows/notify_maintainers.yml
     with:
       workflow-type: 'pr'
@@ -201,3 +199,16 @@ jobs:
     needs:
       - collect-and-compare-reports
     uses: ./.github/workflows/generate_compatibility_tables.yml
+
+  # The PR check fails on new compatibility failures here, in a job of its own, so a red check says whether the
+  # pipeline broke (another job failed) or the PR's changes fail scenarios (this job).
+  new-compatibility-failures:
+    needs:
+      - collect-and-compare-reports
+    if: ${{ !cancelled() && needs.collect-and-compare-reports.outputs.new_failures == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail on new compatibility failures
+        run: |
+          echo "::error title=New compatibility failures::this PR's runs have failures that main's report doesn't have; the summary of the notify-maintainers job lists them"
+          exit 1
