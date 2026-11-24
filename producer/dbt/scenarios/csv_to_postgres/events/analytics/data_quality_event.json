@@ -10,7 +10,7 @@
       "namespace": "postgres://localhost:5432",
       "facets": {
         "dataQualityAssertions": {
-          "assertions": [
+          "{{ unordered_list(result, 'assertions') }}": [
             {
               "assertion": "not_null",
               "name": "not_null_customer_analytics_total_revenue",
