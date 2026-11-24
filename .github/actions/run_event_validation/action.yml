@@ -26,6 +26,10 @@ inputs:
   component:
     description: "Component name to use"
     required: true
+  run-status-file:
+    description: "status.json of the producer run ([{scenario, state, job_id}]); scenarios whose job isn't DONE fail"
+    default: ""
+    required: false
 
 
 outputs:
@@ -52,31 +56,7 @@ runs:
 
     - name: Get spec for each tag
       shell: bash
-      run: |
-        cd tmp
-        IFS=',' read -ra TAGS <<< "${{ inputs.release_tags }}"
-        git fetch --tags --quiet
-        for TAG in "${TAGS[@]}"; do
-        echo "Checking out tag: $TAG"
-            if git checkout --quiet "$TAG"; then
-                DEST_DIR="../specs/$TAG"
-                if [[ -d "spec" || -d "integration/common/openlineage" ]]; then
-                    mkdir -p "$DEST_DIR"
-                    if [ -d "spec" ]; then
-                      find spec -path './website' -prune -o -type f \( -name '*Facet.json' -o -name 'OpenLineage.json' \) -exec cp {} "$DEST_DIR" \;
-                    fi
-                    if [ -d "integration/common/src/openlineage" ]; then
-                      find integration/common/src/openlineage -type f -iname '*facet.json' -exec cp {} "$DEST_DIR" \;
-                    fi
-                    echo "success"
-                else
-                    echo "Neither spec nor integration/common/src/openlineage directory found in $TAG"
-                fi
-            else
-                echo "Tag $TAG not found!"
-            fi
-        done
-        cd ..
+      run: ./dev/validation/get_ol_specs.sh "${{ inputs.release_tags }}" specs tmp
 
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
@@ -94,4 +74,6 @@ runs:
         --component="${{ inputs.component }}" \
         --producer_dir=${{ inputs.producer-dir }} \
         --openlineage_version=${{ inputs.release_tags }} \
-        --component_version=${{ inputs.component_release }}
+        --component_version=${{ inputs.component_release }} \
+        ${{ inputs.ol_release && format('--openlineage_release={0}', inputs.ol_release) || '' }} \
+        ${{ inputs.run-status-file && format('--run_status={0}', inputs.run-status-file) || '' }}

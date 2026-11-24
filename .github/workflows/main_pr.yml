@@ -22,6 +22,7 @@ jobs:
       run_dbt: ${{ steps.get-changed.outputs.dbt_changed }}
       ol_release: ${{ steps.get-release.outputs.openlineage_release }}
       any_run: ${{ steps.get-changed.outputs.any_changed }}
+      revalidate: ${{ steps.get-changed.outputs.revalidate }}
       spark_matrix: ${{ steps.set-matrix-values.outputs.spark_dataproc_matrix }}
       hive_matrix: ${{ steps.set-matrix-values.outputs.hive_dataproc_matrix }}
       dbt_matrix: ${{ steps.set-matrix-values.outputs.dbt_matrix }}
@@ -42,32 +43,13 @@ jobs:
         id: check-configs
         run: ./scripts/check_configs.sh
 
+      # which components to run for real and which to re-validate from stored events, see scripts/get_pr_components.py
       - name: get changed files
         id: get-changed
         run: |
-          check_path() {
-            local path=$1
-            local output=$2
-            if echo "$CHANGED_FILES" | grep -q "$path"; then
-              echo "$output=true" >> $GITHUB_OUTPUT
-              echo "true"
-            fi
-          }
-          
           CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
-          if [[ -n "$CHANGED_FILES" ]]; then
-            echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-            
-            scenarios=$(check_path "consumer/scenarios/" "scenarios_changed")
-            dataplex=$(check_path "consumer/consumers/dataplex/" "dataplex_changed")
-            spark_dataproc=$(check_path "producer/spark_dataproc/" "spark_dataproc_changed")
-            hive_dataproc=$(check_path "producer/hive_dataproc/" "hive_dataproc_changed")
-            dbt=$(check_path "producer/dbt/" "dbt_changed")
-            
-            if [[ $scenarios || $dataplex || $spark_dataproc || $hive_dataproc || $dbt ]]; then
-              echo "any_changed=true" >> $GITHUB_OUTPUT
-            fi
-          fi
+          echo "changes=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n") | map(select(. != ""))')" >> "$GITHUB_OUTPUT"
+          echo "$CHANGED_FILES" | python3 scripts/get_pr_components.py | tee -a "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -104,6 +86,22 @@ jobs:
           echo "hive_dataproc_matrix=$(get_matrix hive_dataproc)" >> $GITHUB_OUTPUT
           echo "dbt_matrix=$(get_matrix dbt)" >> $GITHUB_OUTPUT
           
+
+  script-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run script tests
+        run: |
+          pip install -r scripts/requirements.txt -r scripts/requirements-dev.txt
+          python -m pytest scripts/tests -q
 
   ######## COMPONENT VALIDATION ########
 
@@ -162,6 +160,16 @@ jobs:
       ol_release: ${{ matrix.openlineage_versions }}
       get-latest-snapshots: 'false'
 
+  # validation code changed: validate the events stored by the last release run with this PR's code, without clusters
+  revalidate:
+    needs: initialize_workflow
+    if: ${{ needs.initialize_workflow.outputs.revalidate != '' && needs.initialize_workflow.outputs.revalidate != '[]' }}
+    uses: ./.github/workflows/revalidate_stored_events.yml
+    secrets:
+      gcpKey: ${{ secrets.GCP_SA_KEY }}
+    with:
+      components: ${{ needs.initialize_workflow.outputs.revalidate }}
+
   ######## COLLECTION OF REPORTS AND EXECUTE APPROPRIATE ACTIONS ########
 
   collect-and-compare-reports:
@@ -172,6 +180,7 @@ jobs:
       - spark_dataproc
       - hive_dataproc
       - dbt
+      - revalidate
     if: ${{ !failure() && needs.initialize_workflow.outputs.any_run  == 'true'}}
     uses: ./.github/workflows/collect_and_compare_reports.yml
     with:

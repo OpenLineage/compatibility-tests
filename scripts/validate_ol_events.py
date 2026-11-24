@@ -87,8 +87,10 @@ class OLSyntaxValidator:
                 return []
             else:
                 return [f"$.{schema_type} facet type {schema_type} not recognized"]
-        except Exception:
+        except Exception as e:
+            # a validator that can't check the facet must fail the event, not drop the result
             print(f"when validating {schema_type}, for instance of {name} following exception occurred \n {traceback.format_exc()}")
+            return [f"validator error while checking {schema_type}: {type(e).__name__}: {e}"]
 
     def should_skip_facet(self, facet_name):
         if not self.unchecked_facets or not self.openlineage_version:
@@ -242,6 +244,11 @@ def get_arguments():
     parser.add_argument('--component_version', type=str, help="component release used in generating events")
     parser.add_argument('--openlineage_version', type=str, help="Comma separated list of Openlineage versions")
     parser.add_argument('--target', type=str, help="target file")
+    parser.add_argument('--openlineage_release', type=str, default=None,
+                        help="OpenLineage release used for version gating when --openlineage_version is a spec tag "
+                             "that isn't a version (e.g. main for snapshots)")
+    parser.add_argument('--run_status', type=str, default=None,
+                        help="status.json of the producer run: [{scenario, state, job_id}], state DONE when the job finished")
 
     args = parser.parse_args()
 
@@ -253,7 +260,8 @@ def get_arguments():
     openlineage_version = args.openlineage_version
     spec_base_dir = args.spec_base_dir
 
-    return event_base_dir, producer_dir, target, spec_base_dir, component, component_version, openlineage_version
+    return (event_base_dir, producer_dir, target, spec_base_dir, component, component_version, openlineage_version,
+            args.openlineage_release, args.run_status)
 
 
 def check_versions(component_version, openlineage_version, config):
@@ -264,39 +272,124 @@ def check_versions(component_version, openlineage_version, config):
             release_between(openlineage_version, openlineage_versions.get("min"), openlineage_versions.get("max")))
 
 
-def main():
-    base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version = get_arguments()
-    scenarios = {}
-    if component == 'scenarios':
-        validators = OLSyntaxValidator.get_validators(spec_path=spec_dirs, tags=openlineage_version.split(','))
-        for scenario_name in listdir(base_dir):
-            scenario_path = get_path(base_dir, component, scenario_name)
-            if isdir(scenario_path):
-                config = get_config(producer_dir, component, scenario_name)
-                validator = validators.get(config.get('openlineage_version'))
-                if 'unchecked_facets' in config:
-                    validator.unchecked_facets = config['unchecked_facets']
-                print(f"for scenario {scenario_name} validation version is {config.get('openlineage_version')}")
-                result_events = {file: load_json(path) for file in listdir(scenario_path) if
-                                 isfile(path := join(scenario_path, file))}
-                tests = validate_scenario_syntax(result_events, validator, config)
-                scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-        report = Report({component: Component(component, 'producer', scenarios, "", "")})
+def failure(name, validation_type, detail):
+    return Test(name, 'FAILURE', validation_type, 'openlineage', [detail], {})
+
+
+def last_line_of_exception():
+    return traceback.format_exc().strip().splitlines()[-1]
+
+
+def load_run_status(path):
+    """Producer job states by scenario, from the status.json written by the producer run (if any)."""
+    if path is None:
+        return {}
+    if not isfile(path):
+        print(f"WARNING: run status file {path} not found, producer job states are not checked")
+        return {}
+    return {entry['scenario']: entry for entry in load_json(path)}
+
+
+def load_events(scenario_path):
+    if not isdir(scenario_path):
+        return {}
+    return {file: load_json(path) for file in listdir(scenario_path) if isfile(path := join(scenario_path, file))}
+
+
+def valid_scenarios(producer_dir, component, component_version, openlineage_version):
+    """Scenarios defined for the component whose version ranges include the validated versions."""
+    scenarios_dir = join(producer_dir, component, 'scenarios')
+    if not isdir(scenarios_dir):
+        return []
+    names = []
+    for name in listdir(scenarios_dir):
+        if not isdir(join(scenarios_dir, name)):
+            continue
+        try:
+            if check_versions(component_version, openlineage_version, get_config(producer_dir, component, name)):
+                names.append(name)
+        except Exception:
+            # an unreadable config is reported as that scenario's validation failure
+            names.append(name)
+    return names
+
+
+def validate_producer_scenario(base_dir, producer_dir, spec_dirs, component, component_version, openlineage_version,
+                               gating_version, scenario_name):
+    config = get_config(producer_dir, component, scenario_name)
+    result_events = load_events(get_path(base_dir, component, scenario_name))
+    if not result_events:
+        return {'events': failure('events', 'syntax', 'scenario produced no events')}
+
+    validator = OLSyntaxValidator.get_validator(spec_path=spec_dirs, tag=openlineage_version,
+                                                unchecked_facets=config.get('unchecked_facets'))
+    tests = validate_scenario_syntax(result_events, validator, config)
+    expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, gating_version)
+    if not all_tests_succeeded(tests):
+        tests['semantics'] = Test('semantics', 'SKIPPED', 'semantics', 'openlineage',
+                                  ['semantic checks skipped because syntax validation failed'], {})
+    elif len(expected) == 0:
+        tests['semantics'] = Test('semantics', 'WARNING', 'semantics', 'openlineage',
+                                  [f"no semantic tests apply to {component} {component_version} / OpenLineage {gating_version}"], {})
     else:
-        for scenario_name in listdir(base_dir):
+        tests.update(OLSemanticValidator(expected).validate(result_events))
+    return tests
+
+
+def validate_producer(base_dir, producer_dir, spec_dirs, component, component_version, openlineage_version,
+                      openlineage_release, run_status):
+    # the scenarios come from their definitions, so a scenario without events is reported instead of vanishing
+    gating_version = openlineage_release or openlineage_version
+    scenario_names = set(valid_scenarios(producer_dir, component, component_version, gating_version))
+    scenario_names.update(name for name in listdir(base_dir) if isdir(join(base_dir, name)))
+    job_states = load_run_status(run_status)
+
+    scenarios = {}
+    for scenario_name in sorted(scenario_names):
+        try:
+            tests = validate_producer_scenario(base_dir, producer_dir, spec_dirs, component, component_version,
+                                               openlineage_version, gating_version, scenario_name)
+        except Exception:
+            print(f"validation of scenario {scenario_name} failed:\n{traceback.format_exc()}")
+            tests = {'validation': failure('validation', 'syntax', f"validation failed: {last_line_of_exception()}")}
+
+        job = job_states.get(scenario_name)
+        if job is not None and job.get('state') != 'DONE':
+            tests['producer job'] = failure('producer job', 'run',
+                                            f"producer job ended in state {job.get('state')}, job '{job.get('job_id', '')}'")
+        scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+    return Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
+
+
+def validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, openlineage_version):
+    validators = OLSyntaxValidator.get_validators(spec_path=spec_dirs, tags=openlineage_version.split(','))
+    scenarios = {}
+    for scenario_name in listdir(base_dir):
+        scenario_path = get_path(base_dir, component, scenario_name)
+        if not isdir(scenario_path):
+            continue
+        try:
             config = get_config(producer_dir, component, scenario_name)
-            unchecked_facets = config.get('unchecked_facets')
-            validator = OLSyntaxValidator.get_validator(spec_path=spec_dirs, tag=openlineage_version, unchecked_facets=unchecked_facets)
-            scenario_path = get_path(base_dir, component, scenario_name)
-            expected = get_expected_events(producer_dir, component, scenario_name, config, component_version, openlineage_version)
-            result_events = {file: load_json(path) for file in listdir(scenario_path) if
-                             isfile(path := join(scenario_path, file))}
-            tests = validate_scenario_syntax(result_events, validator, config)
-            if all_tests_succeeded(tests) and expected is not None:
-                for name, res in OLSemanticValidator(expected).validate(result_events).items():
-                    tests[name] = res
-            scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
-        report = Report({component: Component(component, 'producer', scenarios, component_version, openlineage_version)})
+            validator = validators.get(config.get('openlineage_version'))
+            if 'unchecked_facets' in config:
+                validator.unchecked_facets = config['unchecked_facets']
+            print(f"for scenario {scenario_name} validation version is {config.get('openlineage_version')}")
+            tests = validate_scenario_syntax(load_events(scenario_path), validator, config)
+        except Exception:
+            print(f"validation of scenario {scenario_name} failed:\n{traceback.format_exc()}")
+            tests = {'validation': failure('validation', 'syntax', f"validation failed: {last_line_of_exception()}")}
+        scenarios[scenario_name] = Scenario.simplified(scenario_name, tests)
+    return Report({component: Component(component, 'producer', scenarios, "", "")})
+
+
+def main():
+    (base_dir, producer_dir, target, spec_dirs, component, component_version, openlineage_version,
+     openlineage_release, run_status) = get_arguments()
+    if component == 'scenarios':
+        report = validate_consumer_scenarios(base_dir, producer_dir, spec_dirs, component, openlineage_version)
+    else:
+        report = validate_producer(base_dir, producer_dir, spec_dirs, component, component_version, openlineage_version,
+                                   openlineage_release, run_status)
     with open(target, 'w') as f:
         jsonc.dump(report.to_dict(), f, indent=2)
 

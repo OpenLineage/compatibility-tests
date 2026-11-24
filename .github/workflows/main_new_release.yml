@@ -140,6 +140,7 @@ jobs:
     with:
       matrix: ${{ needs.initialize_workflow.outputs.spark_matrix }}
       get-latest-snapshots: 'false'
+      update-baseline: true
 
   hive-dataproc:
     needs: initialize_workflow
@@ -153,6 +154,7 @@ jobs:
       ol_release: ${{ matrix.openlineage_versions }}
       component_release: ${{ matrix.component_version }}
       get-latest-snapshots: 'false'
+      update-baseline: true
 
   dbt:
     needs: initialize_workflow

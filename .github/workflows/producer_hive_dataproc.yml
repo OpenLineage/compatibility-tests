@@ -15,6 +15,10 @@ on:
       get-latest-snapshots:
         description: "Should the artifact be downloaded from maven repo or circleci"
         type: string
+      update-baseline:
+        description: "Store the validated events as the baseline the PR checks re-validate (release check only)"
+        type: boolean
+        default: false
 
 jobs:
   run-hive-tests:
@@ -62,6 +66,7 @@ jobs:
           skip-s3: 'true'
           skip-gcp-lineage: 'true'
           skip-sql: 'true'
+          skip-gcs: 'true'  # see GCS_TRANSPORT_JAR below
 
       - name: Upload openlineage hive integration to GCS
         id: upload-hive-integration
@@ -69,15 +74,6 @@ jobs:
         uses: ./.github/actions/upload_artifacts
         with:
           local-file-path: ${{ steps.get-ol-artifacts.outputs.hive }}
-          gcs-path: "gs://open-lineage-e2e/jars"
-          credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
-
-      - name: Upload openlineage GCS transport to GCS
-        id: upload-gcs-transport
-        if: ${{ steps.init.outputs.scenarios }}
-        uses: ./.github/actions/upload_artifacts
-        with:
-          local-file-path: ${{ steps.get-ol-artifacts.outputs.gcs }}
           gcs-path: "gs://open-lineage-e2e/jars"
           credentials: ${{ steps.gcp-auth.outputs.credentials_file_path }}
 
@@ -102,7 +98,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
-          if [ -f producer/hive_dataproc/runner/requirements.txt ]; then pip install -r producer/spark_dataproc/runner/requirements.txt; fi
+          if [ -f producer/hive_dataproc/runner/requirements.txt ]; then pip install -r producer/hive_dataproc/runner/requirements.txt; fi
 
 
       - name: Start producer
@@ -115,7 +111,10 @@ jobs:
           region: us-west1
           create-command: |
             metadata=''
-            metadata+='GCS_TRANSPORT_JAR=${{ steps.upload-gcs-transport.outputs.uploaded-file }}'
+            # Temporary: released transports-gcs 1.40.0-1.55.0 break Hive on Dataproc (half-relocated Woodstox stops
+            # HiveServer2, the bundled Conscrypt native library aborts the Tez AM). This snapshot has both fixed; go back
+            # to uploading the matching transport (get-ol-artifacts' gcs output) once a release has the fix (1.56.0?).
+            metadata+='GCS_TRANSPORT_JAR=gs://open-lineage-e2e/jars/transports-gcs-1.56.0-SNAPSHOT-conscrypt-fix.jar'
             metadata+=',OPENLINEAGE_HIVE_URL=${{ steps.upload-hive-integration.outputs.uploaded-file }}'
           
             properties=''
@@ -154,6 +153,12 @@ jobs:
           properties+=',hive.openlineage.transport.type=gcs'
           properties+=',hive.scenario.suffix=${{steps.init.outputs.component_cluster_suffix}}-${{steps.init.outputs.openlineage_cluster_suffix}}'
 
+          # one entry per scenario, [{scenario, state, job_id}] as written by the spark runner; a failed query fails
+          # its scenario in validation instead of stopping the other scenarios
+          status_file="${{ steps.set-producer-output.outputs.event_dir }}/status.json"
+          mkdir -p "${{ steps.set-producer-output.outputs.event_dir }}"
+          echo '[]' > "$status_file"
+
           for scenario in "${scenarios[@]}"
           do
               echo "Getting script for scenario $scenario"
@@ -167,7 +172,7 @@ jobs:
               properties+=",hive.openlineage.transport.bucketName=open-lineage-e2e"
               properties+=",hive.openlineage.transport.fileNamePrefix=events/$scenario/$(date +%s%3N)/"
 
-              if ! python producer/hive_dataproc/runner/dataproc_workflow.py run-hive-query \
+              if python producer/hive_dataproc/runner/dataproc_workflow.py run-hive-query \
                 --project-id gcp-open-lineage-testing \
                 --region us-west1 \
                 --cluster-name "hive-dataproc-producer-test-${{steps.init.outputs.component_cluster_suffix}}-${{ steps.init.outputs.openlineage_cluster_suffix }}-${{ github.run_id }}" \
@@ -176,11 +181,14 @@ jobs:
                 --output-directory "${{ steps.set-producer-output.outputs.event_dir }}/$scenario" \
                 --properties "$properties"
               then
-                echo "Error: hive job failed for scenario: $scenario"
-                exit 1
+                state=DONE
+                echo "Finished running hive job for scenario: $scenario"
+              else
+                state=FAILED
+                echo "::warning::hive job failed for scenario $scenario"
               fi
-
-              echo "Finished running hive job for scenario: $scenario"
+              jq --arg scenario "$scenario" --arg state "$state" '. + [{scenario: $scenario, state: $state, job_id: ""}]' \
+                "$status_file" > "$status_file.tmp" && mv "$status_file.tmp" "$status_file"
           done
 
           echo "Finished running all scenarios"
@@ -194,7 +202,15 @@ jobs:
           ol_release: ${{ inputs.ol_release }}
           component_release: ${{ inputs.component_release }}
           event-directory: ${{ steps.set-producer-output.outputs.event_dir }}
-          target-path: 'hive-dataproc-${{inputs.hive_release}}-${{inputs.ol_release}}-report.json'
+          target-path: 'hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report.json'
+          run-status-file: ${{ steps.set-producer-output.outputs.event_dir }}/status.json
+
+      # the events PR checks re-validate when validation code changes (revalidate_stored_events.yml)
+      - name: Update baseline events
+        if: ${{ inputs.update-baseline && steps.init.outputs.scenarios }}
+        run: |
+          baseline="gs://open-lineage-e2e/baseline-events/hive_dataproc/${{ inputs.component_release }}/${{ inputs.ol_release }}"
+          gcloud storage rsync -r --delete-unmatched-destination-objects "${{ steps.set-producer-output.outputs.event_dir }}" "$baseline"
 
       - uses: actions/upload-artifact@v4
         if: ${{ steps.init.outputs.scenarios }}
@@ -202,3 +218,4 @@ jobs:
           name: hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report
           path: hive-dataproc-${{inputs.component_release}}-${{inputs.ol_release}}-report.json
           retention-days: 1
+          if-no-files-found: error
