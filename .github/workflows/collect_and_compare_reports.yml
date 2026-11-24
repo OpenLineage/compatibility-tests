@@ -1,36 +1,32 @@
 name: Collect Reports
 on:
   workflow_call:
-    inputs:
-      fail-for-new-failures:
-        type: boolean
-        required: false
-        default: false
-        description: "fail the job if new failure report is found"
+    outputs:
+      new_failures:
+        description: "'true' if the reports of this run have failures that main's report.json doesn't have"
+        value: ${{ jobs.collect-and-compare-reports.outputs.new_failures }}
 
+# This job fails only when collecting itself breaks. New compatibility failures don't fail it: they are the
+# `new_failures` output, so callers can tell a broken pipeline (a failed job) from a validation result.
 jobs:
   collect-and-compare-reports:
     runs-on: ubuntu-latest
+    outputs:
+      new_failures: ${{ steps.new-failures.outputs.new_failures }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: refs/heads/main
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: last-report
-          path: generated-files/report.json
-          retention-days: 1
-
-      - uses: actions/checkout@v4
-
-      - name: Create report.json directory
-        run: mkdir -p reports/
 
       - uses: actions/download-artifact@v4
         with:
           path: reports/
           merge-multiple: true
+
+      # main's report, read from git: uploading it as an artifact and downloading it right away raced with the artifact
+      # listing (run 45167537161: the download didn't see it yet)
+      - name: Get main's report
+        run: |
+          git fetch --quiet --depth=1 origin main
+          git show FETCH_HEAD:generated-files/report.json > reports/report.json
 
       - name: Run task for Collect Reports
         id: collect-and-merge-reports
@@ -41,15 +37,21 @@ jobs:
           name: updated-report
           path: reports/updated-report.json
           retention-days: 1
+          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         with:
           name: retention-failures-report
           path: reports/retention-failures-report.json
           retention-days: 1
+          if-no-files-found: error
 
-      - name: Fail if new failures found
-        id: fail-for-new-failures
-        if: ${{ inputs.fail-for-new-failures && steps.collect-and-merge-reports.outcome == 'success'}}
+      - name: Check for new failures
+        id: new-failures
         run: |
-          jq -e '. == []' reports/retention-failures-report.json > /dev/null ||  exit 1
+          if jq -e '. == []' reports/retention-failures-report.json > /dev/null; then
+            echo "new_failures=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_failures=true" >> "$GITHUB_OUTPUT"
+            echo "::notice title=New compatibility failures::see the summary of the notify-maintainers job or the issues"
+          fi

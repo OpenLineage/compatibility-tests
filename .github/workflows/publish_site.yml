@@ -1,0 +1,38 @@
+name: Publish site
+
+# Regenerates the compatibility tables from main's generated-files/report.json and pushes them to the site, without
+# running any test. Use it after rotating OL_SITE_PUSH_TOKEN, or whenever the site is behind the report.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  main-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # generate_compatibility_tables.yml reads the artifact `updated-report` as updated-report.json
+      - name: Name it like collect's output
+        run: cp generated-files/report.json updated-report.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: updated-report
+          path: updated-report.json
+          retention-days: 1
+          if-no-files-found: error
+
+  generate-compatibility-tables:
+    needs: main-report
+    uses: ./.github/workflows/generate_compatibility_tables.yml
+
+  update-site:
+    needs: generate-compatibility-tables
+    uses: ./.github/workflows/update_site.yml
+    secrets:
+      CI_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}

@@ -1,0 +1,35 @@
+name: CI health
+
+# Weekly alarms for what breaks the pipeline without failing a job (scripts/ci_alarm.py health): a push token expired
+# or expiring within 30 days (one `ci-broken` issue per token, with the rotation steps), the compatibility site behind
+# the report, the release check not running. Each issue closes itself once the problem is gone.
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Only print what would change in the issues"
+        type: boolean
+        default: false
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tokens, site and release check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_PUSH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
+          OL_SITE_PUSH_TOKEN: ${{ secrets.OL_SITE_PUSH_TOKEN }}
+          DRY_RUN: ${{ (inputs.dry-run || github.ref != 'refs/heads/main') && '--dry-run' || '' }}
+        run: |
+          # shellcheck disable=SC2086  # DRY_RUN is empty or one flag
+          python scripts/ci_alarm.py health --repo "${{ github.repository }}" $DRY_RUN | tee -a "$GITHUB_STEP_SUMMARY"
