@@ -24,6 +24,7 @@ remove_trailing_slash() {
 check_path "$BASE_PATH/consumer/README.md"
 check_path "$BASE_PATH/generated-files/compatibility-table.md"
 check_path "$BASE_PATH/generated-files/releases.json"
+check_path "$BASE_PATH/generated-files/pending_runs.json"
 check_path "$BASE_PATH/generated-files/report.json"
 check_path "$BASE_PATH/generated-files/spec_versions.json"
 
