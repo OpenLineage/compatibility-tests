@@ -22,11 +22,13 @@ Usage: $0 --component NAME --component-version V --openlineage-version OL --even
   --events-dir DIR             <DIR>/<scenario>/*.json, optionally <DIR>/status.json
   --report PATH                where to write the report (default: ./<component>-<V>-<OL>-report.json, the CI artifact name)
   --run-status PATH            status.json of the run (default: <events-dir>/status.json if it exists)
+  --scenarios 's1;s2'          scenarios to validate, for a run of only some of them (default: all
+                               scenarios valid for the versions, so a missing one is reported as producing no events)
 USAGE
   exit "${1:-1}"
 }
 
-component="" component_version="" ol_version="" events_dir="" report="" run_status=""
+component="" component_version="" ol_version="" events_dir="" report="" run_status="" scenarios=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --component) component="$2"; shift 2 ;;
@@ -35,6 +37,7 @@ while [[ $# -gt 0 ]]; do
     --events-dir) events_dir="$2"; shift 2 ;;
     --report) report="$2"; shift 2 ;;
     --run-status) run_status="$2"; shift 2 ;;
+    --scenarios) scenarios="$2"; shift 2 ;;
     -h|--help) usage 0 ;;
     *) echo "Unknown option: $1" >&2; usage ;;
   esac
@@ -67,6 +70,7 @@ fi
 args=(--event_base_dir="$events_dir" --spec_base_dir="$CACHE_DIR/specs" --target="$report" --component="$component"
       --producer_dir="$REPO_ROOT/producer" --openlineage_version="$ol_version" --component_version="$component_version")
 [[ -n "$run_status" ]] && args+=(--run_status="$run_status")
+[[ -n "$scenarios" ]] && args+=(--scenarios="$scenarios")
 "$venv/bin/python" "$REPO_ROOT/scripts/validate_ol_events.py" "${args[@]}" > "$CACHE_DIR/last-validation.log" 2>&1 \
   || { cat "$CACHE_DIR/last-validation.log" >&2; exit 1; }
 
