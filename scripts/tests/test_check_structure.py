@@ -39,3 +39,29 @@ def test_empty_scenario_md_fails(tree, scenario_md):
 def test_missing_scenario_md_still_fails(tree):
     (tree / "producer/spark_dataproc/scenarios/bigquery/scenario.md").unlink()
     assert check(tree).returncode == 1
+
+
+RUN_SCRIPT = "producer/dbt/run_dbt_tests.sh"
+
+
+@pytest.mark.parametrize("run_script", [RUN_SCRIPT, "producer/template/run_template_tests.sh"])
+def test_empty_run_script_fails(tree, run_script):
+    (tree / run_script).write_text("")
+    result = check(tree)
+    assert result.returncode == 1
+    assert f"Empty: {tree / run_script}" in result.stdout
+
+
+def test_run_script_that_isnt_executable_fails(tree):
+    (tree / RUN_SCRIPT).chmod(0o644)
+    result = check(tree)
+    assert result.returncode == 1
+    assert f"Not executable: {tree / RUN_SCRIPT}" in result.stdout
+
+
+def test_run_script_with_a_syntax_error_fails(tree):
+    with open(tree / RUN_SCRIPT, "a") as f:
+        f.write("\nif true; then\n")
+    result = check(tree)
+    assert result.returncode == 1
+    assert f"Syntax error: {tree / RUN_SCRIPT}" in result.stdout
