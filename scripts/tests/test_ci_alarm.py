@@ -126,6 +126,98 @@ def test_workflows_have_separate_issues():
     assert action.kind == "create"
 
 
+# ---------- run-status: parts without a result ----------
+
+FIRST = "https://github.com/o/r/actions/runs/1"
+
+
+def part(failures, component="spark_dataproc", cv="3.5.1", ol="1.55.0"):
+    return {"component": component, "component_version": cv, "openlineage_version": ol, "failures": failures,
+            "first_failed_run": FIRST, "last_failed_run": RUN}
+
+
+def run(jobs, pending, existing=None, run_url=RUN):
+    previous = existing.stored_state if existing and existing.is_open else None
+    return run_status_check("Release check", run_url, jobs, "pipeline-alarm", previous, pending)
+
+
+def test_part_below_the_limit_is_listed_without_a_comment():
+    existing = issue_for(status([job("spark", "failure")]))
+    [action] = plan([run([job("spark", "failure")], [part(2)], existing)], [existing])
+    assert action.kind == "update" and action.comment is None
+    assert "| spark_dataproc 3.5.1 × OL 1.55.0 | 2 | [run](https://github.com/o/r/actions/runs/1) |" in action.body
+
+
+def test_part_below_the_limit_with_green_jobs_opens_nothing():
+    assert plan([run([job("spark")], [part(2)])], []) == []
+
+
+def test_part_reaching_the_limit_gets_one_comment():
+    existing = issue_for(run([job("spark", "failure")], [part(2)]))
+    reached = run([job("spark", "failure")], [part(3)], existing, "https://github.com/o/r/actions/runs/3")
+    [action] = plan([reached], [existing])
+    assert action.kind == "comment"
+    assert "No result for 3 runs in a row: `spark_dataproc 3.5.1 × OL 1.55.0`" in action.comment
+    assert "Now failing" not in action.comment
+    assert "| spark_dataproc 3.5.1 × OL 1.55.0 | **3** |" in action.body
+    after = Issue(number=7, title=existing.title, body=action.body, state="OPEN")
+    [later] = plan([run([job("spark", "failure")], [part(4)], after, "https://github.com/o/r/actions/runs/4")], [after])
+    assert later.kind == "update" and later.comment is None
+    assert "| **4** |" in later.body
+
+
+def test_stuck_part_keeps_the_issue_open_when_every_job_passed():
+    existing = issue_for(run([job("spark", "failure")], [part(3)]))
+    [action] = plan([run([job("spark")], [part(3)], existing)], [existing])
+    assert action.kind == "comment"  # the failed job passed, the part is still stuck
+    assert "No longer failing: `spark`" in action.comment
+    assert "Every job of **Release check** passed" in action.body
+    assert "no part has gone 3 runs without a result" in action.body
+
+
+def test_stuck_part_with_green_jobs_opens_an_issue():
+    [action] = plan([run([job("spark")], [part(5)])], [])
+    assert action.kind == "create"
+    assert "| spark_dataproc 3.5.1 × OL 1.55.0 | **5** |" in action.body
+
+
+def test_part_with_a_result_again_is_removed_and_the_issue_closes():
+    existing = issue_for(run([job("spark")], [part(3), part(1, "dbt", "1.8.0")]))
+    still = run([job("spark")], [part(3)], existing)
+    [action] = plan([still], [existing])
+    assert action.kind == "update" and "dbt" not in action.body
+    [action] = plan([run([job("spark")], [], existing)], [existing])
+    assert action.kind == "close"
+
+
+def test_stuck_part_recovering_while_a_job_still_fails_comments():
+    existing = issue_for(run([job("spark", "failure")], [part(3)]))
+    [action] = plan([run([job("spark", "failure")], [], existing)], [existing])
+    assert action.kind == "comment"
+    assert "Has a result again: `spark_dataproc 3.5.1 × OL 1.55.0`" in action.comment
+    assert "Parts without a result" not in action.body
+
+
+def test_consumer_parts_have_no_versions_in_the_label():
+    [action] = plan([run([job("spark")], [part(3, "dataplex", "", "")])], [])
+    assert "| dataplex | **3** |" in action.body
+
+
+def test_cli_reads_the_pending_file(tmp_path, capsys):
+    jobs = tmp_path / "jobs.json"
+    jobs.write_text(json.dumps([job("spark")]))
+    issues = tmp_path / "issues.json"
+    issues.write_text("[]")
+    pending = tmp_path / "pending.json"
+    pending.write_text(json.dumps([part(2)]))
+    args = ["run-status", "--repo", "o/r", "--workflow", "Release check", "--run-id", "2", "--jobs-file", str(jobs),
+            "--issues-file", str(issues), "--pending", str(pending), "--dry-run"]
+    ci_alarm.main(args)
+    assert "### create" not in capsys.readouterr().out
+    ci_alarm.main(args + ["--escalate-after", "2"])
+    assert "### create" in capsys.readouterr().out
+
+
 # ---------- health ----------
 
 def health(tokens=None, report="2026-11-22T11:00:00Z", site="2026-11-22T11:01:00Z", last_run="2026-11-22T10:00:00Z"):

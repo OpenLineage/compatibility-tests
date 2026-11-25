@@ -2,9 +2,16 @@ name: Pipeline alarm
 
 # The last job of the release check and the spec-change check (`if: always()`, needing every other job): keeps one
 # `ci-broken` issue per workflow open while any job of the run failed or was cancelled (scripts/ci_alarm.py run-status).
-# Runs outside main only print the plan to the job summary, so branch dispatches never open issues.
+# With `pending-artifact` (the release check), the issue also lists the parts without a result and stays open while a
+# part has had none for 3 runs in a row. Runs outside main only print the plan to the job summary, so branch dispatches
+# never open issues.
 on:
   workflow_call:
+    inputs:
+      pending-artifact:
+        type: string
+        default: ''
+        description: "artifact with this run's updated pending_runs.json; the committed one is used if it's missing"
 
 jobs:
   alarm:
@@ -16,12 +23,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # missing when collect didn't run or failed (its job failure raises the alarm anyway)
+      - uses: actions/download-artifact@v4
+        if: ${{ inputs.pending-artifact != '' }}
+        continue-on-error: true
+        with:
+          name: ${{ inputs.pending-artifact }}
+          path: pending/
+
+      - name: Pick the pending parts
+        id: pending
+        if: ${{ inputs.pending-artifact != '' }}
+        run: |
+          file=$(find pending -name '*.json' 2>/dev/null | head -n 1)
+          if [ -z "$file" ]; then
+            echo "::warning::No ${{ inputs.pending-artifact }} artifact, using the committed pending_runs.json"
+            file=generated-files/pending_runs.json
+          fi
+          echo "args=--pending $file" >> "$GITHUB_OUTPUT"
+
       - name: Update the ci-broken issue
         env:
           GH_TOKEN: ${{ github.token }}
           DRY_RUN: ${{ github.ref != 'refs/heads/main' && '--dry-run' || '' }}
+          PENDING: ${{ steps.pending.outputs.args }}
         run: |
-          # shellcheck disable=SC2086  # DRY_RUN is empty or one flag
+          # shellcheck disable=SC2086  # DRY_RUN is empty or one flag, PENDING empty or "--pending FILE"
           python scripts/ci_alarm.py run-status --repo "${{ github.repository }}" --workflow "${{ github.workflow }}" \
             --run-id "${{ github.run_id }}" --run-attempt "${{ github.run_attempt }}" \
-            --self-job "pipeline-alarm / alarm" $DRY_RUN | tee -a "$GITHUB_STEP_SUMMARY"
+            --self-job "pipeline-alarm / alarm" $PENDING $DRY_RUN | tee -a "$GITHUB_STEP_SUMMARY"
