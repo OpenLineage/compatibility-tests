@@ -2,7 +2,9 @@
 
   run-status  the final job of a workflow run: one issue per workflow while any job of its latest run failed or was cancelled.
               A failed job always means the pipeline broke (infra, a script crash, an expired token): compatibility
-              failures never fail a job, they end up in the report.
+              failures never fail a job, they end up in the report. With --pending (the release check's
+              pending_runs.json), the issue also lists the parts without a result, and stays open while a part has
+              had none for --escalate-after runs in a row.
   health      a weekly check: a push token expired or expiring within 30 days (one issue per token), the compatibility
               site behind the report, the release check not running.
 
@@ -30,6 +32,8 @@ TOKEN_WARNING_DAYS = 30
 SITE_MAX_LAG = timedelta(days=3)
 RELEASE_CHECK_MAX_AGE = timedelta(days=3)
 RELEASE_CHECK_WORKFLOW = "main_new_release.yml"
+ESCALATE_AFTER = 3
+STUCK = "no result: "  # signature entries for stuck parts; the other entries are job names
 SITE_REPO = "OpenLineage/openlineage-site"
 
 TOKENS = {
@@ -89,42 +93,91 @@ def plan(checks, issues):
 
 # ---------- run-status ----------
 
-def run_status_check(workflow, run_url, jobs, self_job, previous=None):
+def part_label(part):
+    label = part["component"]
+    if part.get("component_version"):
+        label += f" {part['component_version']}"
+    if part.get("openlineage_version"):
+        label += f" × OL {part['openlineage_version']}"
+    return label
+
+
+def pending_table(pending, escalate_after):
+    rows = "\n".join(f"| {part_label(p)} | {'**' if p['failures'] >= escalate_after else ''}{p['failures']}"
+                     f"{'**' if p['failures'] >= escalate_after else ''} | [run]({p['first_failed_run']}) |"
+                     for p in pending)
+    return ("### Parts without a result\n\n"
+            "Every scheduled run retries them (`generated-files/pending_runs.json`). A part without a result for "
+            f"{escalate_after} runs in a row keeps this issue open until it gets one.\n\n"
+            f"| Part | Runs in a row without a result | Since |\n|---|---|---|\n{rows}")
+
+
+def run_status_check(workflow, run_url, jobs, self_job, previous=None, pending=(), escalate_after=ESCALATE_AFTER):
     """previous: the stored state of the workflow's open issue, if any. A job that failed before must run again and pass
-    before the issue closes: a run that skips it (nothing changed, or an earlier job failed) proves nothing."""
+    before the issue closes: a run that skips it (nothing changed, or an earlier job failed) proves nothing.
+    pending: the parts without a result after this run (pending_runs.json); a part at `escalate_after` runs or more is
+    stuck: it keeps the issue open (even when every job passed) and gets one comment when it gets stuck."""
+    key = f"workflow:{workflow}"
+    old_signature = (previous or {}).get("signature", [])
+    old_jobs = [n for n in old_signature if not n.startswith(STUCK)]
     failed = sorted((j for j in jobs if j.get("conclusion") in FAILED_CONCLUSIONS and j["name"] != self_job),
                     key=lambda j: j["name"])
-    key = f"workflow:{workflow}"
-    if not failed:
-        passed = {j["name"] for j in jobs if j.get("conclusion") == "success"}
-        not_rerun = [n for n in (previous or {}).get("signature", []) if n not in passed]
-        if not not_rerun:
-            return Check(key, alarm=False, resolved_comment=f"All jobs passed in {run_url}.")
+    passed = {j["name"] for j in jobs if j.get("conclusion") == "success"}
+    not_rerun = [n for n in old_jobs if n not in passed]
+    stuck = [p for p in pending if p["failures"] >= escalate_after]
+
+    if failed:
+        job_names = [j["name"] for j in failed]
+        rows = "\n".join(f"| [{j['name']}]({j.get('html_url') or run_url}) | {j['conclusion']} |" for j in failed)
+        text = (f"Jobs of **{workflow}** failed in its latest run: {run_url}\n\n| Job | Result |\n|---|---|\n{rows}\n\n"
+                "A failed job means the pipeline itself broke (infrastructure, a script crash, an expired token): "
+                "compatibility failures never fail a job, they go to the report. Jobs that depend on a failed one "
+                "(report update, compatibility tables, site, issues) may have been skipped.")
+        closes = "Closed automatically once the failed jobs run again and pass"
+    elif not_rerun:
+        job_names = old_jobs  # unchanged, so no comment
         listed = "\n".join(f"- `{n}`" for n in not_rerun)
         text = (f"No job of **{workflow}** failed in its latest run ({run_url}), but these jobs failed earlier and "
-                f"haven't run since:\n\n{listed}\n\nThe issue closes once they run and pass (e.g. dispatch the workflow).")
-        return Check(key, alarm=True, title=f"CI pipeline failing: {workflow}", text=text,
-                     state={**previous, "run": run_url}, signature=list(previous["signature"]))
-    names = [j["name"] for j in failed]
-    rows = "\n".join(f"| [{j['name']}]({j.get('html_url') or run_url}) | {j['conclusion']} |" for j in failed)
+                f"haven't run since (dispatch the workflow to run them):\n\n{listed}")
+        closes = "Closed automatically once they run and pass"
+    elif stuck:
+        job_names = []
+        text = (f"Every job of **{workflow}** passed in its latest run ({run_url}), but some parts have had no result "
+                f"for {escalate_after} runs in a row or more. A job can pass without a result, e.g. when its "
+                "producer job didn't run and validation was skipped, so check the job logs of the runs listed.")
+        closes = "Closed automatically once"
+    else:
+        return Check(key, alarm=False, resolved_comment=f"All jobs passed in {run_url}.")
+
+    if pending:
+        text += "\n\n" + pending_table(pending, escalate_after)
+    if stuck:
+        closes += ("" if closes.endswith("once") else " and") + f" no part has gone {escalate_after} runs without a result"
+    text += f"\n\n{closes}."
+    stuck_entries = [STUCK + part_label(p) for p in stuck]
 
     def changed(old):
-        before = set(old.get("signature", []))
-        new, fixed = [n for n in names if n not in before], sorted(before - set(names))
-        lines = [f"The failing jobs changed in {run_url}."]
+        before = old.get("signature", [])
+        before_jobs = {n for n in before if not n.startswith(STUCK)}
+        before_stuck = {n for n in before if n.startswith(STUCK)}
+        lines = [f"What changed in {run_url}:"]
+        new = [n for n in job_names if n not in before_jobs]
+        fixed = sorted(before_jobs - set(job_names))
         if new:
             lines.append("Now failing: " + ", ".join(f"`{n}`" for n in new))
         if fixed:
             lines.append("No longer failing: " + ", ".join(f"`{n}`" for n in fixed))
+        for part, entry in zip(stuck, stuck_entries):
+            if entry not in before_stuck:
+                lines.append(f"No result for {part['failures']} runs in a row: `{part_label(part)}` "
+                             f"(since [this run]({part['first_failed_run']})).")
+        recovered = sorted(before_stuck - set(stuck_entries))
+        if recovered:
+            lines.append("Has a result again: " + ", ".join(f"`{n[len(STUCK):]}`" for n in recovered))
         return "\n\n".join(lines)
 
-    text = (f"Jobs of **{workflow}** failed in its latest run: {run_url}\n\n| Job | Result |\n|---|---|\n{rows}\n\n"
-            "A failed job means the pipeline itself broke (infrastructure, a script crash, an expired token): "
-            "compatibility failures never fail a job, they go to the report. Jobs that depend on a failed one (report "
-            "update, compatibility tables, site, issues) may have been skipped.\n\n"
-            "Closed automatically once the failed jobs run again and pass.")
     return Check(key, alarm=True, title=f"CI pipeline failing: {workflow}", text=text, state={"run": run_url},
-                 signature=names, changed_comment=changed)
+                 signature=job_names + stuck_entries, changed_comment=changed)
 
 
 def fetch_jobs(repo, run_id, run_attempt):
@@ -260,6 +313,9 @@ def main(argv=None):
     run.add_argument("--run-attempt", default="1")
     run.add_argument("--self-job", default="pipeline-alarm", help="the job running this script, not counted")
     run.add_argument("--jobs-file", help="JSON list of {name, conclusion, html_url} instead of asking GitHub")
+    run.add_argument("--pending", help="the pending parts after this run (the release check's pending_runs.json)")
+    run.add_argument("--escalate-after", type=int, default=ESCALATE_AFTER,
+                     help="runs in a row without a result after which a part keeps the issue open")
     health = sub.add_parser("health", help="token expiry, site staleness, release check age")
     for p in (run, health):
         p.add_argument("--repo", required=True)
@@ -282,7 +338,12 @@ def main(argv=None):
             jobs = fetch_jobs(args.repo, args.run_id, args.run_attempt)
         existing = owned_issues(issues).get(f"workflow:{args.workflow}")
         previous = existing.stored_state if existing and existing.is_open else None
-        checks = [run_status_check(args.workflow, run_url, jobs, args.self_job, previous)]
+        pending = []
+        if args.pending:
+            with open(args.pending) as f:
+                pending = json.load(f)
+        checks = [run_status_check(args.workflow, run_url, jobs, args.self_job, previous, pending,
+                                   args.escalate_after)]
     else:
         checks = health_checks(args.repo, os.environ, datetime.now(timezone.utc))
 

@@ -280,3 +280,5 @@ jobs:
       - update-site
     if: ${{ always() }}
     uses: ./.github/workflows/pipeline_alarm.yml
+    with:
+      pending-artifact: updated-pending-runs
