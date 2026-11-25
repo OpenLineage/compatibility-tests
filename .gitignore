@@ -179,3 +179,4 @@ bin/
 # output of the local run scripts (producer/*/run_*_tests.sh) when run from the repo root
 /*-events-*/
 /*-report.json
+/*-logs-*/

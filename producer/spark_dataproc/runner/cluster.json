@@ -1,0 +1,36 @@
+{
+  "master_machine_type": "n1-standard-4",
+  "bigquery_connector_version": "0.42.0",
+  "common_jars": [
+    "gs://spark-lib/spanner/spark-3.1-spanner-1.1.0.jar",
+    "gs://open-lineage-e2e/jars/spark-bigtable_2.12-0.5.0-SNAPSHOT.jar",
+    "gs://open-lineage-e2e/jars/postgresql-42.5.6.jar"
+  ],
+  "metadata": {
+    "enable-cloud-sql-hive-metastore": "false",
+    "additional-cloud-sql-instances": "gcp-open-lineage-testing:us-central1:open-lineage-e2e=tcp:3307"
+  },
+  "releases": {
+    "3.5.1": {
+      "image": "2.2-ubuntu22",
+      "spark_short": "3.5",
+      "jars": [
+        "gs://open-lineage-e2e/jars/delta-spark_2.12-3.3.1.jar",
+        "gs://open-lineage-e2e/jars/delta-storage-3.3.1.jar",
+        "gs://open-lineage-e2e/jars/iceberg-spark-runtime-3.5_2.12-1.10.0.jar",
+        "gs://open-lineage-e2e/jars/iceberg-gcp-bundle-1.10.0.jar",
+        "gs://open-lineage-e2e/jars/iceberg-bigquery-1.10.0.jar"
+      ]
+    },
+    "3.3.2": {
+      "image": "2.1-ubuntu20",
+      "spark_short": "3.3",
+      "jars": []
+    },
+    "3.1.3": {
+      "image": "2.0-ubuntu18",
+      "spark_short": "3.1",
+      "jars": []
+    }
+  }
+}

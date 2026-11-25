@@ -69,5 +69,6 @@ Producers with a one-command local run, described step by step in their README (
 |---|---|
 | dbt | `producer/dbt/run_dbt_tests.sh --component-version 1.8.0 --openlineage-version 1.55.0` ([playbook](dbt/README.md#run-locally-as-ci-does)) |
 | hive_dataproc | `producer/hive_dataproc/run_hive_dataproc_tests.sh --component-version 3.1.3 --openlineage-version 1.55.0` ([playbook](hive_dataproc/README.md#run-locally-as-ci-does)); needs GCP access |
+| spark_dataproc | `producer/spark_dataproc/run_spark_dataproc_tests.sh --component-version 3.5.1 --openlineage-version 1.55.0` ([playbook](spark_dataproc/README.md#run-locally-as-ci-does)); needs GCP access |
 
 A new producer starts from `producer/template/run_template_tests.sh` and the sections in `producer/template/README.md`.
