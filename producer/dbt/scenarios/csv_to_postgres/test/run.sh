@@ -11,6 +11,27 @@ DBT_POSTGRES_HOST="${DBT_POSTGRES_HOST:-localhost}"
 DBT_POSTGRES_PORT="${DBT_POSTGRES_PORT:-5432}"
 DBT_POSTGRES_USER="${DBT_POSTGRES_USER:-testuser}"
 DBT_POSTGRES_DB="${DBT_POSTGRES_DB:-dbt_test}"
+# a stuck Docker engine makes docker commands wait forever; give up after these many seconds
+DOCKER_CHECK_TIMEOUT="${DOCKER_CHECK_TIMEOUT:-30}"
+DOCKER_UP_TIMEOUT="${DOCKER_UP_TIMEOUT:-300}"  # includes pulling the image the first time
+
+# run_with_timeout SECONDS CMD...: CMD's exit code, or 124 after stopping it (macOS has no `timeout`)
+run_with_timeout() {
+  local seconds=$1 waited=0
+  shift
+  "$@" &
+  local pid=$!
+  while kill -0 "$pid" 2>/dev/null; do
+    if (( waited >= seconds )); then
+      kill -TERM "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      return 124
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+  wait "$pid"
+}
 
 resolve_compose_command() {
   if docker compose version >/dev/null 2>&1; then
@@ -48,11 +69,22 @@ ensure_local_postgres() {
     return 1
   }
 
-  echo "Starting local Postgres container with Docker Compose"
-  $compose_command -f "$COMPOSE_FILE" up -d postgres
+  if ! run_with_timeout "$DOCKER_CHECK_TIMEOUT" docker info >/dev/null 2>&1; then
+    echo "The Docker engine didn't answer within ${DOCKER_CHECK_TIMEOUT}s: start (or restart) Docker, or point" \
+      "DBT_POSTGRES_HOST/DBT_POSTGRES_PORT at a running Postgres" >&2
+    return 1
+  fi
 
-  for attempt in $(seq 1 30); do
-    if $compose_command -f "$COMPOSE_FILE" exec -T postgres pg_isready -U "$DBT_POSTGRES_USER" -d "$DBT_POSTGRES_DB" >/dev/null 2>&1; then
+  echo "Starting local Postgres container with Docker Compose"
+  # shellcheck disable=SC2086  # compose_command is "docker compose" or "docker-compose"
+  if ! run_with_timeout "$DOCKER_UP_TIMEOUT" $compose_command -f "$COMPOSE_FILE" up -d postgres; then
+    echo "Starting Postgres with Docker Compose failed or took more than ${DOCKER_UP_TIMEOUT}s" >&2
+    return 1
+  fi
+
+  for _ in $(seq 1 30); do
+    # shellcheck disable=SC2086
+    if run_with_timeout 10 $compose_command -f "$COMPOSE_FILE" exec -T postgres pg_isready -U "$DBT_POSTGRES_USER" -d "$DBT_POSTGRES_DB" >/dev/null 2>&1; then
       echo "Postgres is ready"
       return 0
     fi

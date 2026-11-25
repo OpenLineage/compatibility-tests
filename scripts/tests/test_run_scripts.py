@@ -41,3 +41,43 @@ def test_unknown_option_fails_with_usage(script):
 def test_missing_required_arguments_fail(script):
     result = subprocess.run(["bash", str(REPO_ROOT / script)], capture_output=True, text=True)
     assert result.returncode != 0
+
+
+# ---------- dbt csv_to_postgres: a stuck Docker engine fails fast ----------
+
+FAKE_DOCKER = """#!/bin/bash
+# compose v2 is found; `info` or `compose up` hang like a stuck engine when asked to
+[ "$1 $2" = "compose version" ] && exit 0
+[ "$1" = info ] && { [ -n "$STUCK_INFO" ] && exec sleep 600; exit 0; }
+[ "$1 $4" = "compose up" ] && [ -n "$STUCK_UP" ] && exec sleep 600
+exit 0
+"""
+
+
+def free_port():
+    import socket
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]  # closed when the block ends, so nothing listens there
+
+
+@pytest.mark.parametrize("stuck, message", [("STUCK_INFO", "The Docker engine didn't answer within 2s"),
+                                            ("STUCK_UP", "took more than 2s")])
+def test_dbt_scenario_fails_fast_when_docker_hangs(tmp_path, stuck, message):
+    import os
+    import time
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    docker = bin_dir / "docker"
+    docker.write_text(FAKE_DOCKER)
+    docker.chmod(0o755)
+    events = tmp_path / "events"
+    events.mkdir()
+    env = {**os.environ, "PATH": f"{bin_dir}:{os.environ['PATH']}", stuck: "1", "DBT_POSTGRES_HOST": "127.0.0.1",
+           "DBT_POSTGRES_PORT": str(free_port()), "DOCKER_CHECK_TIMEOUT": "2", "DOCKER_UP_TIMEOUT": "2"}
+    started = time.monotonic()
+    result = subprocess.run(["bash", str(REPO_ROOT / "producer/dbt/scenarios/csv_to_postgres/test/run.sh"), str(events)],
+                            capture_output=True, text=True, env=env, timeout=60)
+    assert result.returncode != 0
+    assert message in result.stderr
+    assert time.monotonic() - started < 15
